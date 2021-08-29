@@ -6,10 +6,10 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-public class AutomataString extends Automata {
+class AutomataString extends Automata {
     private static AutomataString ourInstance = new AutomataString();
 
-    public static AutomataString getInstance() {
+    static AutomataString getInstance() {
         return ourInstance;
     }
 
@@ -17,16 +17,16 @@ public class AutomataString extends Automata {
 
     }
 
-    private Token estadoString1() throws IOException, LexicalException {
+    Token esInicioString() throws IOException, LexicalException {
         if(!isEndOfFile() && isStringBreak()){
             updateHandler();
-            return estadoString1();
+            return esInicioString();
         } else if( handler.getCurrentChar().equals('\\')){
             updateHandler();
-            return estadoString2();
+            return esBackslashEnString();
         } else if( handler.getCurrentChar().equals('"')){
             updateHandler();
-            return estadoString3();
+            return esFinString();
         } else {
             throw createLexicalException();
         }
@@ -38,16 +38,16 @@ public class AutomataString extends Automata {
         return stringBreakerPattern.matcher(handler.getCurrentChar().toString()).matches();
     }
 
-    private Token estadoString2() throws IOException, LexicalException {
+    Token esBackslashEnString() throws IOException, LexicalException {
         if(!isEndOfFile() && !handler.getCurrentChar().equals('\n')){
             updateHandler();
-            return estadoString1();
+            return esInicioString();
         } else {
             throw createLexicalException();
         }
     }
 
-    private Token estadoString3() {
+    Token esFinString() {
         return createToken("string");
     }
 

@@ -4,10 +4,10 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 
 import java.io.IOException;
 
-public class AutomataIdentificador extends Automata {
+class AutomataIdentificador extends Automata {
     private static AutomataIdentificador ourInstance = new AutomataIdentificador();
 
-    public static AutomataIdentificador getInstance() {
+    static AutomataIdentificador getInstance() {
         return ourInstance;
     }
 
@@ -19,6 +19,10 @@ public class AutomataIdentificador extends Automata {
             updateHandler();
             return esIdClase();
         } else {
+            String palabraClave = searchPalabraClave();
+            if(palabraClave != null){
+                return createToken(palabraClave);
+            }
             return createToken("idClase");
         }
     }
@@ -29,12 +33,20 @@ public class AutomataIdentificador extends Automata {
                 handler.getCurrentChar().equals('_');
     }
 
+    private String searchPalabraClave(){
+        return PalabrasClaveHandler.getInstance().getPalabraClaveToken(handler.getLexema());
+    }
+
 
     Token esIdMetVar() throws IOException {
         if(isValidId()){
             updateHandler();
             return esIdMetVar();
         } else {
+            String palabraClave = searchPalabraClave();
+            if(palabraClave != null){
+                return createToken(palabraClave);
+            }
             return createToken("idMetVar");
         }
     }

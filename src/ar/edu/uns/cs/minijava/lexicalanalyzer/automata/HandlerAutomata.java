@@ -51,7 +51,7 @@ public class HandlerAutomata {
         if(Character.isDigit(currentChar)){
             updateLexema();
             updateCurrentChar();
-            return AutomataEntero.getInstance().estadoEntero1();
+            return AutomataEntero.getInstance().esDigito();
         } else if(Character.isLetter(currentChar)){
 
         }

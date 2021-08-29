@@ -5,10 +5,10 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 
 import java.io.IOException;
 
-public class AutomataComentario extends Automata {
+class AutomataComentario extends Automata {
     private static AutomataComentario ourInstance = new AutomataComentario();
 
-    public static AutomataComentario getInstance() {
+    static AutomataComentario getInstance() {
         return ourInstance;
     }
 

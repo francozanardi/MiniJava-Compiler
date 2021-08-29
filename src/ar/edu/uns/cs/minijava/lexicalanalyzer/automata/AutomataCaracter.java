@@ -6,23 +6,23 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-public class AutomataCaracter extends Automata {
+class AutomataCaracter extends Automata {
     private static AutomataCaracter ourInstance = new AutomataCaracter();
 
-    public static AutomataCaracter getInstance() {
+    static AutomataCaracter getInstance() {
         return ourInstance;
     }
 
     private AutomataCaracter() {
     }
 
-    private Token estadoCharacter1() throws IOException, LexicalException {
+    Token esInicioCaracter() throws IOException, LexicalException {
         if(!isEndOfFile() && isCharacterBreak()){
             updateHandler();
-            return estadoCharacter2();
+            return esContenidoCaracter();
         } else if(handler.getCurrentChar().equals('\\')){
             updateHandler();
-            return estadoCharacter3();
+            return esBackslashEnCaracter();
         } else {
             throw createLexicalException();
         }
@@ -34,23 +34,23 @@ public class AutomataCaracter extends Automata {
         return characterBreakerPattern.matcher(handler.getCurrentChar().toString()).matches();
     }
 
-    private Token estadoCharacter2() throws IOException, LexicalException {
+    Token esContenidoCaracter() throws IOException, LexicalException {
         if(handler.getCurrentChar().equals('\'')){
             updateHandler();
-            return estadoCharacter4();
+            return esFinCaracter();
         } else {
             throw createLexicalException();
         }
     }
 
-    private Token estadoCharacter4() {
+    Token esFinCaracter() {
         return createToken("caracter");
     }
 
-    private Token estadoCharacter3() throws IOException, LexicalException {
+    Token esBackslashEnCaracter() throws IOException, LexicalException {
         if(!isEndOfFile() && !handler.getCurrentChar().equals('\n')){
             updateHandler();
-            return estadoCharacter2();
+            return esContenidoCaracter();
         } else {
             throw createLexicalException();
         }

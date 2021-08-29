@@ -5,10 +5,10 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 
 import java.io.IOException;
 
-public class AutomataOperador extends Automata {
+class AutomataOperador extends Automata {
     private static AutomataOperador ourInstance = new AutomataOperador();
 
-    public static AutomataOperador getInstance() {
+    static AutomataOperador getInstance() {
         return ourInstance;
     }
 
@@ -80,7 +80,7 @@ public class AutomataOperador extends Automata {
         return createToken("producto");
     }
 
-    Token esDivision() throws IOException {
+    Token esDivision() throws IOException, LexicalException {
         if(handler.getCurrentChar().equals('*')) {
             updateHandler();
             return AutomataComentario.getInstance().esInicioComentarioEnBloque();

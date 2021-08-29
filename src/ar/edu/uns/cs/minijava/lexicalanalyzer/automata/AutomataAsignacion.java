@@ -4,10 +4,10 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 
 import java.io.IOException;
 
-public class AutomataAsignacion extends Automata {
+class AutomataAsignacion extends Automata {
     private static AutomataAsignacion ourInstance = new AutomataAsignacion();
 
-    public static AutomataAsignacion getInstance() {
+    static AutomataAsignacion getInstance() {
         return ourInstance;
     }
 
