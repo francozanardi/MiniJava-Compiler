@@ -18,7 +18,7 @@ class AutomataEntero extends Automata {
     }
 
     Token esDigito() throws IOException, LexicalException {
-        if(Character.isDigit(handler.getCurrentChar())){
+        if(!isEndOfFile() && Character.isDigit(handler.getCurrentChar())){
             handler.updateLexema();
             handler.updateCurrentChar();
             return esDigito();

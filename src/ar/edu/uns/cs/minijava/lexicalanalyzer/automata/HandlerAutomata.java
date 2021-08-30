@@ -18,8 +18,9 @@ public class HandlerAutomata {
         return ourInstance;
     }
 
-    public void setGestorDeSource(GestorDeSource gestorDeSource){
+    public void setGestorDeSource(GestorDeSource gestorDeSource) throws IOException {
         this.gestorDeSource = gestorDeSource;
+        updateCurrentChar();
     }
 
     GestorDeSource getGestorDeSource(){
@@ -48,15 +49,112 @@ public class HandlerAutomata {
     }
 
     private Token estadoInicial() throws LexicalException, IOException {
-        if(Character.isDigit(currentChar)){
+        if(gestorDeSource.isEndOfFile()) {
+            return estadoEOF();
+        } else if(Character.isWhitespace(currentChar)) {
+            updateCurrentChar();
+            return estadoInicial();
+        } else if(Character.isDigit(currentChar)){
             updateLexema();
             updateCurrentChar();
             return AutomataEntero.getInstance().esDigito();
-        } else if(Character.isLetter(currentChar)){
-
+        } else if(Character.isUpperCase(currentChar)){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataIdentificador.getInstance().esIdClase();
+        } else if(Character.isLowerCase(currentChar)){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataIdentificador.getInstance().esIdMetVar();
+        } else if(currentChar.equals('\'')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataCaracter.getInstance().esInicioCaracter();
+        } else if(currentChar.equals('"')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataString.getInstance().esInicioString();
+        } else if(currentChar.equals('(')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataPuntuacion.getInstance().esParentesisAbre();
+        } else if(currentChar.equals(')')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataPuntuacion.getInstance().esParentesisCierra();
+        } else if(currentChar.equals('{')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataPuntuacion.getInstance().esLlaveAbre();
+        } else if(currentChar.equals('}')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataPuntuacion.getInstance().esLlaveCierra();
+        } else if(currentChar.equals('.')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataPuntuacion.getInstance().esPunto();
+        } else if(currentChar.equals(';')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataPuntuacion.getInstance().esPuntoComa();
+        } else if(currentChar.equals(',')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataPuntuacion.getInstance().esComa();
+        } else if(currentChar.equals('<')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataOperador.getInstance().esMenor();
+        } else if(currentChar.equals('>')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataOperador.getInstance().esMayor();
+        } else if(currentChar.equals('!')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataOperador.getInstance().esNegacion();
+        } else if(currentChar.equals('+')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataOperador.getInstance().esSuma();
+        } else if(currentChar.equals('-')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataOperador.getInstance().esResta();
+        } else if(currentChar.equals('/')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataOperador.getInstance().esDivision();
+        } else if(currentChar.equals('*')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataOperador.getInstance().esProducto();
+        } else if(currentChar.equals('%')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataOperador.getInstance().esModulo();
+        } else if(currentChar.equals('=')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataAsignacion.getInstance().esIgual();
+        } else if(currentChar.equals('|')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataOperador.getInstance().esOr1();
+        } else if(currentChar.equals('&')){
+            updateLexema();
+            updateCurrentChar();
+            return AutomataOperador.getInstance().esAnd1();
+        } else {
+            updateLexema();
+            updateCurrentChar();
+            throw new LexicalException(lexema.toString(), gestorDeSource.getLineNumber());
         }
+    }
 
-        return null;
+    private Token estadoEOF() {
+        return new Token("eof", "", gestorDeSource.getLineNumber());
     }
 
 }

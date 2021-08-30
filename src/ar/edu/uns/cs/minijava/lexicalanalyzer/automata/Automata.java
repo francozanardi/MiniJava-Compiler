@@ -25,7 +25,8 @@ abstract class Automata {
         return handler.getGestorDeSource().isEndOfFile();
     }
 
-    protected LexicalException createLexicalException() {
+    protected LexicalException createLexicalException() throws IOException {
+        //handler.updateCurrentChar();
         return new LexicalException(handler.getLexema(), handler.getGestorDeSource().getLineNumber());
     }
 }

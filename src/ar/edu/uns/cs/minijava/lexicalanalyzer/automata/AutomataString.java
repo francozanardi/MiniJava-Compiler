@@ -21,10 +21,10 @@ class AutomataString extends Automata {
         if(!isEndOfFile() && isStringBreak()){
             updateHandler();
             return esInicioString();
-        } else if( handler.getCurrentChar().equals('\\')){
+        } else if(!isEndOfFile() && handler.getCurrentChar().equals('\\')){
             updateHandler();
             return esBackslashEnString();
-        } else if( handler.getCurrentChar().equals('"')){
+        } else if(!isEndOfFile() && handler.getCurrentChar().equals('"')){
             updateHandler();
             return esFinString();
         } else {

@@ -8,7 +8,7 @@ import java.io.IOException;
 public class LexicalAnalyzer {
     private GestorDeSource gestorDeSource;
 
-    public LexicalAnalyzer(GestorDeSource gestorDeSource){
+    public LexicalAnalyzer(GestorDeSource gestorDeSource) throws IOException {
         this.gestorDeSource = gestorDeSource;
         HandlerAutomata.getInstance().setGestorDeSource(gestorDeSource);
     }

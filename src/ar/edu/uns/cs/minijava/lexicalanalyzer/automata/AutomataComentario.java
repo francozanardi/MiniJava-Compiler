@@ -19,7 +19,7 @@ class AutomataComentario extends Automata {
         if(!isEndOfFile() && !handler.getCurrentChar().equals('*')){
             updateHandler();
             return esInicioComentarioEnBloque();
-        } else if(handler.getCurrentChar().equals('*')){
+        } else if(!isEndOfFile() && handler.getCurrentChar().equals('*')){
             return esFinComentarioEnBloque1();
         } else {
             throw createLexicalException();
@@ -30,9 +30,9 @@ class AutomataComentario extends Automata {
         if(!isEndOfFile() && !handler.getCurrentChar().equals('*')){
             updateHandler();
             return esInicioComentarioEnBloque();
-        } else if(handler.getCurrentChar().equals('*')) {
+        } else if(!isEndOfFile() && handler.getCurrentChar().equals('*')) {
             return esFinComentarioEnBloque1();
-        } else if(handler.getCurrentChar().equals('/')) {
+        } else if(!isEndOfFile() && handler.getCurrentChar().equals('/')) {
             return esFinComentarioEnBloque2();
         } else {
             throw createLexicalException();

@@ -31,30 +31,35 @@ public class Main {
             lexicalAnalyzer = new LexicalAnalyzer(gestorDeSource);
         } catch (FileNotFoundException e) {
             System.out.println("No se ha encontrado el archivo fuente especificado");
+        } catch (IOException e) {
+            mostrarErrorAlLeerArchivo(e);
         }
 
         return lexicalAnalyzer;
     }
 
+    private static void mostrarErrorAlLeerArchivo(IOException error) {
+        System.out.println("Se ha producido un error al intentar leer el archivo");
+        System.out.println(error.getMessage());
+    }
+
     private static void searchTokens(LexicalAnalyzer lexicalAnalyzer){
         boolean hayError = false;
-        Token token;
-        try {
-            token = lexicalAnalyzer.nextToken();
-            while(!token.getTokenName().equals("eof")){
+        Token token = null;
+        do {
+            try {
                 token = lexicalAnalyzer.nextToken();
                 mostrarToken(token);
+            } catch (LexicalException lexicalException) {
+                mostrarLexicalException(lexicalException);
+                hayError = true;
+            } catch (IOException e) {
+                mostrarErrorAlLeerArchivo(e);
             }
-        } catch (LexicalException lexicalException) {
-            mostrarLexicalException(lexicalException);
-            hayError = true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if(!hayError){
-                mostrarSinErrores();
-            }
-        }
+        } while (token != null && !token.getTokenName().equals("eof"));
+
+        if(!hayError)
+            mostrarSinErrores();
     }
 
     private static void mostrarToken(Token token){
@@ -74,11 +79,12 @@ public class Main {
                 error.getLineNumberError() +
                 ": " +
                 error.getLexemaError() +
-                "no es un símbolo válido";
+                " no es un símbolo válido";
 
         System.out.println();
         System.out.println(errorMessage);
         System.out.println(error.getMessage());
+        System.out.println();
     }
 
 

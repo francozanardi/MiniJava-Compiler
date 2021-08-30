@@ -16,7 +16,7 @@ class AutomataOperador extends Automata {
     }
 
     Token esMayor() throws IOException {
-        if(handler.getCurrentChar().equals('=')){
+        if(!isEndOfFile() && handler.getCurrentChar().equals('=')){
             updateHandler();
             return esMayorIgual();
         } else {
@@ -29,7 +29,7 @@ class AutomataOperador extends Automata {
     }
 
     Token esMenor() throws IOException {
-        if(handler.getCurrentChar().equals('=')){
+        if(!isEndOfFile() && handler.getCurrentChar().equals('=')){
             updateHandler();
             return esMenorIgual();
         } else {
@@ -42,7 +42,7 @@ class AutomataOperador extends Automata {
     }
 
     Token esNegacion() throws IOException {
-        if(handler.getCurrentChar().equals('=')){
+        if(!isEndOfFile() && handler.getCurrentChar().equals('=')){
             updateHandler();
             return esDistinto();
         } else {
@@ -59,7 +59,7 @@ class AutomataOperador extends Automata {
     }
 
     Token esSuma() throws IOException {
-        if(handler.getCurrentChar().equals('+')){
+        if(!isEndOfFile() && handler.getCurrentChar().equals('+')){
             updateHandler();
             return AutomataAsignacion.getInstance().esIncrementor();
         } else {
@@ -68,7 +68,7 @@ class AutomataOperador extends Automata {
     }
 
     Token esResta() throws IOException {
-        if(handler.getCurrentChar().equals('-')){
+        if(!isEndOfFile() && handler.getCurrentChar().equals('-')){
             updateHandler();
             return AutomataAsignacion.getInstance().esDecrementor();
         } else {
@@ -81,10 +81,10 @@ class AutomataOperador extends Automata {
     }
 
     Token esDivision() throws IOException, LexicalException {
-        if(handler.getCurrentChar().equals('*')) {
+        if(!isEndOfFile() && handler.getCurrentChar().equals('*')) {
             updateHandler();
             return AutomataComentario.getInstance().esInicioComentarioEnBloque();
-        } else if(handler.getCurrentChar().equals('/')){
+        } else if(!isEndOfFile() && handler.getCurrentChar().equals('/')){
             return AutomataComentario.getInstance().esComentarioEnLinea();
         } else {
             return createToken("division");
@@ -96,7 +96,7 @@ class AutomataOperador extends Automata {
     }
 
     Token esAnd1() throws IOException, LexicalException {
-        if(handler.getCurrentChar().equals('&')){
+        if(!isEndOfFile() && handler.getCurrentChar().equals('&')){
             updateHandler();
             return esAnd2();
         } else {
@@ -109,7 +109,7 @@ class AutomataOperador extends Automata {
     }
 
     Token esOr1() throws IOException, LexicalException {
-        if(handler.getCurrentChar().equals('|')){
+        if(!isEndOfFile() && handler.getCurrentChar().equals('|')){
             updateHandler();
             return esOr2();
         } else {

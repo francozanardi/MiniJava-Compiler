@@ -15,7 +15,7 @@ class AutomataAsignacion extends Automata {
     }
 
     Token esIgual() throws IOException {
-        if(handler.getCurrentChar().equals('=')){
+        if(!isEndOfFile() && handler.getCurrentChar().equals('=')){
             updateHandler();
             return AutomataOperador.getInstance().esComparacion();
         } else {

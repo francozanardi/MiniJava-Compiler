@@ -15,7 +15,7 @@ class AutomataIdentificador extends Automata {
     }
 
     Token esIdClase() throws IOException {
-        if(isValidId()){
+        if(!isEndOfFile() && isValidId()){
             updateHandler();
             return esIdClase();
         } else {
@@ -39,7 +39,7 @@ class AutomataIdentificador extends Automata {
 
 
     Token esIdMetVar() throws IOException {
-        if(isValidId()){
+        if(!isEndOfFile() && isValidId()){
             updateHandler();
             return esIdMetVar();
         } else {

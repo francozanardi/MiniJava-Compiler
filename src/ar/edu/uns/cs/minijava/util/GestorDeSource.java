@@ -1,7 +1,6 @@
 package ar.edu.uns.cs.minijava.util;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -9,38 +8,79 @@ public class GestorDeSource {
     private FileReader fileReader;
     private boolean isEOF;
     private int lineNumber;
+    private int currentChar;
+    private boolean wasNewLine;
 
-    public GestorDeSource(String pathname) throws FileNotFoundException {
+    public GestorDeSource(String pathname) throws IOException {
         isEOF = false;
-        lineNumber = 0;
+        lineNumber = 1;
+        currentChar = -1;
+        wasNewLine = false;
 
         openFile(pathname);
     }
 
-    private void openFile(String pathname) throws FileNotFoundException {
+    private void openFile(String pathname) throws IOException {
         File file = new File(pathname);
         fileReader = new FileReader(file);
+
+        currentChar = fileReader.read();
     }
 
     public Character nextChar() throws IOException {
-        int caracterLeido = fileReader.read();
+        int nextChar = fileReader.read();
+        checkIfThereWasNewLine();
 
-        if(caracterLeido != -1){
+        if(currentChar == -1){
             isEOF = true;
             return null;
         }
 
-        if(isNewLine((char)caracterLeido)){
-            lineNumber++;
-        }
+        char currentCharOld = normalizeNewLineIfExists(currentChar, nextChar);
+        updateCurrentChar(nextChar);
 
-        return (char)caracterLeido;
+        return currentCharOld;
     }
 
-    //se asume que una nueva línea únicamente está conformada por un salto de línea (LF).
-    //es decir, ignoramos los retorno de carro (CR).
-    private boolean isNewLine(char c){
-        return c == 10;
+    private Character normalizeNewLineIfExists(int currentChar, int nextChar) {
+        if(thereIsNewLine(currentChar, nextChar)){
+            wasNewLine = true;
+            return '\n';
+        }
+
+        return (char)currentChar;
+    }
+
+    private boolean thereIsNewLine(int currentCharReaded, int nextChar){
+        String currentChar = readerResultToString(currentCharReaded);
+        String charsConcatenated = currentChar + readerResultToString(nextChar);
+
+        return  (System.lineSeparator().equals("\n") && currentChar.equals("\n")) ||
+                (System.lineSeparator().equals("\r") && currentChar.equals("\r")) ||
+                (System.lineSeparator().equals("\r\n") && charsConcatenated.equals("\r\n"));
+    }
+
+    private String readerResultToString(int nextChar){
+        return nextChar == -1 ? "" : Character.toString(nextChar);
+    }
+
+    private void updateCurrentChar(int nextChar) throws IOException {
+        if(thereIsNewLine(currentChar, nextChar) && thereIsCharacterToSkip()){
+            currentChar = fileReader.read();
+        } else {
+            currentChar = nextChar;
+        }
+    }
+
+    private boolean thereIsCharacterToSkip(){
+        return System.lineSeparator().equals("\r\n");
+    }
+
+    private void checkIfThereWasNewLine(){
+        if(wasNewLine){
+            lineNumber++;
+            wasNewLine = false;
+        }
     }
 
     public boolean isEndOfFile(){

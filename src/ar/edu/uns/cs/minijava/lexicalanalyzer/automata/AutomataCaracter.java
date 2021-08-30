@@ -20,7 +20,7 @@ class AutomataCaracter extends Automata {
         if(!isEndOfFile() && isCharacterBreak()){
             updateHandler();
             return esContenidoCaracter();
-        } else if(handler.getCurrentChar().equals('\\')){
+        } else if(!isEndOfFile() && handler.getCurrentChar().equals('\\')){
             updateHandler();
             return esBackslashEnCaracter();
         } else {
@@ -35,7 +35,7 @@ class AutomataCaracter extends Automata {
     }
 
     Token esContenidoCaracter() throws IOException, LexicalException {
-        if(handler.getCurrentChar().equals('\'')){
+        if(!isEndOfFile() && handler.getCurrentChar().equals('\'')){
             updateHandler();
             return esFinCaracter();
         } else {
