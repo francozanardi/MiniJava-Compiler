@@ -2,8 +2,6 @@ package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
-
-import java.io.IOException;
 import java.util.regex.Pattern;
 
 class AutomataString extends Automata {
@@ -17,8 +15,8 @@ class AutomataString extends Automata {
 
     }
 
-    Token esInicioString() throws IOException, LexicalException {
-        if(!isEndOfFile() && isStringBreak()){
+    Token esInicioString() throws LexicalException {
+        if(!isEndOfFile() && notIsStringBreak()){
             updateHandler();
             return esInicioString();
         } else if(!isEndOfFile() && handler.getCurrentChar().equals('\\')){
@@ -28,22 +26,22 @@ class AutomataString extends Automata {
             updateHandler();
             return esFinString();
         } else {
-            throw createLexicalException();
+            throw createLexicalException("no posee correctamente cerrada las comillas.");
         }
     }
 
-    private boolean isStringBreak(){
+    private boolean notIsStringBreak(){
         Pattern stringBreakerPattern = Pattern.compile("[^\\\\\"\\n]");
 
         return stringBreakerPattern.matcher(handler.getCurrentChar().toString()).matches();
     }
 
-    Token esBackslashEnString() throws IOException, LexicalException {
+    Token esBackslashEnString() throws LexicalException {
         if(!isEndOfFile() && !handler.getCurrentChar().equals('\n')){
             updateHandler();
             return esInicioString();
         } else {
-            throw createLexicalException();
+            throw createLexicalException("no posee correctamente cerrada las comillas.");
         }
     }
 

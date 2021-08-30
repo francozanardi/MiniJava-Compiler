@@ -2,8 +2,6 @@ package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 
-import java.io.IOException;
-
 class AutomataAsignacion extends Automata {
     private static AutomataAsignacion ourInstance = new AutomataAsignacion();
 
@@ -14,7 +12,7 @@ class AutomataAsignacion extends Automata {
     private AutomataAsignacion() {
     }
 
-    Token esIgual() throws IOException {
+    Token esIgual() {
         if(!isEndOfFile() && handler.getCurrentChar().equals('=')){
             updateHandler();
             return AutomataOperador.getInstance().esComparacion();
@@ -23,11 +21,11 @@ class AutomataAsignacion extends Automata {
         }
     }
 
-    Token esIncrementor() throws IOException {
+    Token esIncrementor() {
         return createToken("incrementor");
     }
 
-    Token esDecrementor() throws IOException {
+    Token esDecrementor() {
         return createToken("decrementor");
     }
 }

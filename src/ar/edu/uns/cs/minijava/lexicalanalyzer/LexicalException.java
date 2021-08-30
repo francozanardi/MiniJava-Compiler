@@ -4,18 +4,23 @@ public class LexicalException extends Exception {
     private String lexemaError;
     private int lineNumberError;
     private int columnNumberError;
+    private String lineError;
+    private String descriptionError;
 
     public LexicalException(String lexema, int lineNumber, int columnNumber){
-        super(getErrorMessage(lexema, lineNumber));
+        super(getTechnicalErrorMessage(lexema, lineNumber));
 
         this.lexemaError = lexema;
         this.lineNumberError = lineNumber;
         this.columnNumberError = columnNumber;
+        this.lineError = "";
+        this.descriptionError = "";
     }
 
-    private static String getErrorMessage(String lexema, int lineNumber) {
+    private static String getTechnicalErrorMessage(String lexema, int lineNumber) {
         return "[Error:" + lexema + "|" + lineNumber + "]";
     }
+
 
     public String getLexemaError() {
         return lexemaError;
@@ -27,6 +32,22 @@ public class LexicalException extends Exception {
 
     public int getColumnNumberError(){
         return columnNumberError;
+    }
+
+    public void setLineError(String lineError){
+        this.lineError = lineError;
+    }
+
+    public String getLineError(){
+        return lineError;
+    }
+
+    public String getDescriptionError() {
+        return descriptionError;
+    }
+
+    public void setDescriptionError(String descriptionError) {
+        this.descriptionError = descriptionError;
     }
 
 }

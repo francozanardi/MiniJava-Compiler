@@ -31,7 +31,8 @@ public class InfoDisplay {
                 error.getColumnNumberError() +
                 ": " +
                 error.getLexemaError() +
-                " no es un símbolo válido";
+                " " +
+                error.getDescriptionError();
 
         System.out.println();
         System.out.println(errorMessage);
@@ -41,7 +42,18 @@ public class InfoDisplay {
     }
 
     private void mostrarInformacionDetallada(LexicalException error) {
-        System.out.println("Detalle: ");
+        String errorTitleInErrorLine = "Detalle: ";
+
+
+        StringBuilder errorIndication = new StringBuilder();
+        for(int i = 0; i < error.getColumnNumberError()-1+errorTitleInErrorLine.length(); i++){
+            errorIndication.append(" ");
+        }
+
+        errorIndication.append("^");
+
+        System.out.println(errorTitleInErrorLine + error.getLineError());
+        System.out.println(errorIndication.toString());
     }
 
 

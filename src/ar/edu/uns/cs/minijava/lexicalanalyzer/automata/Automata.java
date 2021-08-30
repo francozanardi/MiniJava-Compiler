@@ -16,7 +16,7 @@ abstract class Automata {
         return new Token(tokenName, handler.getLexema(), handler.getGestorDeSource().getLineNumber());
     }
 
-    protected void updateHandler() throws IOException {
+    protected void updateHandler() {
         handler.updateLexema();
         handler.updateCurrentChar();
     }
@@ -25,12 +25,16 @@ abstract class Automata {
         return handler.getGestorDeSource().isEndOfFile();
     }
 
-    protected LexicalException createLexicalException() throws IOException {
-        //handler.updateCurrentChar();
-        return new LexicalException(
+    protected LexicalException createLexicalException(String errorDescription) {
+        LexicalException lexicalException = new LexicalException(
                 handler.getLexema(),
                 handler.getGestorDeSource().getLineNumber(),
                 handler.getGestorDeSource().getColumnNumber()
         );
+
+        lexicalException.setLineError(handler.getGestorDeSource().getCurrentLine());
+        lexicalException.setDescriptionError(errorDescription);
+
+        return lexicalException;
     }
 }

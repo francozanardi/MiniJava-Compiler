@@ -2,8 +2,6 @@ package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 
-import java.io.IOException;
-
 class AutomataIdentificador extends Automata {
     private static AutomataIdentificador ourInstance = new AutomataIdentificador();
 
@@ -14,7 +12,7 @@ class AutomataIdentificador extends Automata {
     private AutomataIdentificador() {
     }
 
-    Token esIdClase() throws IOException {
+    Token esIdClase(){
         if(!isEndOfFile() && isValidId()){
             updateHandler();
             return esIdClase();
@@ -38,7 +36,7 @@ class AutomataIdentificador extends Automata {
     }
 
 
-    Token esIdMetVar() throws IOException {
+    Token esIdMetVar() {
         if(!isEndOfFile() && isValidId()){
             updateHandler();
             return esIdMetVar();

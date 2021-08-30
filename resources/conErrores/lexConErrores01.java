@@ -3,5 +3,7 @@
 123#
 #
 "hola"
-v1 + # chau
+v1 + \n 	# chau
 if class}
+///////
+/*asdasd*

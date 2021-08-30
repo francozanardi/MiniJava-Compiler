@@ -3,7 +3,6 @@ package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 
-import java.io.IOException;
 
 class AutomataOperador extends Automata {
     private static AutomataOperador ourInstance = new AutomataOperador();
@@ -15,7 +14,7 @@ class AutomataOperador extends Automata {
     private AutomataOperador() {
     }
 
-    Token esMayor() throws IOException {
+    Token esMayor() {
         if(!isEndOfFile() && handler.getCurrentChar().equals('=')){
             updateHandler();
             return esMayorIgual();
@@ -28,7 +27,7 @@ class AutomataOperador extends Automata {
         return createToken("mayor_igual");
     }
 
-    Token esMenor() throws IOException {
+    Token esMenor() {
         if(!isEndOfFile() && handler.getCurrentChar().equals('=')){
             updateHandler();
             return esMenorIgual();
@@ -41,7 +40,7 @@ class AutomataOperador extends Automata {
         return createToken("menor_igual");
     }
 
-    Token esNegacion() throws IOException {
+    Token esNegacion() {
         if(!isEndOfFile() && handler.getCurrentChar().equals('=')){
             updateHandler();
             return esDistinto();
@@ -58,7 +57,7 @@ class AutomataOperador extends Automata {
         return createToken("comparacion");
     }
 
-    Token esSuma() throws IOException {
+    Token esSuma() {
         if(!isEndOfFile() && handler.getCurrentChar().equals('+')){
             updateHandler();
             return AutomataAsignacion.getInstance().esIncrementor();
@@ -67,7 +66,7 @@ class AutomataOperador extends Automata {
         }
     }
 
-    Token esResta() throws IOException {
+    Token esResta(){
         if(!isEndOfFile() && handler.getCurrentChar().equals('-')){
             updateHandler();
             return AutomataAsignacion.getInstance().esDecrementor();
@@ -80,11 +79,12 @@ class AutomataOperador extends Automata {
         return createToken("producto");
     }
 
-    Token esDivision() throws IOException, LexicalException {
+    Token esDivision() throws LexicalException {
         if(!isEndOfFile() && handler.getCurrentChar().equals('*')) {
             updateHandler();
             return AutomataComentario.getInstance().esInicioComentarioEnBloque();
         } else if(!isEndOfFile() && handler.getCurrentChar().equals('/')){
+            updateHandler();
             return AutomataComentario.getInstance().esComentarioEnLinea();
         } else {
             return createToken("division");
@@ -95,12 +95,12 @@ class AutomataOperador extends Automata {
         return createToken("modulo");
     }
 
-    Token esAnd1() throws IOException, LexicalException {
+    Token esAnd1() throws LexicalException {
         if(!isEndOfFile() && handler.getCurrentChar().equals('&')){
             updateHandler();
             return esAnd2();
         } else {
-            throw createLexicalException();
+            throw createLexicalException("no es un símbolo válido.");
         }
     }
 
@@ -108,12 +108,12 @@ class AutomataOperador extends Automata {
         return createToken("and");
     }
 
-    Token esOr1() throws IOException, LexicalException {
+    Token esOr1() throws LexicalException {
         if(!isEndOfFile() && handler.getCurrentChar().equals('|')){
             updateHandler();
             return esOr2();
         } else {
-            throw createLexicalException();
+            throw createLexicalException("no es un símbolo válido.");
         }
     }
 

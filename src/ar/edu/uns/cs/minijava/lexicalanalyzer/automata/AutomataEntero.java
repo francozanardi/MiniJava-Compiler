@@ -3,8 +3,6 @@ package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 
-import java.io.IOException;
-
 class AutomataEntero extends Automata {
     private static AutomataEntero ourInstance = new AutomataEntero();
     private final static int MAX_INTEGER_LENGTH = 9;
@@ -17,14 +15,17 @@ class AutomataEntero extends Automata {
 
     }
 
-    Token esDigito() throws IOException, LexicalException {
+    Token esDigito() throws LexicalException {
         if(!isEndOfFile() && Character.isDigit(handler.getCurrentChar())){
-            handler.updateLexema();
-            handler.updateCurrentChar();
+            updateHandler();
             return esDigito();
         } else {
             if(handler.getLexema().length() > MAX_INTEGER_LENGTH){
-                throw createLexicalException();
+                throw createLexicalException(
+                                "es un entero que supera el límite establecido de "
+                                + MAX_INTEGER_LENGTH
+                                + " dígitos."
+                );
             }
             return createToken("entero");
         }

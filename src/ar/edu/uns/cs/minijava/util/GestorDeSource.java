@@ -3,21 +3,20 @@ package ar.edu.uns.cs.minijava.util;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class GestorDeSource {
     private FileReader fileReader;
     private boolean isEOF;
     private int lineNumber;
-    private int currentChar;
-    private boolean wasNewLine;
+    private ArrayList<String> allLines;
     private int columnNumber;
 
     public GestorDeSource(String pathname) throws IOException {
         isEOF = false;
         lineNumber = 1;
-        currentChar = -1;
-        wasNewLine = false;
         columnNumber = 0;
+        allLines = new ArrayList<>();
 
         openFile(pathname);
     }
@@ -26,65 +25,67 @@ public class GestorDeSource {
         File file = new File(pathname);
         fileReader = new FileReader(file);
 
-        currentChar = fileReader.read();
+        readAllFile();
     }
 
-    public Character nextChar() throws IOException {
-        int nextChar = fileReader.read();
-        checkIfThereWasNewLine();
+    private void readAllFile() throws IOException {
+        StringBuilder currentLine = new StringBuilder();
+        int currentChar = fileReader.read();
 
-        if(currentChar == -1){
-            isEOF = true;
-            return null;
+        while(currentChar != -1) {
+            currentChar = readCharHandlingNewLine((char)currentChar, currentLine);
         }
 
-        columnNumber++;
-        char currentCharOld = normalizeNewLineIfExists(currentChar, nextChar);
-        updateCurrentChar(nextChar);
-
-        return currentCharOld;
+        allLines.add(currentLine.toString());
     }
 
-    private Character normalizeNewLineIfExists(int currentChar, int nextChar) {
-        if(thereIsNewLine(currentChar, nextChar)){
-            wasNewLine = true;
-            return '\n';
-        }
-
-        return (char)currentChar;
-    }
-
-    private boolean thereIsNewLine(int currentCharReaded, int nextChar){
-        String currentChar = readerResultToString(currentCharReaded);
-        String charsConcatenated = currentChar + readerResultToString(nextChar);
-
-        return  (System.lineSeparator().equals("\n") && currentChar.equals("\n")) ||
-                (System.lineSeparator().equals("\r") && currentChar.equals("\r")) ||
-                (System.lineSeparator().equals("\r\n") && charsConcatenated.equals("\r\n"));
-    }
-
-    private String readerResultToString(int nextChar){
-        return nextChar == -1 ? "" : Character.toString(nextChar);
-    }
-
-    private void updateCurrentChar(int nextChar) throws IOException {
-        if(thereIsNewLine(currentChar, nextChar) && thereIsCharacterToSkip()){
-            currentChar = fileReader.read();
+    private int readCharHandlingNewLine(Character currentChar, StringBuilder currentLine) throws IOException {
+        if(currentChar.equals('\n')){
+            addNewLine(currentLine);
+            return fileReader.read();
+        } else if(currentChar.equals('\r')){
+            int nextChar = fileReader.read();
+            if(nextChar != -1 && Character.toString(nextChar).equals("\n")){
+                addNewLine(currentLine);
+                return fileReader.read();
+            } else {
+                addNewLine(currentLine);
+                return nextChar;
+            }
         } else {
-            currentChar = nextChar;
+            currentLine.append(currentChar);
         }
+
+        return fileReader.read();
     }
 
-    private boolean thereIsCharacterToSkip(){
-        return System.lineSeparator().equals("\r\n");
+    private void addNewLine(StringBuilder currentLine){
+        currentLine.append(getNewLineUniformRepresentation());
+        allLines.add(currentLine.toString());
+        currentLine.setLength(0);
     }
 
-    private void checkIfThereWasNewLine(){
-        if(wasNewLine){
-            columnNumber = 0;
+    public Character nextChar() {
+        Character nextChar;
+        String currentLine = allLines.get(lineNumber-1);
+
+        if(columnNumber < currentLine.length()){
+            nextChar = currentLine.charAt(columnNumber);
+            columnNumber++;
+        } else if(lineNumber < allLines.size()){
             lineNumber++;
-            wasNewLine = false;
+            columnNumber = 0;
+            nextChar = nextChar();
+        } else {
+            nextChar = null;
+            isEOF = true;
         }
+
+        return nextChar;
+    }
+
+    private Character getNewLineUniformRepresentation(){
+        return '\n';
     }
 
     public boolean isEndOfFile(){
@@ -97,5 +98,9 @@ public class GestorDeSource {
 
     public int getColumnNumber() {
         return columnNumber;
+    }
+
+    public String getCurrentLine(){
+        return allLines.get(lineNumber-1).replace("\n", "");
     }
 }

@@ -52,8 +52,6 @@ public class Main {
             } catch (LexicalException lexicalException) {
                 infoDisplay.mostrarLexicalException(lexicalException);
                 hayError = true;
-            } catch (IOException e) {
-                infoDisplay.mostrarErrorAlLeerArchivo(e);
             }
         } while (token != null && !token.getTokenName().equals("eof"));
 

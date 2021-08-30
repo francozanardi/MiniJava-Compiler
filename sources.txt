@@ -1,3 +1,4 @@
+./src/ar/edu/uns/cs/minijava/infodisplay/InfoDisplay.java
 ./src/ar/edu/uns/cs/minijava/lexicalanalyzer/automata/Automata.java
 ./src/ar/edu/uns/cs/minijava/lexicalanalyzer/automata/AutomataAsignacion.java
 ./src/ar/edu/uns/cs/minijava/lexicalanalyzer/automata/AutomataCaracter.java

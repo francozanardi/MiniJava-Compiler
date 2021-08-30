@@ -1,7 +1,6 @@
 package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 
 class PalabrasClaveHandler {
     private static PalabrasClaveHandler ourInstance = new PalabrasClaveHandler();

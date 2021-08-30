@@ -3,7 +3,6 @@ package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.util.GestorDeSource;
-import java.io.IOException;
 
 public class HandlerAutomata {
     private StringBuilder lexema;
@@ -18,7 +17,7 @@ public class HandlerAutomata {
         return ourInstance;
     }
 
-    public void setGestorDeSource(GestorDeSource gestorDeSource) throws IOException {
+    public void setGestorDeSource(GestorDeSource gestorDeSource){
         this.gestorDeSource = gestorDeSource;
         updateCurrentChar();
     }
@@ -27,7 +26,7 @@ public class HandlerAutomata {
         return gestorDeSource;
     }
 
-    public Token nextToken() throws LexicalException, IOException {
+    public Token nextToken() throws LexicalException {
         lexema = new StringBuilder();
         return estadoInicial();
     }
@@ -36,7 +35,7 @@ public class HandlerAutomata {
         lexema.append(currentChar);
     }
 
-    void updateCurrentChar() throws IOException {
+    void updateCurrentChar() {
         currentChar = gestorDeSource.nextChar();
     }
 
@@ -48,7 +47,7 @@ public class HandlerAutomata {
         return lexema.toString();
     }
 
-    private Token estadoInicial() throws LexicalException, IOException {
+    private Token estadoInicial() throws LexicalException {
         if(gestorDeSource.isEndOfFile()) {
             return estadoEOF();
         } else if(Character.isWhitespace(currentChar)) {
@@ -154,6 +153,9 @@ public class HandlerAutomata {
                     gestorDeSource.getLineNumber(),
                     getGestorDeSource().getColumnNumber()
             );
+
+            charWithLexicalException.setLineError(gestorDeSource.getCurrentLine());
+            charWithLexicalException.setDescriptionError("no es un símbolo válido.");
 
             updateCurrentChar();
 
