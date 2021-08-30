@@ -147,9 +147,17 @@ public class HandlerAutomata {
             updateCurrentChar();
             return AutomataOperador.getInstance().esAnd1();
         } else {
+            LexicalException charWithLexicalException;
             updateLexema();
+            charWithLexicalException = new LexicalException(
+                    lexema.toString(),
+                    gestorDeSource.getLineNumber(),
+                    getGestorDeSource().getColumnNumber()
+            );
+
             updateCurrentChar();
-            throw new LexicalException(lexema.toString(), gestorDeSource.getLineNumber());
+
+            throw charWithLexicalException;
         }
     }
 

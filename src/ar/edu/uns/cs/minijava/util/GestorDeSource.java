@@ -10,12 +10,14 @@ public class GestorDeSource {
     private int lineNumber;
     private int currentChar;
     private boolean wasNewLine;
+    private int columnNumber;
 
     public GestorDeSource(String pathname) throws IOException {
         isEOF = false;
         lineNumber = 1;
         currentChar = -1;
         wasNewLine = false;
+        columnNumber = 0;
 
         openFile(pathname);
     }
@@ -36,6 +38,7 @@ public class GestorDeSource {
             return null;
         }
 
+        columnNumber++;
         char currentCharOld = normalizeNewLineIfExists(currentChar, nextChar);
         updateCurrentChar(nextChar);
 
@@ -78,6 +81,7 @@ public class GestorDeSource {
 
     private void checkIfThereWasNewLine(){
         if(wasNewLine){
+            columnNumber = 0;
             lineNumber++;
             wasNewLine = false;
         }
@@ -89,5 +93,9 @@ public class GestorDeSource {
 
     public int getLineNumber(){
         return lineNumber;
+    }
+
+    public int getColumnNumber() {
+        return columnNumber;
     }
 }

@@ -27,6 +27,10 @@ abstract class Automata {
 
     protected LexicalException createLexicalException() throws IOException {
         //handler.updateCurrentChar();
-        return new LexicalException(handler.getLexema(), handler.getGestorDeSource().getLineNumber());
+        return new LexicalException(
+                handler.getLexema(),
+                handler.getGestorDeSource().getLineNumber(),
+                handler.getGestorDeSource().getColumnNumber()
+        );
     }
 }

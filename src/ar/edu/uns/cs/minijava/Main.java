@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava;
 
+import ar.edu.uns.cs.minijava.infodisplay.InfoDisplay;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalAnalyzer;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
@@ -9,8 +10,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Main {
+    private static InfoDisplay infoDisplay;
     public static void main(String[] args){
         LexicalAnalyzer lexicalAnalyzer;
+        infoDisplay = new InfoDisplay();
 
         if(args.length == 1){
             lexicalAnalyzer = crearLexicalAnalyzer(args[0]);
@@ -32,16 +35,12 @@ public class Main {
         } catch (FileNotFoundException e) {
             System.out.println("No se ha encontrado el archivo fuente especificado");
         } catch (IOException e) {
-            mostrarErrorAlLeerArchivo(e);
+            infoDisplay.mostrarErrorAlLeerArchivo(e);
         }
 
         return lexicalAnalyzer;
     }
 
-    private static void mostrarErrorAlLeerArchivo(IOException error) {
-        System.out.println("Se ha producido un error al intentar leer el archivo");
-        System.out.println(error.getMessage());
-    }
 
     private static void searchTokens(LexicalAnalyzer lexicalAnalyzer){
         boolean hayError = false;
@@ -49,48 +48,17 @@ public class Main {
         do {
             try {
                 token = lexicalAnalyzer.nextToken();
-                mostrarToken(token);
+                infoDisplay.mostrarToken(token);
             } catch (LexicalException lexicalException) {
-                mostrarLexicalException(lexicalException);
+                infoDisplay.mostrarLexicalException(lexicalException);
                 hayError = true;
             } catch (IOException e) {
-                mostrarErrorAlLeerArchivo(e);
+                infoDisplay.mostrarErrorAlLeerArchivo(e);
             }
         } while (token != null && !token.getTokenName().equals("eof"));
 
         if(!hayError)
-            mostrarSinErrores();
-    }
-
-    private static void mostrarToken(Token token){
-        String tokenInfo = "(" +
-                token.getTokenName() +
-                "," +
-                token.getLexema() +
-                "," +
-                token.getLineNumber() +
-                ")";
-
-        System.out.println(tokenInfo);
-    }
-
-    private static void mostrarLexicalException(LexicalException error) {
-        String errorMessage = "Error léxico en línea " +
-                error.getLineNumberError() +
-                ": " +
-                error.getLexemaError() +
-                " no es un símbolo válido";
-
-        System.out.println();
-        System.out.println(errorMessage);
-        System.out.println(error.getMessage());
-        System.out.println();
-    }
-
-
-    private static void mostrarSinErrores() {
-        System.out.println();
-        System.out.println("[SinErrores]");
+            infoDisplay.mostrarSinErrores();
     }
 
 }
