@@ -1,6 +1,8 @@
 package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
+import ar.edu.uns.cs.minijava.util.CharacterUtils;
 
 class AutomataIdentificador extends Automata {
     private static AutomataIdentificador ourInstance = new AutomataIdentificador();
@@ -13,21 +15,21 @@ class AutomataIdentificador extends Automata {
     }
 
     Token esIdClase(){
-        if(!isEndOfFile() && isValidId()){
+        while(!isEndOfFile() && isValidId()){
             updateHandler();
-            return esIdClase();
-        } else {
-            String palabraClave = searchPalabraClave();
-            if(palabraClave != null){
-                return createToken(palabraClave);
-            }
-            return createToken("idClase");
         }
+
+        String palabraClave = searchPalabraClave();
+        if(palabraClave != null){
+            return createToken(palabraClave);
+        }
+
+        return createToken(TokenName.IDENTIFICADOR_DE_CLASE);
     }
 
     private boolean isValidId(){
-        return  Character.isLetter(handler.getCurrentChar()) ||
-                Character.isDigit(handler.getCurrentChar()) ||
+        return  CharacterUtils.isLetter(handler.getCurrentChar()) ||
+                CharacterUtils.isDigit(handler.getCurrentChar()) ||
                 handler.getCurrentChar().equals('_');
     }
 
@@ -37,15 +39,14 @@ class AutomataIdentificador extends Automata {
 
 
     Token esIdMetVar() {
-        if(!isEndOfFile() && isValidId()){
+        while(!isEndOfFile() && isValidId()){
             updateHandler();
-            return esIdMetVar();
-        } else {
-            String palabraClave = searchPalabraClave();
-            if(palabraClave != null){
-                return createToken(palabraClave);
-            }
-            return createToken("idMetVar");
         }
+
+        String palabraClave = searchPalabraClave();
+        if(palabraClave != null){
+            return createToken(palabraClave);
+        }
+        return createToken(TokenName.IDENTIFICADOR_DE_METODO_O_VARIABLE);
     }
 }

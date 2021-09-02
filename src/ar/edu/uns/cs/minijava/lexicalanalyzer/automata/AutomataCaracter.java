@@ -1,7 +1,9 @@
 package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 
+import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalErrorDescription;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 
 import java.util.regex.Pattern;
 
@@ -23,7 +25,7 @@ class AutomataCaracter extends Automata {
             updateHandler();
             return esBackslashEnCaracter();
         } else {
-            throw createLexicalException("no es un caracter válido");
+            throw createLexicalException(LexicalErrorDescription.INVALID_SYMBOL);
         }
     }
 
@@ -38,12 +40,12 @@ class AutomataCaracter extends Automata {
             updateHandler();
             return esFinCaracter();
         } else {
-            throw createLexicalException("no es un caracter válido");
+            throw createLexicalException(LexicalErrorDescription.INVALID_CHAR);
         }
     }
 
     Token esFinCaracter() {
-        return createToken("caracter");
+        return createToken(TokenName.CARACTER);
     }
 
     Token esBackslashEnCaracter() throws LexicalException {
@@ -51,7 +53,7 @@ class AutomataCaracter extends Automata {
             updateHandler();
             return esContenidoCaracter();
         } else {
-            throw createLexicalException("no es un caracter válido");
+            throw createLexicalException(LexicalErrorDescription.INVALID_CHAR);
         }
     }
 

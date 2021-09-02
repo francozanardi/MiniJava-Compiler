@@ -1,7 +1,9 @@
 package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 
+import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalErrorDescription;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 
 
 class AutomataOperador extends Automata {
@@ -19,12 +21,12 @@ class AutomataOperador extends Automata {
             updateHandler();
             return esMayorIgual();
         } else {
-            return createToken("mayor");
+            return createToken(TokenName.MAYOR);
         }
     }
 
     Token esMayorIgual() {
-        return createToken("mayor_igual");
+        return createToken(TokenName.MAYOR_IGUAL);
     }
 
     Token esMenor() {
@@ -32,12 +34,12 @@ class AutomataOperador extends Automata {
             updateHandler();
             return esMenorIgual();
         } else {
-            return createToken("menor");
+            return createToken(TokenName.MENOR);
         }
     }
 
     Token esMenorIgual() {
-        return createToken("menor_igual");
+        return createToken(TokenName.MENOR_IGUAL);
     }
 
     Token esNegacion() {
@@ -45,16 +47,16 @@ class AutomataOperador extends Automata {
             updateHandler();
             return esDistinto();
         } else {
-            return createToken("negacion");
+            return createToken(TokenName.NEGACION);
         }
     }
 
     Token esDistinto() {
-        return createToken("distinto");
+        return createToken(TokenName.DISTINTO);
     }
 
     Token esComparacion() {
-        return createToken("comparacion");
+        return createToken(TokenName.COMPARACION);
     }
 
     Token esSuma() {
@@ -62,7 +64,7 @@ class AutomataOperador extends Automata {
             updateHandler();
             return AutomataAsignacion.getInstance().esIncrementor();
         } else {
-            return createToken("suma");
+            return createToken(TokenName.SUMA);
         }
     }
 
@@ -71,12 +73,12 @@ class AutomataOperador extends Automata {
             updateHandler();
             return AutomataAsignacion.getInstance().esDecrementor();
         } else {
-            return createToken("resta");
+            return createToken(TokenName.RESTA);
         }
     }
 
     Token esProducto(){
-        return createToken("producto");
+        return createToken(TokenName.PRODUCTO);
     }
 
     Token esDivision() throws LexicalException {
@@ -87,12 +89,12 @@ class AutomataOperador extends Automata {
             updateHandler();
             return AutomataComentario.getInstance().esComentarioEnLinea();
         } else {
-            return createToken("division");
+            return createToken(TokenName.DIVISION);
         }
     }
 
     Token esModulo(){
-        return createToken("modulo");
+        return createToken(TokenName.MODULO);
     }
 
     Token esAnd1() throws LexicalException {
@@ -100,12 +102,12 @@ class AutomataOperador extends Automata {
             updateHandler();
             return esAnd2();
         } else {
-            throw createLexicalException("no es un símbolo válido.");
+            throw createLexicalException(LexicalErrorDescription.INVALID_SYMBOL);
         }
     }
 
     private Token esAnd2() {
-        return createToken("and");
+        return createToken(TokenName.AND);
     }
 
     Token esOr1() throws LexicalException {
@@ -113,12 +115,12 @@ class AutomataOperador extends Automata {
             updateHandler();
             return esOr2();
         } else {
-            throw createLexicalException("no es un símbolo válido.");
+            throw createLexicalException(LexicalErrorDescription.INVALID_SYMBOL);
         }
     }
 
     private Token esOr2() {
-        return createToken("or");
+        return createToken(TokenName.OR);
     }
 
 }

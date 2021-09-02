@@ -1,6 +1,7 @@
 package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 
 class AutomataAsignacion extends Automata {
     private static AutomataAsignacion ourInstance = new AutomataAsignacion();
@@ -17,15 +18,15 @@ class AutomataAsignacion extends Automata {
             updateHandler();
             return AutomataOperador.getInstance().esComparacion();
         } else {
-            return createToken("asignacion");
+            return createToken(TokenName.ASIGNACION);
         }
     }
 
     Token esIncrementor() {
-        return createToken("incrementor");
+        return createToken(TokenName.INCREMENTOR);
     }
 
     Token esDecrementor() {
-        return createToken("decrementor");
+        return createToken(TokenName.DECREMENTOR);
     }
 }

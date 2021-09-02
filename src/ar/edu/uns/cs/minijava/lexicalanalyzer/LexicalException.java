@@ -8,7 +8,7 @@ public class LexicalException extends Exception {
     private String descriptionError;
 
     public LexicalException(String lexema, int lineNumber, int columnNumber){
-        super(getTechnicalErrorMessage(lexema, lineNumber));
+        super(getErrorCodeMessage(lexema, lineNumber));
 
         this.lexemaError = lexema;
         this.lineNumberError = lineNumber;
@@ -17,8 +17,13 @@ public class LexicalException extends Exception {
         this.descriptionError = "";
     }
 
-    private static String getTechnicalErrorMessage(String lexema, int lineNumber) {
-        return "[Error:" + lexema + "|" + lineNumber + "]";
+    private static String getErrorCodeMessage(String lexema, int lineNumber) {
+        return "[Error:" + getFirstLine(lexema) + "|" + lineNumber + "]";
+    }
+
+    private static String getFirstLine(String text){
+        String[] multiLine = text.split("\n");
+        return multiLine.length > 1 ? multiLine[0] + "..." : multiLine[0];
     }
 
 

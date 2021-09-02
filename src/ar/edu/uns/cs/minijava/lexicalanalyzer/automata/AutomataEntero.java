@@ -1,11 +1,15 @@
 package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 
+import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalErrorDescription;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
+import ar.edu.uns.cs.minijava.util.CharacterUtils;
+
+import static ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalAnalyzerSettings.MAX_INTEGER_LENGTH;
 
 class AutomataEntero extends Automata {
     private static AutomataEntero ourInstance = new AutomataEntero();
-    private final static int MAX_INTEGER_LENGTH = 9;
 
     static AutomataEntero getInstance() {
         return ourInstance;
@@ -16,18 +20,14 @@ class AutomataEntero extends Automata {
     }
 
     Token esDigito() throws LexicalException {
-        if(!isEndOfFile() && Character.isDigit(handler.getCurrentChar())){
+        while(!isEndOfFile() && CharacterUtils.isDigit(handler.getCurrentChar())){
             updateHandler();
-            return esDigito();
-        } else {
-            if(handler.getLexema().length() > MAX_INTEGER_LENGTH){
-                throw createLexicalException(
-                                "es un entero que supera el límite establecido de "
-                                + MAX_INTEGER_LENGTH
-                                + " dígitos."
-                );
-            }
-            return createToken("entero");
         }
+
+        if(handler.getLexema().length() > MAX_INTEGER_LENGTH){
+            throw createLexicalException(LexicalErrorDescription.INTEGER_LIMITED_EXCEEDED);
+        }
+
+        return createToken(TokenName.ENTERO);
     }
 }

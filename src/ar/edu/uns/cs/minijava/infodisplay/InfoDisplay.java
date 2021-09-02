@@ -30,7 +30,7 @@ public class InfoDisplay {
                 ", columna " +
                 error.getColumnNumberError() +
                 ": " +
-                error.getLexemaError() +
+                getFirstLine(error.getLexemaError()) +
                 " " +
                 error.getDescriptionError();
 
@@ -41,14 +41,17 @@ public class InfoDisplay {
         System.out.println();
     }
 
+    private String getFirstLine(String text){
+        String[] multiLine = text.split("\n");
+        return multiLine.length > 1 ? multiLine[0] + "..." : multiLine[0];
+    }
+
     private void mostrarInformacionDetallada(LexicalException error) {
         String errorTitleInErrorLine = "Detalle: ";
-
-
         StringBuilder errorIndication = new StringBuilder();
-        for(int i = 0; i < error.getColumnNumberError()-1+errorTitleInErrorLine.length(); i++){
-            errorIndication.append(" ");
-        }
+
+        addSpacesDueToTitle(errorIndication, errorTitleInErrorLine);
+        addSpacesDueToLine(errorIndication, error);
 
         errorIndication.append("^");
 
@@ -56,9 +59,37 @@ public class InfoDisplay {
         System.out.println(errorIndication.toString());
     }
 
+    private void addSpacesDueToTitle(StringBuilder errorIndication, String errorTitleInErrorLine) {
+        for(int i = 0; i < errorTitleInErrorLine.length(); i++){
+            errorIndication.append(" ");
+        }
+    }
+
+    private void addSpacesDueToLine(StringBuilder errorIndication, LexicalException error) {
+        String lineError = error.getLineError();
+        for(int i = 0; i < error.getColumnNumberError()-1; i++){
+            if(lineError.charAt(i) != '\t'){
+                errorIndication.append(" ");
+            } else {
+                errorIndication.append("\t");
+            }
+        }
+    }
 
     public void mostrarSinErrores() {
         System.out.println();
         System.out.println("[SinErrores]");
+    }
+
+    public void mostrarCantidadErrores(int cantidadErrores) {
+        System.out.println();
+        System.out.println("Se ha" +
+                (cantidadErrores != 1 ? "n" : "") +
+                " " +
+                "producido " +
+                cantidadErrores +
+                " error" +
+                (cantidadErrores != 1 ? "es" : "") +
+                " en todo el archivo fuente.");
     }
 }

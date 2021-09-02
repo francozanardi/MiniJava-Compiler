@@ -10,8 +10,13 @@
 ./src/ar/edu/uns/cs/minijava/lexicalanalyzer/automata/AutomataString.java
 ./src/ar/edu/uns/cs/minijava/lexicalanalyzer/automata/HandlerAutomata.java
 ./src/ar/edu/uns/cs/minijava/lexicalanalyzer/automata/PalabrasClaveHandler.java
+./src/ar/edu/uns/cs/minijava/lexicalanalyzer/LazyTokenEvaluation.java
 ./src/ar/edu/uns/cs/minijava/lexicalanalyzer/LexicalAnalyzer.java
+./src/ar/edu/uns/cs/minijava/lexicalanalyzer/LexicalAnalyzerSettings.java
+./src/ar/edu/uns/cs/minijava/lexicalanalyzer/LexicalErrorDescription.java
 ./src/ar/edu/uns/cs/minijava/lexicalanalyzer/LexicalException.java
 ./src/ar/edu/uns/cs/minijava/lexicalanalyzer/Token.java
+./src/ar/edu/uns/cs/minijava/lexicalanalyzer/TokenName.java
 ./src/ar/edu/uns/cs/minijava/Main.java
+./src/ar/edu/uns/cs/minijava/util/CharacterUtils.java
 ./src/ar/edu/uns/cs/minijava/util/GestorDeSource.java

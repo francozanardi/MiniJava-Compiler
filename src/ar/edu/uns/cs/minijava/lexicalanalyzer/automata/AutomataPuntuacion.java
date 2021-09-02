@@ -1,6 +1,7 @@
 package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 
 class AutomataPuntuacion extends Automata {
     private static AutomataPuntuacion ourInstance = new AutomataPuntuacion();
@@ -13,30 +14,30 @@ class AutomataPuntuacion extends Automata {
     }
 
     Token esParentesisAbre(){
-        return createToken("parentesis_abre");
+        return createToken(TokenName.PARENTESIS_ABRE);
     }
 
     Token esParentesisCierra(){
-        return createToken("parentesis_cierra");
+        return createToken(TokenName.PARENTESIS_CIERRA);
     }
 
     Token esLlaveAbre(){
-        return createToken("llave_abre");
+        return createToken(TokenName.LLAVE_ABRE);
     }
 
     Token esLlaveCierra(){
-        return createToken("llave_cierra");
+        return createToken(TokenName.LLAVE_CIERRA);
     }
 
     Token esPuntoComa(){
-        return createToken("punto_y_coma");
+        return createToken(TokenName.PUNTO_Y_COMA);
     }
 
     Token esComa(){
-        return createToken("coma");
+        return createToken(TokenName.COMA);
     }
 
     Token esPunto(){
-        return createToken("punto");
+        return createToken(TokenName.PUNTO);
     }
 }

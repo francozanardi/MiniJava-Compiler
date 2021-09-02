@@ -43,7 +43,7 @@ public class Main {
 
 
     private static void searchTokens(LexicalAnalyzer lexicalAnalyzer){
-        boolean hayError = false;
+        int cantidadErrores = 0;
         Token token = null;
         do {
             try {
@@ -51,11 +51,13 @@ public class Main {
                 infoDisplay.mostrarToken(token);
             } catch (LexicalException lexicalException) {
                 infoDisplay.mostrarLexicalException(lexicalException);
-                hayError = true;
+                cantidadErrores++;
             }
         } while (token != null && !token.getTokenName().equals("eof"));
 
-        if(!hayError)
+        if(cantidadErrores > 0)
+            infoDisplay.mostrarCantidadErrores(cantidadErrores);
+        else
             infoDisplay.mostrarSinErrores();
     }
 

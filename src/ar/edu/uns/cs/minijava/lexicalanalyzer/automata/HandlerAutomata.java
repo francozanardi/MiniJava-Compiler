@@ -1,16 +1,73 @@
 package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 
-import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
-import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.lexicalanalyzer.*;
+import ar.edu.uns.cs.minijava.util.CharacterUtils;
 import ar.edu.uns.cs.minijava.util.GestorDeSource;
+
+import java.util.HashMap;
 
 public class HandlerAutomata {
     private StringBuilder lexema;
     private Character currentChar;
     private GestorDeSource gestorDeSource;
+    private HashMap<Character, LazyTokenEvaluation> charToTokenMap;
     private static HandlerAutomata ourInstance = new HandlerAutomata();
 
     private HandlerAutomata() {
+        charToTokenMap = new HashMap<>();
+
+        loadCharToTokenMap();
+    }
+
+    private void loadCharToTokenMap() {
+        charToTokenMap.put('\'', () -> AutomataCaracter.getInstance().esInicioCaracter());
+        charToTokenMap.put('"', () -> AutomataString.getInstance().esInicioString());
+        charToTokenMap.put('(', () -> AutomataPuntuacion.getInstance().esParentesisAbre());
+        charToTokenMap.put(')', () -> AutomataPuntuacion.getInstance().esParentesisCierra());
+        charToTokenMap.put('{', () -> AutomataPuntuacion.getInstance().esLlaveAbre());
+        charToTokenMap.put('}', () -> AutomataPuntuacion.getInstance().esLlaveCierra());
+        charToTokenMap.put('.', () -> AutomataPuntuacion.getInstance().esPunto());
+        charToTokenMap.put(',', () -> AutomataPuntuacion.getInstance().esComa());
+        charToTokenMap.put(';', () -> AutomataPuntuacion.getInstance().esPuntoComa());
+        charToTokenMap.put('<', () -> AutomataOperador.getInstance().esMenor());
+        charToTokenMap.put('>', () -> AutomataOperador.getInstance().esMayor());
+        charToTokenMap.put('!', () -> AutomataOperador.getInstance().esNegacion());
+        charToTokenMap.put('+', () -> AutomataOperador.getInstance().esSuma());
+        charToTokenMap.put('-', () -> AutomataOperador.getInstance().esResta());
+        charToTokenMap.put('*', () -> AutomataOperador.getInstance().esProducto());
+        charToTokenMap.put('/', () -> AutomataOperador.getInstance().esDivision());
+        charToTokenMap.put('%', () -> AutomataOperador.getInstance().esModulo());
+        charToTokenMap.put('=', () -> AutomataAsignacion.getInstance().esIgual());
+        charToTokenMap.put('&', () -> AutomataOperador.getInstance().esAnd1());
+        charToTokenMap.put('|', () -> AutomataOperador.getInstance().esOr1());
+
+        loadDigitos();
+        loadMayusculas();
+        loadMinusculas();
+    }
+
+    private void loadDigitos(){
+        LazyTokenEvaluation lazyEvalDigitos = () -> AutomataEntero.getInstance().esDigito();
+
+        for(int c = '0'; c <= '9'; c++){
+            charToTokenMap.put((char)c, lazyEvalDigitos);
+        }
+    }
+
+    private void loadMinusculas(){
+        LazyTokenEvaluation lazyEvalMinusculas = () -> AutomataIdentificador.getInstance().esIdMetVar();
+
+        for(int c = 'a'; c <= 'z'; c++){
+            charToTokenMap.put((char)c, lazyEvalMinusculas);
+        }
+    }
+
+    private void loadMayusculas(){
+        LazyTokenEvaluation lazyEvalMayusculas = () -> AutomataIdentificador.getInstance().esIdClase();
+
+        for(int c = 'A'; c <= 'Z'; c++){
+            charToTokenMap.put((char)c, lazyEvalMayusculas);
+        }
     }
 
     public static HandlerAutomata getInstance() {
@@ -39,124 +96,26 @@ public class HandlerAutomata {
         currentChar = gestorDeSource.nextChar();
     }
 
-    Character getCurrentChar(){
-        return currentChar;
+    private void updateAll(){
+        updateLexema();
+        updateCurrentChar();
     }
 
-    String getLexema(){
-        return lexema.toString();
-    }
+    Token estadoInicial() throws LexicalException {
+        LazyTokenEvaluation lazyTokenEvaluation;
 
-    private Token estadoInicial() throws LexicalException {
         if(gestorDeSource.isEndOfFile()) {
             return estadoEOF();
-        } else if(Character.isWhitespace(currentChar)) {
+        } else if(CharacterUtils.isWhitespace(currentChar)) {
             updateCurrentChar();
             return estadoInicial();
-        } else if(Character.isDigit(currentChar)){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataEntero.getInstance().esDigito();
-        } else if(Character.isUpperCase(currentChar)){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataIdentificador.getInstance().esIdClase();
-        } else if(Character.isLowerCase(currentChar)){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataIdentificador.getInstance().esIdMetVar();
-        } else if(currentChar.equals('\'')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataCaracter.getInstance().esInicioCaracter();
-        } else if(currentChar.equals('"')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataString.getInstance().esInicioString();
-        } else if(currentChar.equals('(')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataPuntuacion.getInstance().esParentesisAbre();
-        } else if(currentChar.equals(')')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataPuntuacion.getInstance().esParentesisCierra();
-        } else if(currentChar.equals('{')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataPuntuacion.getInstance().esLlaveAbre();
-        } else if(currentChar.equals('}')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataPuntuacion.getInstance().esLlaveCierra();
-        } else if(currentChar.equals('.')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataPuntuacion.getInstance().esPunto();
-        } else if(currentChar.equals(';')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataPuntuacion.getInstance().esPuntoComa();
-        } else if(currentChar.equals(',')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataPuntuacion.getInstance().esComa();
-        } else if(currentChar.equals('<')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataOperador.getInstance().esMenor();
-        } else if(currentChar.equals('>')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataOperador.getInstance().esMayor();
-        } else if(currentChar.equals('!')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataOperador.getInstance().esNegacion();
-        } else if(currentChar.equals('+')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataOperador.getInstance().esSuma();
-        } else if(currentChar.equals('-')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataOperador.getInstance().esResta();
-        } else if(currentChar.equals('/')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataOperador.getInstance().esDivision();
-        } else if(currentChar.equals('*')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataOperador.getInstance().esProducto();
-        } else if(currentChar.equals('%')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataOperador.getInstance().esModulo();
-        } else if(currentChar.equals('=')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataAsignacion.getInstance().esIgual();
-        } else if(currentChar.equals('|')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataOperador.getInstance().esOr1();
-        } else if(currentChar.equals('&')){
-            updateLexema();
-            updateCurrentChar();
-            return AutomataOperador.getInstance().esAnd1();
+        } else if((lazyTokenEvaluation = charToTokenMap.get(currentChar)) != null){
+            updateAll();
+            return lazyTokenEvaluation.eval();
         } else {
             LexicalException charWithLexicalException;
             updateLexema();
-            charWithLexicalException = new LexicalException(
-                    lexema.toString(),
-                    gestorDeSource.getLineNumber(),
-                    getGestorDeSource().getColumnNumber()
-            );
-
-            charWithLexicalException.setLineError(gestorDeSource.getCurrentLine());
-            charWithLexicalException.setDescriptionError("no es un símbolo válido.");
-
+            charWithLexicalException = createLexicalExceptionByCharInvalid();
             updateCurrentChar();
 
             throw charWithLexicalException;
@@ -164,7 +123,27 @@ public class HandlerAutomata {
     }
 
     private Token estadoEOF() {
-        return new Token("eof", "", gestorDeSource.getLineNumber());
+        return new Token(TokenName.EOF, "", gestorDeSource.getLineNumber());
     }
 
+    private LexicalException createLexicalExceptionByCharInvalid(){
+        LexicalException lexicalException = new LexicalException(
+                lexema.toString(),
+                gestorDeSource.getLineNumber(),
+                getGestorDeSource().getColumnNumber()
+        );
+
+        lexicalException.setLineError(gestorDeSource.getCurrentLine());
+        lexicalException.setDescriptionError(LexicalErrorDescription.INVALID_SYMBOL);
+
+        return lexicalException;
+    }
+
+    Character getCurrentChar(){
+        return currentChar;
+    }
+
+    String getLexema(){
+        return lexema.toString();
+    }
 }

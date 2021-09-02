@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 
+import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalErrorDescription;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 
@@ -14,42 +15,44 @@ class AutomataComentario extends Automata {
     }
 
     Token esInicioComentarioEnBloque() throws LexicalException {
-        if(!isEndOfFile() && !handler.getCurrentChar().equals('*')){
+        while(!isEndOfFile() && !handler.getCurrentChar().equals('*')){
             updateHandler();
-            return esInicioComentarioEnBloque();
-        } else if(!isEndOfFile() && handler.getCurrentChar().equals('*')){
+        }
+
+        if(!isEndOfFile()){
             updateHandler();
             return esFinComentarioEnBloque1();
         } else {
-            throw createLexicalException("debe finalizar con */ para cerrar el bloque de comentarios.");
+            throw createLexicalException(LexicalErrorDescription.BLOCK_COMMENT_NEVER_CLOSED);
         }
     }
 
     Token esFinComentarioEnBloque1() throws LexicalException {
-        if(!isEndOfFile() && !handler.getCurrentChar().equals('*')){
+         while(!isEndOfFile() && handler.getCurrentChar().equals('*')) {
+            updateHandler();
+         }
+
+        if(!isEndOfFile() && !handler.getCurrentChar().equals('/')){
             updateHandler();
             return esInicioComentarioEnBloque();
-        } else if(!isEndOfFile() && handler.getCurrentChar().equals('*')) {
-            updateHandler();
-            return esFinComentarioEnBloque1();
         } else if(!isEndOfFile() && handler.getCurrentChar().equals('/')) {
             updateHandler();
             return esFinComentarioEnBloque2();
         } else {
-            throw createLexicalException("debe finalizar con */ para cerrar el bloque de comentarios.");
+            throw createLexicalException(LexicalErrorDescription.BLOCK_COMMENT_NEVER_CLOSED);
         }
     }
 
-    Token esFinComentarioEnBloque2() {
-        return createToken("comentario_bloque");
+    Token esFinComentarioEnBloque2() throws LexicalException {
+        return handler.nextToken();
     }
 
-    Token esComentarioEnLinea() {
+    Token esComentarioEnLinea() throws LexicalException {
         if(!isEndOfFile() && !handler.getCurrentChar().equals('\n')){
             updateHandler();
             return esComentarioEnLinea();
         } else {
-            return createToken("comentario_linea");
+            return handler.nextToken();
         }
     }
 

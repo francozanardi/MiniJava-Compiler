@@ -26,6 +26,8 @@ public class GestorDeSource {
         fileReader = new FileReader(file);
 
         readAllFile();
+
+        fileReader.close();
     }
 
     private void readAllFile() throws IOException {

@@ -1,7 +1,10 @@
 package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 
+import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalErrorDescription;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
+
 import java.util.regex.Pattern;
 
 class AutomataString extends Automata {
@@ -16,17 +19,18 @@ class AutomataString extends Automata {
     }
 
     Token esInicioString() throws LexicalException {
-        if(!isEndOfFile() && notIsStringBreak()){
+        while(!isEndOfFile() && notIsStringBreak()){
             updateHandler();
-            return esInicioString();
-        } else if(!isEndOfFile() && handler.getCurrentChar().equals('\\')){
+        }
+
+        if(!isEndOfFile() && handler.getCurrentChar().equals('\\')){
             updateHandler();
             return esBackslashEnString();
         } else if(!isEndOfFile() && handler.getCurrentChar().equals('"')){
             updateHandler();
             return esFinString();
         } else {
-            throw createLexicalException("no posee correctamente cerrada las comillas.");
+            throw createLexicalException(LexicalErrorDescription.STRING_NEVER_CLOSED);
         }
     }
 
@@ -41,12 +45,12 @@ class AutomataString extends Automata {
             updateHandler();
             return esInicioString();
         } else {
-            throw createLexicalException("no posee correctamente cerrada las comillas.");
+            throw createLexicalException(LexicalErrorDescription.STRING_NEVER_CLOSED);
         }
     }
 
     Token esFinString() {
-        return createToken("string");
+        return createToken(TokenName.STRING);
     }
 
 }
