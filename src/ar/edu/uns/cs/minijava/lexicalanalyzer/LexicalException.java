@@ -2,18 +2,18 @@ package ar.edu.uns.cs.minijava.lexicalanalyzer;
 
 public class LexicalException extends Exception {
     private String lexemaError;
-    private int lineNumberError;
-    private int columnNumberError;
-    private String lineError;
+    private int lineNumberInError;
+    private int columnNumberInError;
+    private String errorLine;
     private String descriptionError;
 
     public LexicalException(String lexema, int lineNumber, int columnNumber){
         super(getErrorCodeMessage(lexema, lineNumber));
 
         this.lexemaError = lexema;
-        this.lineNumberError = lineNumber;
-        this.columnNumberError = columnNumber;
-        this.lineError = "";
+        this.lineNumberInError = lineNumber;
+        this.columnNumberInError = columnNumber;
+        this.errorLine = "";
         this.descriptionError = "";
     }
 
@@ -22,8 +22,13 @@ public class LexicalException extends Exception {
     }
 
     private static String getFirstLine(String text){
-        String[] multiLine = text.split("\n");
-        return multiLine.length > 1 ? multiLine[0] + "..." : multiLine[0];
+        int indexSaltoDeLinea = text.indexOf('\n');
+        boolean haySaltoDeLinea = indexSaltoDeLinea != -1;
+
+        indexSaltoDeLinea = haySaltoDeLinea ? indexSaltoDeLinea : text.length();
+        String firstLine = text.substring(0, indexSaltoDeLinea);
+
+        return haySaltoDeLinea ? firstLine + "..." : firstLine;
     }
 
 
@@ -31,20 +36,20 @@ public class LexicalException extends Exception {
         return lexemaError;
     }
 
-    public int getLineNumberError() {
-        return lineNumberError;
+    public int getLineNumberInError() {
+        return lineNumberInError;
     }
 
     public int getColumnNumberError(){
-        return columnNumberError;
+        return columnNumberInError;
     }
 
-    public void setLineError(String lineError){
-        this.lineError = lineError;
+    public void setErrorLine(String errorLine){
+        this.errorLine = errorLine;
     }
 
-    public String getLineError(){
-        return lineError;
+    public String getErrorLine(){
+        return errorLine;
     }
 
     public String getDescriptionError() {

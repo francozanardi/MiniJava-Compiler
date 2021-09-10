@@ -1,7 +1,8 @@
 package ar.edu.uns.cs.minijava.lexicalanalyzer;
 
 public class TokenName {
-    public static final String STRING = "string";
+    public static final String STRING = "string_linea";
+    public static final String STRING_BLOCK = "string_bloque";
 
     public static final String ASIGNACION = "asignacion";
     public static final String INCREMENTOR = "incrementor";

@@ -19,37 +19,53 @@ class AutomataString extends Automata {
     }
 
     Token esInicioString() throws LexicalException {
-        while(!isEndOfFile() && notIsStringBreak()){
+        if(!isEndOfFile() && handler.getCurrentChar().equals('"')){
+            updateHandler();
+            return AutomataStringBloque.getInstance().esStringVaciaOEnBloque();
+        } else if(!isEndOfFile() && handler.getCurrentChar().equals('\\')){
+            updateHandler();
+            return esBackslashEnStringInLine();
+        } else if(!isEndOfFile() && !handler.getCurrentChar().equals('\n')){
+            updateHandler();
+            return esStringInLine();
+        } else {
+            throw createLexicalException(LexicalErrorDescription.STRING_NEVER_CLOSED);
+        }
+    }
+
+
+    Token esStringInLine() throws LexicalException {
+        while(!isEndOfFile() && notIsStringLineBreak()){
             updateHandler();
         }
 
         if(!isEndOfFile() && handler.getCurrentChar().equals('\\')){
             updateHandler();
-            return esBackslashEnString();
+            return esBackslashEnStringInLine();
         } else if(!isEndOfFile() && handler.getCurrentChar().equals('"')){
             updateHandler();
-            return esFinString();
+            return esFinStringInLine();
         } else {
             throw createLexicalException(LexicalErrorDescription.STRING_NEVER_CLOSED);
         }
     }
 
-    private boolean notIsStringBreak(){
+    private boolean notIsStringLineBreak(){
         Pattern stringBreakerPattern = Pattern.compile("[^\\\\\"\\n]");
 
         return stringBreakerPattern.matcher(handler.getCurrentChar().toString()).matches();
     }
 
-    Token esBackslashEnString() throws LexicalException {
+    Token esBackslashEnStringInLine() throws LexicalException {
         if(!isEndOfFile() && !handler.getCurrentChar().equals('\n')){
             updateHandler();
-            return esInicioString();
+            return esStringInLine();
         } else {
             throw createLexicalException(LexicalErrorDescription.STRING_NEVER_CLOSED);
         }
     }
 
-    Token esFinString() {
+    Token esFinStringInLine() {
         return createToken(TokenName.STRING);
     }
 

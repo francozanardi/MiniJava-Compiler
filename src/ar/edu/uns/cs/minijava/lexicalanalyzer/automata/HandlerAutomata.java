@@ -49,24 +49,24 @@ public class HandlerAutomata {
     private void loadDigitos(){
         LazyTokenEvaluation lazyEvalDigitos = () -> AutomataEntero.getInstance().esDigito();
 
-        for(int c = '0'; c <= '9'; c++){
-            charToTokenMap.put((char)c, lazyEvalDigitos);
+        for(Character c: CharacterUtils.getAllDigits()){
+            charToTokenMap.put(c, lazyEvalDigitos);
         }
     }
 
     private void loadMinusculas(){
         LazyTokenEvaluation lazyEvalMinusculas = () -> AutomataIdentificador.getInstance().esIdMetVar();
 
-        for(int c = 'a'; c <= 'z'; c++){
-            charToTokenMap.put((char)c, lazyEvalMinusculas);
+        for(Character c: CharacterUtils.getAllLowerCase()){
+            charToTokenMap.put(c, lazyEvalMinusculas);
         }
     }
 
     private void loadMayusculas(){
         LazyTokenEvaluation lazyEvalMayusculas = () -> AutomataIdentificador.getInstance().esIdClase();
 
-        for(int c = 'A'; c <= 'Z'; c++){
-            charToTokenMap.put((char)c, lazyEvalMayusculas);
+        for(Character c: CharacterUtils.getAllUpperCase()){
+            charToTokenMap.put(c, lazyEvalMayusculas);
         }
     }
 
@@ -115,7 +115,7 @@ public class HandlerAutomata {
         } else {
             LexicalException charWithLexicalException;
             updateLexema();
-            charWithLexicalException = createLexicalExceptionByCharInvalid();
+            charWithLexicalException = createLexicalException(LexicalErrorDescription.INVALID_SYMBOL);
             updateCurrentChar();
 
             throw charWithLexicalException;
@@ -126,15 +126,22 @@ public class HandlerAutomata {
         return new Token(TokenName.EOF, "", gestorDeSource.getLineNumber());
     }
 
-    private LexicalException createLexicalExceptionByCharInvalid(){
+    LexicalException createLexicalException(String errorDescription){
+        String[] lexemaInLines = lexema.toString().split("\n", -1);
+        int cantDeLineasEnLexema = lexemaInLines.length;
+
+        int firstLineNumberInError = gestorDeSource.getLineNumber()-cantDeLineasEnLexema+1;
+        String firstLineInError = gestorDeSource.getLine(firstLineNumberInError);
+        int firstColumnNumberInError = firstLineInError.length()-lexemaInLines[0].length()+1;
+
         LexicalException lexicalException = new LexicalException(
                 lexema.toString(),
-                gestorDeSource.getLineNumber(),
-                getGestorDeSource().getColumnNumber()
+                firstLineNumberInError,
+                firstColumnNumberInError
         );
 
-        lexicalException.setLineError(gestorDeSource.getCurrentLine());
-        lexicalException.setDescriptionError(LexicalErrorDescription.INVALID_SYMBOL);
+        lexicalException.setErrorLine(firstLineInError);
+        lexicalException.setDescriptionError(errorDescription);
 
         return lexicalException;
     }

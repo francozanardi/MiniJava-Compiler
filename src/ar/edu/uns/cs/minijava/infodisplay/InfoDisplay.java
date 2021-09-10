@@ -26,11 +26,11 @@ public class InfoDisplay {
 
     public void mostrarLexicalException(LexicalException error) {
         String errorMessage = "Error léxico en línea " +
-                error.getLineNumberError() +
+                error.getLineNumberInError() +
                 ", columna " +
                 error.getColumnNumberError() +
                 ": " +
-                getFirstLine(error.getLexemaError()) +
+                error.getLexemaError() +
                 " " +
                 error.getDescriptionError();
 
@@ -41,21 +41,17 @@ public class InfoDisplay {
         System.out.println();
     }
 
-    private String getFirstLine(String text){
-        String[] multiLine = text.split("\n");
-        return multiLine.length > 1 ? multiLine[0] + "..." : multiLine[0];
-    }
 
     private void mostrarInformacionDetallada(LexicalException error) {
         String errorTitleInErrorLine = "Detalle: ";
         StringBuilder errorIndication = new StringBuilder();
 
         addSpacesDueToTitle(errorIndication, errorTitleInErrorLine);
-        addSpacesDueToLine(errorIndication, error);
+        addSpacesDueToLineInError(errorIndication, error);
 
         errorIndication.append("^");
 
-        System.out.println(errorTitleInErrorLine + error.getLineError());
+        System.out.println(errorTitleInErrorLine + error.getErrorLine());
         System.out.println(errorIndication.toString());
     }
 
@@ -65,8 +61,8 @@ public class InfoDisplay {
         }
     }
 
-    private void addSpacesDueToLine(StringBuilder errorIndication, LexicalException error) {
-        String lineError = error.getLineError();
+    private void addSpacesDueToLineInError(StringBuilder errorIndication, LexicalException error) {
+        String lineError = error.getErrorLine();
         for(int i = 0; i < error.getColumnNumberError()-1; i++){
             if(lineError.charAt(i) != '\t'){
                 errorIndication.append(" ");

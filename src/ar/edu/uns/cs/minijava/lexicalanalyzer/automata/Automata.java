@@ -3,8 +3,6 @@ package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 
-import java.io.IOException;
-
 abstract class Automata {
     protected HandlerAutomata handler;
 
@@ -26,15 +24,6 @@ abstract class Automata {
     }
 
     protected LexicalException createLexicalException(String errorDescription) {
-        LexicalException lexicalException = new LexicalException(
-                handler.getLexema(),
-                handler.getGestorDeSource().getLineNumber(),
-                handler.getGestorDeSource().getColumnNumber()
-        );
-
-        lexicalException.setLineError(handler.getGestorDeSource().getCurrentLine());
-        lexicalException.setDescriptionError(errorDescription);
-
-        return lexicalException;
+        return handler.createLexicalException(errorDescription);
     }
 }

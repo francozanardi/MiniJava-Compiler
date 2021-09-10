@@ -105,4 +105,8 @@ public class GestorDeSource {
     public String getCurrentLine(){
         return allLines.get(lineNumber-1).replace("\n", "");
     }
+
+    public String getLine(int lineRequested){
+        return allLines.get(lineRequested-1).replace("\n", "");
+    }
 }

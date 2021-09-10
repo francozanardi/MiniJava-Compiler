@@ -13,5 +13,6 @@
 
 
 
-* Ver los métodos que agregamos para mostrar por pantalla strings, que solo agregamos que se muestre la primera línea. Pensar eso bien y corregirlo.
-* agregar el bloque de strings
+* Hacer más casos de pruebas inteligentes.
+* Hacer informe.
+* Mover el error elegante al inicio de donde comienza el error.
