@@ -8,7 +8,7 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 import java.util.regex.Pattern;
 
 class AutomataCaracter extends Automata {
-    private static AutomataCaracter ourInstance = new AutomataCaracter();
+    private static final AutomataCaracter ourInstance = new AutomataCaracter();
 
     static AutomataCaracter getInstance() {
         return ourInstance;

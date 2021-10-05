@@ -6,7 +6,7 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 
 public class AutomataStringBloque extends Automata {
-    private static AutomataStringBloque ourInstance = new AutomataStringBloque();
+    private static final AutomataStringBloque ourInstance = new AutomataStringBloque();
 
     public static AutomataStringBloque getInstance() {
         return ourInstance;

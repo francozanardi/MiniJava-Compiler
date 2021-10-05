@@ -9,7 +9,7 @@ import ar.edu.uns.cs.minijava.util.CharacterUtils;
 import static ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalAnalyzerSettings.MAX_INTEGER_LENGTH;
 
 class AutomataEntero extends Automata {
-    private static AutomataEntero ourInstance = new AutomataEntero();
+    private static final AutomataEntero ourInstance = new AutomataEntero();
 
     static AutomataEntero getInstance() {
         return ourInstance;

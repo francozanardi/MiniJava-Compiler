@@ -19,5 +19,16 @@
 ./src/ar/edu/uns/cs/minijava/lexicalanalyzer/Token.java
 ./src/ar/edu/uns/cs/minijava/lexicalanalyzer/TokenName.java
 ./src/ar/edu/uns/cs/minijava/Main.java
+./src/ar/edu/uns/cs/minijava/syntaxanalyzer/CurrentTokenHandler.java
+./src/ar/edu/uns/cs/minijava/syntaxanalyzer/gramatica/core/Derivacion.java
+./src/ar/edu/uns/cs/minijava/syntaxanalyzer/gramatica/core/Estado.java
+./src/ar/edu/uns/cs/minijava/syntaxanalyzer/gramatica/core/EstadoRecursivo.java
+./src/ar/edu/uns/cs/minijava/syntaxanalyzer/gramatica/core/NoTerminal.java
+./src/ar/edu/uns/cs/minijava/syntaxanalyzer/gramatica/core/NoTerminalConEpsilon.java
+./src/ar/edu/uns/cs/minijava/syntaxanalyzer/gramatica/core/Terminal.java
+./src/ar/edu/uns/cs/minijava/syntaxanalyzer/gramatica/NoTerminales.java
+./src/ar/edu/uns/cs/minijava/syntaxanalyzer/gramatica/Terminales.java
+./src/ar/edu/uns/cs/minijava/syntaxanalyzer/SyntaxAnalyzer.java
+./src/ar/edu/uns/cs/minijava/syntaxanalyzer/SyntaxException.java
 ./src/ar/edu/uns/cs/minijava/util/CharacterUtils.java
 ./src/ar/edu/uns/cs/minijava/util/GestorDeSource.java

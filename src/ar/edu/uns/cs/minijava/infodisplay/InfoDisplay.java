@@ -2,6 +2,8 @@ package ar.edu.uns.cs.minijava.infodisplay;
 
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.syntaxanalyzer.SyntaxAnalyzer;
+import ar.edu.uns.cs.minijava.syntaxanalyzer.SyntaxException;
 
 import java.io.IOException;
 
@@ -87,5 +89,11 @@ public class InfoDisplay {
                 " error" +
                 (cantidadErrores != 1 ? "es" : "") +
                 " en todo el archivo fuente.");
+    }
+
+    public void mostrarSyntaxException(SyntaxException syntaxException) {
+        System.out.println(syntaxException.getMessage());
+        System.out.println();
+        System.out.println(syntaxException.getErrorCodeMessage());
     }
 }

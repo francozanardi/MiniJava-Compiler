@@ -4,7 +4,7 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 
 class AutomataPuntuacion extends Automata {
-    private static AutomataPuntuacion ourInstance = new AutomataPuntuacion();
+    private static final AutomataPuntuacion ourInstance = new AutomataPuntuacion();
 
     static AutomataPuntuacion getInstance() {
         return ourInstance;

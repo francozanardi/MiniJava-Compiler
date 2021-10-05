@@ -7,7 +7,7 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 
 
 class AutomataOperador extends Automata {
-    private static AutomataOperador ourInstance = new AutomataOperador();
+    private static final AutomataOperador ourInstance = new AutomataOperador();
 
     static AutomataOperador getInstance() {
         return ourInstance;

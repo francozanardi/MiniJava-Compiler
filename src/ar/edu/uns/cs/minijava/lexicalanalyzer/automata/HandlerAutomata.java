@@ -10,8 +10,8 @@ public class HandlerAutomata {
     private StringBuilder lexema;
     private Character currentChar;
     private GestorDeSource gestorDeSource;
-    private HashMap<Character, LazyTokenEvaluation> charToTokenMap;
-    private static HandlerAutomata ourInstance = new HandlerAutomata();
+    private final HashMap<Character, LazyTokenEvaluation> charToTokenMap;
+    private static final HandlerAutomata ourInstance = new HandlerAutomata();
 
     private HandlerAutomata() {
         charToTokenMap = new HashMap<>();
@@ -129,21 +129,42 @@ public class HandlerAutomata {
     LexicalException createLexicalException(String errorDescription){
         String[] lexemaInLines = lexema.toString().split("\n", -1);
         int cantDeLineasEnLexema = lexemaInLines.length;
-
-        int firstLineNumberInError = gestorDeSource.getLineNumber()-cantDeLineasEnLexema+1;
-        String firstLineInError = gestorDeSource.getLine(firstLineNumberInError);
-        int firstColumnNumberInError = firstLineInError.length()-lexemaInLines[0].length()+1;
+        int firstLineNumberInError = getFirstLineNumberInError(cantDeLineasEnLexema);
+        String firstLineInError = getFirstLineInError(cantDeLineasEnLexema, firstLineNumberInError);
+        int firstColumnNumberInError = getFirstColumnNumberInError(
+                cantDeLineasEnLexema, firstLineInError, lexemaInLines[0].length());
 
         LexicalException lexicalException = new LexicalException(
-                lexema.toString(),
-                firstLineNumberInError,
-                firstColumnNumberInError
-        );
+                lexema.toString(), firstLineNumberInError, firstColumnNumberInError);
 
         lexicalException.setErrorLine(firstLineInError);
         lexicalException.setDescriptionError(errorDescription);
 
         return lexicalException;
+    }
+
+    private int getFirstLineNumberInError(int cantDeLineasEnLexema){
+        if(cantDeLineasEnLexema > 1){
+            return gestorDeSource.getLineNumber()-cantDeLineasEnLexema+1;
+        }
+
+        return gestorDeSource.getLineNumber();
+    }
+
+    private String getFirstLineInError(int cantDeLineasEnLexema, int firstLineNumberInError){
+        if(cantDeLineasEnLexema > 1){
+            return gestorDeSource.getLine(firstLineNumberInError);
+        }
+
+        return gestorDeSource.getCurrentLine();
+    }
+
+    private int getFirstColumnNumberInError(int cantDeLineasEnLexema, String firstLineInError, int firstLineInLexemaLength){
+        if(cantDeLineasEnLexema > 1){
+            return firstLineInError.length()-firstLineInLexemaLength+1;
+        }
+
+        return firstLineInError.indexOf(lexema.toString()) + 1;
     }
 
     Character getCurrentChar(){

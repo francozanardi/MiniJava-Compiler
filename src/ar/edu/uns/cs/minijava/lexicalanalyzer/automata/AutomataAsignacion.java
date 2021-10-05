@@ -4,7 +4,7 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 
 class AutomataAsignacion extends Automata {
-    private static AutomataAsignacion ourInstance = new AutomataAsignacion();
+    private static final AutomataAsignacion ourInstance = new AutomataAsignacion();
 
     static AutomataAsignacion getInstance() {
         return ourInstance;

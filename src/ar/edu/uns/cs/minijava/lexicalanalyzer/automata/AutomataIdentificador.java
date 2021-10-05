@@ -5,7 +5,7 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 import ar.edu.uns.cs.minijava.util.CharacterUtils;
 
 class AutomataIdentificador extends Automata {
-    private static AutomataIdentificador ourInstance = new AutomataIdentificador();
+    private static final AutomataIdentificador ourInstance = new AutomataIdentificador();
 
     static AutomataIdentificador getInstance() {
         return ourInstance;

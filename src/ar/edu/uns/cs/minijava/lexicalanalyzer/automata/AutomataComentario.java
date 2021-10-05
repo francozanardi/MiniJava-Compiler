@@ -5,7 +5,7 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 
 class AutomataComentario extends Automata {
-    private static AutomataComentario ourInstance = new AutomataComentario();
+    private static final AutomataComentario ourInstance = new AutomataComentario();
 
     static AutomataComentario getInstance() {
         return ourInstance;

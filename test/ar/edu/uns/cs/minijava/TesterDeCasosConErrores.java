@@ -3,6 +3,7 @@ package ar.edu.uns.cs.minijava;
 import java.io.*;
 import java.util.ArrayList;
 
+import ar.edu.uns.cs.minijava.Main;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Test;
@@ -16,7 +17,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class TesterDeCasosConErrores {
     
     //TODO: el tipo de esta variable init tiene que ser la clase que tiene el main
-    private static final ar.edu.uns.cs.minijava.Main init = null;
+    private static final Main init = null;
     
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
