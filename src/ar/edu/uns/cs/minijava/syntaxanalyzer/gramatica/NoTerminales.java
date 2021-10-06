@@ -153,7 +153,7 @@ public class NoTerminales {
                 listaMiembros = NoTerminalConEpsilon
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(PUBLIC_PR ,PRIVATE_PR ,IDENTIFICADOR_DE_CLASE ,STATIC_PR ,DYNAMIC_PR)
+                                Derivacion.create(PUBLIC_PR, PRIVATE_PR, IDENTIFICADOR_DE_CLASE, STATIC_PR, DYNAMIC_PR)
                                         .appendEstado(this::miembro)
                                         .appendEstadoRecursivo()
                         )
@@ -165,7 +165,7 @@ public class NoTerminales {
                 miembro = NoTerminal
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(PUBLIC_PR ,PRIVATE_PR)
+                                Derivacion.create(PUBLIC_PR, PRIVATE_PR)
                                         .appendEstado(this::atributo)
                         )
                         .appendDerivacion(
@@ -173,7 +173,7 @@ public class NoTerminales {
                                         .appendEstado(this::constructor)
                         )
                         .appendDerivacion(
-                                Derivacion.create(STATIC_PR ,DYNAMIC_PR)
+                                Derivacion.create(STATIC_PR, DYNAMIC_PR)
                                         .appendEstado(this::metodo)
                         )
                         .build());
@@ -184,7 +184,7 @@ public class NoTerminales {
                 atributo = NoTerminal
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(PUBLIC_PR ,PRIVATE_PR)
+                                Derivacion.create(PUBLIC_PR, PRIVATE_PR)
                                         .appendEstado(this::visibilidad)
                                         .appendEstado(this::tipo)
                                         .appendEstado(this::listaDecAtrs)
@@ -211,7 +211,7 @@ public class NoTerminales {
                 metodo = NoTerminal
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(STATIC_PR ,DYNAMIC_PR)
+                                Derivacion.create(STATIC_PR, DYNAMIC_PR)
                                         .appendEstado(this::formaMetodo)
                                         .appendEstado(this::tipoMetodo)
                                         .appendEstado(terminales.getTerminal(IDENTIFICADOR_DE_METODO_O_VARIABLE))
@@ -241,7 +241,7 @@ public class NoTerminales {
                 tipo = NoTerminal
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(BOOLEAN_PR ,CHAR_PR ,INT_PR ,STRING_PR)
+                                Derivacion.create(BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR)
                                         .appendEstado(this::tipoPrimitivo)
                         )
                         .appendDerivacion(
@@ -319,7 +319,7 @@ public class NoTerminales {
                 tipoMetodo = NoTerminal
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(BOOLEAN_PR ,CHAR_PR ,INT_PR ,STRING_PR ,IDENTIFICADOR_DE_CLASE)
+                                Derivacion.create(BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE)
                                         .appendEstado(this::tipo)
                         )
                         .appendDerivacion(
@@ -347,7 +347,7 @@ public class NoTerminales {
                 listaArgsFormalesOVacio = NoTerminalConEpsilon
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(BOOLEAN_PR ,CHAR_PR ,INT_PR ,STRING_PR ,IDENTIFICADOR_DE_CLASE)
+                                Derivacion.create(BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE)
                                         .appendEstado(this::listaArgsFormales)
                         )
                         .build());
@@ -358,7 +358,7 @@ public class NoTerminales {
                 listaArgsFormales = NoTerminal
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(BOOLEAN_PR ,CHAR_PR ,INT_PR ,STRING_PR ,IDENTIFICADOR_DE_CLASE)
+                                Derivacion.create(BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE)
                                         .appendEstado(this::argFormal)
                                         .appendEstado(this::listaArgsFormalesAux)
                         )
@@ -383,7 +383,7 @@ public class NoTerminales {
                 argFormal = NoTerminal
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(BOOLEAN_PR ,CHAR_PR ,INT_PR ,STRING_PR ,IDENTIFICADOR_DE_CLASE)
+                                Derivacion.create(BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE)
                                         .appendEstado(this::tipo)
                                         .appendEstado(terminales.getTerminal(IDENTIFICADOR_DE_METODO_O_VARIABLE))
                         )
@@ -408,7 +408,7 @@ public class NoTerminales {
                 listaSentencias = NoTerminalConEpsilon
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(PUNTO_Y_COMA ,BOOLEAN_PR ,CHAR_PR ,INT_PR ,STRING_PR ,IDENTIFICADOR_DE_CLASE ,RETURN_PR ,IF_PR ,FOR_PR ,LLAVE_ABRE ,THIS_PR ,NEW_PR ,IDENTIFICADOR_DE_METODO_O_VARIABLE ,PARENTESIS_ABRE)
+                                Derivacion.create(PUNTO_Y_COMA, BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE, RETURN_PR, IF_PR, FOR_PR, LLAVE_ABRE, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE)
                                         .appendEstado(this::sentencia)
                                         .appendEstadoRecursivo()
                         )
@@ -424,7 +424,7 @@ public class NoTerminales {
                                         .appendEstado(terminales.getTerminal(PUNTO_Y_COMA))
                         )
                         .appendDerivacion(
-                                Derivacion.create(BOOLEAN_PR ,CHAR_PR ,INT_PR ,STRING_PR ,IDENTIFICADOR_DE_CLASE)
+                                Derivacion.create(BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE)
                                         .appendEstado(this::varLocal)
                                         .appendEstado(terminales.getTerminal(PUNTO_Y_COMA))
                         )
@@ -446,7 +446,7 @@ public class NoTerminales {
                                         .appendEstado(this::bloque)
                         )
                         .appendDerivacion(
-                                Derivacion.create(THIS_PR ,NEW_PR ,IDENTIFICADOR_DE_METODO_O_VARIABLE ,PARENTESIS_ABRE)
+                                Derivacion.create(THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE)
                                         .appendEstado(this::asignacionOLlamada)
                                         .appendEstado(terminales.getTerminal(PUNTO_Y_COMA))
                         )
@@ -458,7 +458,7 @@ public class NoTerminales {
                 asignacionOLlamada = NoTerminal
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(THIS_PR ,NEW_PR ,IDENTIFICADOR_DE_METODO_O_VARIABLE ,PARENTESIS_ABRE)
+                                Derivacion.create(THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE)
                                         .appendEstado(this::acceso)
                                         .appendEstado(this::asignacionOLlamadaAux)
                         )
@@ -470,7 +470,7 @@ public class NoTerminales {
                 asignacionOLlamadaAux = NoTerminalConEpsilon
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(ASIGNACION ,INCREMENTOR ,DECREMENTOR)
+                                Derivacion.create(ASIGNACION, INCREMENTOR, DECREMENTOR)
                                         .appendEstado(this::tipoDeAsignacion)
                         )
                         .build());
@@ -481,7 +481,7 @@ public class NoTerminales {
                 asignacion = NoTerminal
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(THIS_PR ,NEW_PR ,IDENTIFICADOR_DE_METODO_O_VARIABLE ,PARENTESIS_ABRE)
+                                Derivacion.create(THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE)
                                         .appendEstado(this::acceso)
                                         .appendEstado(this::tipoDeAsignacion)
                         )
@@ -513,7 +513,7 @@ public class NoTerminales {
                 varLocal = NoTerminal
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(BOOLEAN_PR ,CHAR_PR ,INT_PR ,STRING_PR ,IDENTIFICADOR_DE_CLASE)
+                                Derivacion.create(BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE)
                                         .appendEstado(this::tipo)
                                         .appendEstado(terminales.getTerminal(IDENTIFICADOR_DE_METODO_O_VARIABLE))
                                         .appendEstado(this::varLocalAux)
@@ -550,7 +550,7 @@ public class NoTerminales {
                 expresionOVacio = NoTerminalConEpsilon
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(SUMA ,RESTA ,NEGACION ,NULL_PR ,TRUE_PR ,FALSE_PR ,ENTERO ,CARACTER ,STRING ,THIS_PR ,NEW_PR ,IDENTIFICADOR_DE_METODO_O_VARIABLE ,PARENTESIS_ABRE)
+                                Derivacion.create(SUMA, RESTA, NEGACION, NULL_PR, TRUE_PR, FALSE_PR, ENTERO, CARACTER, STRING, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE)
                                         .appendEstado(this::expresion)
                         )
                         .build());
@@ -608,7 +608,7 @@ public class NoTerminales {
                 expresion = NoTerminal
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(SUMA ,RESTA ,NEGACION ,NULL_PR ,TRUE_PR ,FALSE_PR ,ENTERO ,CARACTER ,STRING ,THIS_PR ,NEW_PR ,IDENTIFICADOR_DE_METODO_O_VARIABLE ,PARENTESIS_ABRE)
+                                Derivacion.create(SUMA, RESTA, NEGACION, NULL_PR, TRUE_PR, FALSE_PR, ENTERO, CARACTER, STRING, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE)
                                         .appendEstado(this::expresionUnaria)
                                         .appendEstado(this::expresionBinaria)
                         )
@@ -620,7 +620,7 @@ public class NoTerminales {
                 expresionBinaria = NoTerminalConEpsilon
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(OR ,AND ,COMPARACION ,DISTINTO ,MENOR ,MAYOR ,MENOR_IGUAL ,MAYOR_IGUAL ,SUMA ,RESTA ,PRODUCTO ,DIVISION ,MODULO)
+                                Derivacion.create(OR, AND, COMPARACION, DISTINTO, MENOR, MAYOR, MENOR_IGUAL, MAYOR_IGUAL, SUMA, RESTA, PRODUCTO, DIVISION, MODULO)
                                         .appendEstado(this::operadorBinario)
                                         .appendEstado(this::expresionUnaria)
                                         .appendEstadoRecursivo()
@@ -692,12 +692,12 @@ public class NoTerminales {
                 expresionUnaria = NoTerminal
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(SUMA ,RESTA ,NEGACION)
+                                Derivacion.create(SUMA, RESTA, NEGACION)
                                         .appendEstado(this::operadorUnario)
                                         .appendEstado(this::operando)
                         )
                         .appendDerivacion(
-                                Derivacion.create(NULL_PR ,TRUE_PR ,FALSE_PR ,ENTERO ,CARACTER ,STRING ,THIS_PR ,NEW_PR ,IDENTIFICADOR_DE_METODO_O_VARIABLE ,PARENTESIS_ABRE)
+                                Derivacion.create(NULL_PR, TRUE_PR, FALSE_PR, ENTERO, CARACTER, STRING, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE)
                                         .appendEstado(this::operando)
                         )
                         .build());
@@ -727,11 +727,11 @@ public class NoTerminales {
                 operando = NoTerminal
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(NULL_PR ,TRUE_PR ,FALSE_PR ,ENTERO ,CARACTER ,STRING)
+                                Derivacion.create(NULL_PR, TRUE_PR, FALSE_PR, ENTERO, CARACTER, STRING)
                                         .appendEstado(this::literal)
                         )
                         .appendDerivacion(
-                                Derivacion.create(THIS_PR ,NEW_PR ,IDENTIFICADOR_DE_METODO_O_VARIABLE ,PARENTESIS_ABRE)
+                                Derivacion.create(THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE)
                                         .appendEstado(this::acceso)
                         )
                         .build());
@@ -773,7 +773,7 @@ public class NoTerminales {
                 acceso = NoTerminal
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(THIS_PR ,NEW_PR ,IDENTIFICADOR_DE_METODO_O_VARIABLE)
+                                Derivacion.create(THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE)
                                         .appendEstado(this::primarioSinExpresionParentizada)
                                         .appendEstado(this::encadenado)
                         )
@@ -808,7 +808,7 @@ public class NoTerminales {
                                         .appendEstado(this::primarioConExpresionParentizada)
                         )
                         .appendDerivacion(
-                                Derivacion.create(SUMA ,RESTA ,NEGACION ,NULL_PR ,TRUE_PR ,FALSE_PR ,ENTERO ,CARACTER ,STRING ,THIS_PR ,NEW_PR ,IDENTIFICADOR_DE_METODO_O_VARIABLE ,PARENTESIS_ABRE)
+                                Derivacion.create(SUMA, RESTA, NEGACION, NULL_PR, TRUE_PR, FALSE_PR, ENTERO, CARACTER, STRING, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE)
                                         .appendEstado(this::expresion)
                                         .appendEstado(terminales.getTerminal(PARENTESIS_CIERRA))
                         )
@@ -824,7 +824,7 @@ public class NoTerminales {
                                         .appendEstado(this::expresionParentizada)
                         )
                         .appendDerivacion(
-                                Derivacion.create(THIS_PR ,NEW_PR ,IDENTIFICADOR_DE_METODO_O_VARIABLE)
+                                Derivacion.create(THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE)
                                         .appendEstado(this::primarioSinExpresionParentizada)
                         )
                         .build());
@@ -927,7 +927,7 @@ public class NoTerminales {
                 listaExpsOVacio = NoTerminalConEpsilon
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(SUMA ,RESTA ,NEGACION ,NULL_PR ,TRUE_PR ,FALSE_PR ,ENTERO ,CARACTER ,STRING ,THIS_PR ,NEW_PR ,IDENTIFICADOR_DE_METODO_O_VARIABLE ,PARENTESIS_ABRE)
+                                Derivacion.create(SUMA, RESTA, NEGACION, NULL_PR, TRUE_PR, FALSE_PR, ENTERO, CARACTER, STRING, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE)
                                         .appendEstado(this::listaExps)
                         )
                         .build());
@@ -938,7 +938,7 @@ public class NoTerminales {
                 listaExps = NoTerminal
                         .create()
                         .appendDerivacion(
-                                Derivacion.create(SUMA ,RESTA ,NEGACION ,NULL_PR ,TRUE_PR ,FALSE_PR ,ENTERO ,CARACTER ,STRING ,THIS_PR ,NEW_PR ,IDENTIFICADOR_DE_METODO_O_VARIABLE ,PARENTESIS_ABRE)
+                                Derivacion.create(SUMA, RESTA, NEGACION, NULL_PR, TRUE_PR, FALSE_PR, ENTERO, CARACTER, STRING, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE)
                                         .appendEstado(this::expresion)
                                         .appendEstado(this::listaExpsAux)
                         )

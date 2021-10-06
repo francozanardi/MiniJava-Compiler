@@ -78,6 +78,6 @@ public class AutomataStringBloque extends Automata {
     }
 
     Token esFinStringEnBloque() {
-        return createToken(TokenName.STRING_BLOCK);
+        return createToken(TokenName.STRING);
     }
 }
