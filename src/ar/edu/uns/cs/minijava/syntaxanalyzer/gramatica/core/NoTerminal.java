@@ -2,18 +2,16 @@ package ar.edu.uns.cs.minijava.syntaxanalyzer.gramatica.core;
 
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.syntaxanalyzer.CurrentTokenHandler;
-import ar.edu.uns.cs.minijava.syntaxanalyzer.SyntaxException;
+import ar.edu.uns.cs.minijava.syntaxanalyzer.exception.SyntaxException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
 
-// TODO: falta crear NoTerminalConEpsilon
-
 public class NoTerminal implements Estado {
-    private final List<String> primeros;
-    private final List<Derivacion> derivaciones;
+    protected final List<String> primeros;
+    protected final List<Derivacion> derivaciones;
 
     protected NoTerminal(List<String> primeros, List<Derivacion> derivaciones) {
         this.primeros = primeros;

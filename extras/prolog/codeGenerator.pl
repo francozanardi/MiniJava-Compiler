@@ -2,6 +2,30 @@
 :- use_module(reglas).
 :- use_module(core).
 
+
+mostrarSiguientesAux([]):- !.
+
+mostrarSiguientesAux([S | []]):-
+	mostrarTokenName(S), !.
+	
+mostrarSiguientesAux([S | Ss]):-
+	mostrarTokenName(S),
+	write(', '),
+	mostrarSiguientesAux(Ss).
+
+mostrarSiguientes(NT):-
+	primeros(NT, Primeros),
+	member(t('epsilon'), Primeros),
+	siguientes(NT, Siguientes),
+	Siguientes \= [],
+	!,
+	write('.appendSiguientes('),
+	mostrarSiguientesAux(Siguientes),
+	write(')'), nl.
+	
+mostrarSiguientes(_).
+
+
 mostrarTokenName(t('epsilon')):- !.
 
 mostrarTokenName(t(T)):-
@@ -10,7 +34,6 @@ mostrarTokenName(t(T)):-
 
 mostrarTokenName(nt(NT)):-
 	write(NT).
-	
 
 mostrarPrimerosDerivAux([]):- !.
 
@@ -33,6 +56,8 @@ mostrarEstado(_, nt(NT)):-
 	write('.appendEstado(this::'),
 	write(NT), write(')'),
 	nl, !.
+	
+mostrarEstado(_, t('epsilon')):- !.
 
 mostrarEstado(_, t(T)):-
 	write('.appendEstado(terminales.getTerminal('),
@@ -75,6 +100,7 @@ generate_method(nt(NT)):-
 	mostrarTipoDeNT(nt(NT)), nl,
 	write('.create()'), nl,
 	foreach(regla(NT, Deriv), mostrarDeriv(NT, Deriv)),
+	mostrarSiguientes(nt(NT)),
 	write('.build());'), nl,
 	write('}').
 	

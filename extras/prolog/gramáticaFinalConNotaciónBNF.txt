@@ -1,0 +1,169 @@
+<Inicial> ::= <ListaClases>
+
+<ListaClases> ::= <Clase> <ListaClasesAux>
+<ListaClasesAux> ::= <Clase> <ListaClasesAux>
+<ListaClasesAux> ::= ε
+
+<Clase> ::= class idclase <Herencia> { <ListaMiembros> }
+
+<Herencia> ::= extends idclase
+<Herencia> ::= ε
+
+<ListaMiembros> ::= <Miembro> <ListaMiembros>
+<ListaMiembros> ::= ε
+
+<Miembro> ::= <Atributo>
+<Miembro> ::= <Constructor>
+<Miembro> ::= <Metodo>
+
+<Atributo> ::= <Visibilidad> <Tipo> <ListaDecAtrs> ;
+
+<Constructor> ::= idclase <ArgsFormales> <Bloque>
+
+<Metodo> ::= <FormaMetodo> <TipoMetodo> idmetvar <ArgsFormales> <Bloque>
+
+<Visibilidad> ::= public
+<Visibilidad> ::= private
+
+<Tipo> ::= <TipoPrimitivo>
+<Tipo> ::= idclase
+
+<TipoPrimitivo> ::= boolean
+<TipoPrimitivo> ::= char
+<TipoPrimitivo> ::= int
+<TipoPrimitivo> ::= string
+
+<ListaDecAtrs> ::= idmetvar <ListaDecAtrsAux>
+<ListaDecAtrsAux> ::= , idmetvar <ListaDecAtrsAux>
+<ListaDecAtrsAux> ::= ε
+
+<FormaMetodo> ::= static
+<FormaMetodo> ::= dynamic
+
+<TipoMetodo> ::= <Tipo>
+<TipoMetodo> ::= void
+
+<ArgsFormales> ::= ( <ListaArgsFormalesOVacio> )
+
+<ListaArgsFormalesOVacio> ::= <ListaArgsFormales>
+<ListaArgsFormalesOVacio> ::= ε
+
+<ListaArgsFormales> ::= <ArgFormal> <ListaArgsFormalesAux>
+<ListaArgsFormalesAux> ::= , <ArgFormal> <ListaArgsFormalesAux>
+<ListaArgsFormalesAux> ::= ε
+
+<ArgFormal> ::= <Tipo> idmetvar
+
+<Bloque> ::= { <ListaSentencias> }
+
+<ListaSentencias> ::= <Sentencia> <ListaSentencias>
+<ListaSentencias> ::= ε
+
+<Sentencia> ::= ;
+<Sentencia> ::= <VarLocal> ;
+<Sentencia> ::= <Return> ;
+<Sentencia> ::= <If>
+<Sentencia> ::= <For>
+<Sentencia> ::= <Bloque>
+<Sentencia> ::= <AsignacionOLlamada> ;
+
+<AsignacionOLlamada> ::= <Acceso> <AsignacionOLlamadaAux>
+<AsignacionOLlamadaAux> ::= <TipoDeAsignacion>
+<AsignacionOLlamadaAux> ::= ε
+
+<Asignacion> ::= <Acceso> <TipoDeAsignacion>
+
+<TipoDeAsignacion> ::= = <Expresion>
+<TipoDeAsignacion> ::= ++
+<TipoDeAsignacion> ::= --
+
+<VarLocal> ::= <Tipo> idmetvar <VarLocalAux>
+<VarLocalAux> ::= = <Expresion>
+<VarLocalAux> ::= ε
+
+<Return> ::= return <ExpresionOVacio>
+<ExpresionOVacio> ::= <Expresion>
+<ExpresionOVacio> ::= ε
+
+<If> ::= if ( <Expresion> ) <Sentencia> <Else>
+
+<Else> ::= else <Sentencia>
+<Else> ::= ε
+
+<For> ::= for ( <VarLocal> ; <Expresion> ; <Asignacion> ) <Sentencia>
+
+<Expresion> ::= <ExpresionUnaria> <ExpresionBinaria>
+
+<ExpresionBinaria> ::= <OperadorBinario> <ExpresionUnaria> <ExpresionBinaria>
+<ExpresionBinaria> ::= ε
+
+<OperadorBinario> ::= ||
+<OperadorBinario> ::= &&
+<OperadorBinario> ::= ==
+<OperadorBinario> ::= !=
+<OperadorBinario> ::= <
+<OperadorBinario> ::= >
+<OperadorBinario> ::= <=
+<OperadorBinario> ::= >=
+<OperadorBinario> ::= +
+<OperadorBinario> ::= -
+<OperadorBinario> ::= *
+<OperadorBinario> ::= /
+<OperadorBinario> ::= %
+
+<ExpresionUnaria> ::= <OperadorUnario> <Operando>
+<ExpresionUnaria> ::= <Operando>
+
+<OperadorUnario> ::= +
+<OperadorUnario> ::= -
+<OperadorUnario> ::= !
+
+<Operando> ::= <Literal>
+<Operando> ::= <Acceso>
+
+<Literal> ::= null
+<Literal> ::= true
+<Literal> ::= false
+<Literal> ::= intliteral
+<Literal> ::= charliteral
+<Literal> ::= stringliteral
+
+<Acceso> ::= <PrimarioSinExpresionParentizada> <Encadenado>
+<Acceso> ::= <CastingOExpresionParentizada> <Encadenado>
+
+<CastingOExpresionParentizada> ::= ( <CastingOExpresionParentizadaAux>
+<CastingOExpresionParentizadaAux> ::= idclase ) <PrimarioConExpresionParentizada>
+<CastingOExpresionParentizadaAux> ::= <Expresion> )
+
+<PrimarioConExpresionParentizada> ::= <ExpresionParentizada>
+<PrimarioConExpresionParentizada> ::= <PrimarioSinExpresionParentizada>
+
+<PrimarioSinExpresionParentizada> ::= <AccesoThis>
+<PrimarioSinExpresionParentizada> ::= <AccesoConstructor>
+<PrimarioSinExpresionParentizada> ::= <AccesoVarOMetodo>
+
+<ExpresionParentizada> ::= ( <Expresion> )
+
+<AccesoVarOMetodo> ::= idmetvar <AccesoVarOMetodoAux>
+<AccesoVarOMetodoAux> ::= <ArgsActuales>
+<AccesoVarOMetodoAux> ::= ε
+
+<AccesoThis> ::= this
+
+<AccesoConstructor> ::= new idclase <ArgsActuales>
+
+<ArgsActuales> ::= ( <ListaExpsOVacio> )
+
+<ListaExpsOVacio> ::= <ListaExps>
+<ListaExpsOVacio> ::= ε
+
+<ListaExps> ::= <Expresion> <ListaExpsAux>
+<ListaExpsAux> ::= , <Expresion> <ListaExpsAux>
+<ListaExpsAux> ::= ε
+
+<Encadenado> ::= <VarOMetodoEncadenado> <Encadenado>
+<Encadenado> ::= ε
+
+<VarOMetodoEncadenado> ::= . idmetvar <VarOMetodoEncadenadoAux>
+<VarOMetodoEncadenadoAux> ::= <ArgsActuales>
+<VarOMetodoEncadenadoAux> ::= ε

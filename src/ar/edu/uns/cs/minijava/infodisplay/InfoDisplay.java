@@ -2,8 +2,7 @@ package ar.edu.uns.cs.minijava.infodisplay;
 
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
-import ar.edu.uns.cs.minijava.syntaxanalyzer.SyntaxAnalyzer;
-import ar.edu.uns.cs.minijava.syntaxanalyzer.SyntaxException;
+import ar.edu.uns.cs.minijava.syntaxanalyzer.exception.SyntaxException;
 
 import java.io.IOException;
 

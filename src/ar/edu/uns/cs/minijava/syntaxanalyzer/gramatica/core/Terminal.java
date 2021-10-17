@@ -1,9 +1,8 @@
 package ar.edu.uns.cs.minijava.syntaxanalyzer.gramatica.core;
 
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
-import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 import ar.edu.uns.cs.minijava.syntaxanalyzer.CurrentTokenHandler;
-import ar.edu.uns.cs.minijava.syntaxanalyzer.SyntaxException;
+import ar.edu.uns.cs.minijava.syntaxanalyzer.exception.SyntaxException;
 
 public class Terminal implements Estado {
     private final String tokenName;

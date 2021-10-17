@@ -1,4 +1,4 @@
-// Prueba un bloque con una asignacion
+// Prueba un bloque con una asignación
 
 class Prueba1{
 

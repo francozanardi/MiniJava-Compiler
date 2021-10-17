@@ -2,7 +2,7 @@
 	[
 		regla/2
 	]).
-	
+
 
 regla(inicial, [nt(listaClases)]).
 

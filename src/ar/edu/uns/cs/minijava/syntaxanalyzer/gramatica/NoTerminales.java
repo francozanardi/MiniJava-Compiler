@@ -145,6 +145,7 @@ public class NoTerminales {
                                         .appendEstado(terminales.getTerminal(EXTENDS_PR))
                                         .appendEstado(terminales.getTerminal(IDENTIFICADOR_DE_CLASE))
                         )
+                        .appendSiguientes(LLAVE_ABRE)
                         .build());
     }
 
@@ -157,6 +158,7 @@ public class NoTerminales {
                                         .appendEstado(this::miembro)
                                         .appendEstadoRecursivo()
                         )
+                        .appendSiguientes(LLAVE_CIERRA)
                         .build());
     }
 
@@ -296,6 +298,7 @@ public class NoTerminales {
                                         .appendEstado(terminales.getTerminal(IDENTIFICADOR_DE_METODO_O_VARIABLE))
                                         .appendEstadoRecursivo()
                         )
+                        .appendSiguientes(PUNTO_Y_COMA)
                         .build());
     }
 
@@ -350,6 +353,7 @@ public class NoTerminales {
                                 Derivacion.create(BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE)
                                         .appendEstado(this::listaArgsFormales)
                         )
+                        .appendSiguientes(PARENTESIS_CIERRA)
                         .build());
     }
 
@@ -375,6 +379,7 @@ public class NoTerminales {
                                         .appendEstado(this::argFormal)
                                         .appendEstadoRecursivo()
                         )
+                        .appendSiguientes(PARENTESIS_CIERRA)
                         .build());
     }
 
@@ -412,6 +417,7 @@ public class NoTerminales {
                                         .appendEstado(this::sentencia)
                                         .appendEstadoRecursivo()
                         )
+                        .appendSiguientes(LLAVE_CIERRA)
                         .build());
     }
 
@@ -473,6 +479,7 @@ public class NoTerminales {
                                 Derivacion.create(ASIGNACION, INCREMENTOR, DECREMENTOR)
                                         .appendEstado(this::tipoDeAsignacion)
                         )
+                        .appendSiguientes(PUNTO_Y_COMA)
                         .build());
     }
 
@@ -530,6 +537,7 @@ public class NoTerminales {
                                         .appendEstado(terminales.getTerminal(ASIGNACION))
                                         .appendEstado(this::expresion)
                         )
+                        .appendSiguientes(PUNTO_Y_COMA)
                         .build());
     }
 
@@ -553,6 +561,7 @@ public class NoTerminales {
                                 Derivacion.create(SUMA, RESTA, NEGACION, NULL_PR, TRUE_PR, FALSE_PR, ENTERO, CARACTER, STRING, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE)
                                         .appendEstado(this::expresion)
                         )
+                        .appendSiguientes(PUNTO_Y_COMA)
                         .build());
     }
 
@@ -581,6 +590,7 @@ public class NoTerminales {
                                         .appendEstado(terminales.getTerminal(ELSE_PR))
                                         .appendEstado(this::sentencia)
                         )
+                        .appendSiguientes(PUNTO_Y_COMA, BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE, RETURN_PR, IF_PR, FOR_PR, LLAVE_ABRE, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE, LLAVE_CIERRA, ELSE_PR)
                         .build());
     }
 
@@ -625,6 +635,7 @@ public class NoTerminales {
                                         .appendEstado(this::expresionUnaria)
                                         .appendEstadoRecursivo()
                         )
+                        .appendSiguientes(PUNTO_Y_COMA, PARENTESIS_CIERRA, COMA)
                         .build());
     }
 
@@ -882,6 +893,7 @@ public class NoTerminales {
                                 Derivacion.create(PARENTESIS_ABRE)
                                         .appendEstado(this::argsActuales)
                         )
+                        .appendSiguientes(PUNTO, ASIGNACION, INCREMENTOR, DECREMENTOR, PUNTO_Y_COMA, OR, AND, COMPARACION, DISTINTO, MENOR, MAYOR, MENOR_IGUAL, MAYOR_IGUAL, SUMA, RESTA, PRODUCTO, DIVISION, MODULO, PARENTESIS_CIERRA, COMA)
                         .build());
     }
 
@@ -930,6 +942,7 @@ public class NoTerminales {
                                 Derivacion.create(SUMA, RESTA, NEGACION, NULL_PR, TRUE_PR, FALSE_PR, ENTERO, CARACTER, STRING, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE)
                                         .appendEstado(this::listaExps)
                         )
+                        .appendSiguientes(PARENTESIS_CIERRA)
                         .build());
     }
 
@@ -955,6 +968,7 @@ public class NoTerminales {
                                         .appendEstado(this::expresion)
                                         .appendEstadoRecursivo()
                         )
+                        .appendSiguientes(PARENTESIS_CIERRA)
                         .build());
     }
 
@@ -967,6 +981,7 @@ public class NoTerminales {
                                         .appendEstado(this::varOMetodoEncadenado)
                                         .appendEstadoRecursivo()
                         )
+                        .appendSiguientes(ASIGNACION, INCREMENTOR, DECREMENTOR, PUNTO_Y_COMA, OR, AND, COMPARACION, DISTINTO, MENOR, MAYOR, MENOR_IGUAL, MAYOR_IGUAL, SUMA, RESTA, PRODUCTO, DIVISION, MODULO, PARENTESIS_CIERRA, COMA)
                         .build());
     }
 
@@ -991,6 +1006,7 @@ public class NoTerminales {
                                 Derivacion.create(PARENTESIS_ABRE)
                                         .appendEstado(this::argsActuales)
                         )
+                        .appendSiguientes(PUNTO, ASIGNACION, INCREMENTOR, DECREMENTOR, PUNTO_Y_COMA, OR, AND, COMPARACION, DISTINTO, MENOR, MAYOR, MENOR_IGUAL, MAYOR_IGUAL, SUMA, RESTA, PRODUCTO, DIVISION, MODULO, PARENTESIS_CIERRA, COMA)
                         .build());
     }
 

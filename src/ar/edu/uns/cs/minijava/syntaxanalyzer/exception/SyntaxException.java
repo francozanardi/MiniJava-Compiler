@@ -1,6 +1,7 @@
-package ar.edu.uns.cs.minijava.syntaxanalyzer;
+package ar.edu.uns.cs.minijava.syntaxanalyzer.exception;
 
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -14,19 +15,19 @@ public class SyntaxException extends Exception {
     public SyntaxException(Token tokenFound, String expectedToken){
         super(getLineNumberMessageError(tokenFound.getLineNumber()) +
                 ": Se esperaba " +
-                expectedToken +
-                " pero se encontró " +
-                tokenFound.getLexema());
+                TokenNameDisplayable.getInstance().getTokenNameDisplayable(expectedToken) +
+                " pero se encontró '" +
+                tokenFound.getLexema() + "'");
 
         this.tokenFound = tokenFound;
     }
 
     public SyntaxException(Token tokenFound, List<String> expectedTokens){
         super(getLineNumberMessageError(tokenFound.getLineNumber()) +
-                ": Se esperaba alguno de los siguientes tokens " +
+                ": Se esperaba alguno de los siguientes tokens: " +
                 arrayToString(expectedTokens) +
-                " pero se encontró "
-                + tokenFound.getLexema());
+                "\nSin embargo, se encontró '"
+                + tokenFound.getLexema() + "'");
 
         this.tokenFound = tokenFound;
     }
@@ -37,17 +38,13 @@ public class SyntaxException extends Exception {
 
     private static String arrayToString(List<String> expectedTokens) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("{");
+        stringBuilder.append("\n");
 
-        int listIndex = 0;
         for(String token: expectedTokens){
-            if(listIndex < expectedTokens.size()-1){
-                stringBuilder.append(token).append(", ");
-            } else {
-                stringBuilder.append(token).append("}");
-            }
-
-            listIndex++;
+            stringBuilder
+                    .append("(*) ")
+                    .append(TokenNameDisplayable.getInstance().getTokenNameDisplayable(token))
+                    .append("\n");
         }
 
         return stringBuilder.toString();

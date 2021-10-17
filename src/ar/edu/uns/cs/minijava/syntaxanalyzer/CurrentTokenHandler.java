@@ -36,7 +36,5 @@ public class CurrentTokenHandler {
 
     public void nextToken() throws LexicalException {
         currentToken = lexicalAnalyzer.nextToken();
-
-        System.out.println("Se obtuvo el token " + currentToken.getTokenName());
     }
 }
