@@ -9,29 +9,35 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class NoTerminal implements Estado {
+public class NoTerminal<I, S> extends Estado<I, S> {
     protected final List<String> primeros;
-    protected final List<Derivacion> derivaciones;
+    protected final List<Derivacion<S>> derivaciones;
 
-    protected NoTerminal(List<String> primeros, List<Derivacion> derivaciones) {
+    protected NoTerminal(List<String> primeros, List<Derivacion<S>> derivaciones) {
         this.primeros = primeros;
         this.derivaciones = derivaciones;
     }
 
-    public static Builder create(){
-        return new Builder();
+    public static <TI, TS> Builder<TI, TS> create(Class<TI> classInherited, Class<TS> classSynthesized){
+        return new Builder<>();
+    }
+
+    public static Builder<Void, Void> create(){
+        return new Builder<>();
     }
 
     @Override
-    public void run(Estado parent, CurrentTokenHandler currentTokenHandler) throws SyntaxException, LexicalException {
+    public void run(Estado<?, ?> parent, CurrentTokenHandler currentTokenHandler) throws SyntaxException, LexicalException {
         boolean derivacionFound = false;
-        Iterator<Derivacion> iteratorDerivacion = derivaciones.iterator();
+        Iterator<Derivacion<S>> iteratorDerivacion = derivaciones.iterator();
 
         while(iteratorDerivacion.hasNext() && !derivacionFound){
-            Derivacion derivacion = iteratorDerivacion.next();
+            Derivacion<S> derivacion = iteratorDerivacion.next();
             if(derivacion.getPrimeros().contains(currentTokenHandler.getCurrentTokenName())){
-                for(Supplier<Estado> lazyEstado : derivacion.getLazyEstados()){
+                for(Supplier<Estado<?, ?>> lazyEstado : derivacion.getLazyEstados()){
                     lazyEstado.get().run(this, currentTokenHandler);
+                    lazyEstado.get().runAction();
+                    lazyEstado.get();
                 }
 
                 derivacionFound = true;
@@ -48,24 +54,25 @@ public class NoTerminal implements Estado {
         throw new SyntaxException(currentTokenHandler.getCurrentToken(), primeros);
     }
 
-    public static class Builder {
+    public static class Builder<TI, TS> {
         protected final List<String> primeros;
-        protected final List<Derivacion> derivaciones;
+        protected final List<Derivacion<TS>> derivaciones;
 
         protected Builder() {
             primeros = new ArrayList<>();
             derivaciones = new ArrayList<>();
         }
 
-        public Builder appendDerivacion(Derivacion derivacion){
+        public Builder<TI, TS> appendDerivacion(Derivacion<TS> derivacion){
             primeros.addAll(derivacion.getPrimeros());
             derivaciones.add(derivacion);
             return this;
         }
 
-        public NoTerminal build(){
-            return new NoTerminal(primeros, derivaciones);
+        public NoTerminal<TI, TS> build(){
+            return new NoTerminal<>(primeros, derivaciones);
         }
+
     }
 }
 

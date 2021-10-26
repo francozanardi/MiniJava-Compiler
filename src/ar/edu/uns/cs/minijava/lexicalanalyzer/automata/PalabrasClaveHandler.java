@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 class PalabrasClaveHandler {
     private static final PalabrasClaveHandler ourInstance = new PalabrasClaveHandler();
-    private final HashMap<String, String> palabrasClaveTable; //tabla hash de lexema a token
+    private final HashMap<String, TokenName> palabrasClaveTable; //tabla hash de lexema a token
 
     private PalabrasClaveHandler() {
         palabrasClaveTable = new HashMap<>();
@@ -46,7 +46,7 @@ class PalabrasClaveHandler {
         return palabrasClaveTable.containsKey(palabraClave);
     }
 
-    String getPalabraClaveToken(String palabraClave){
+    TokenName getPalabraClaveToken(String palabraClave){
         return palabrasClaveTable.get(palabraClave);
     }
 

@@ -1,27 +1,67 @@
 package ar.edu.uns.cs.minijava.lexicalanalyzer;
 
-public class LexicalException extends Exception {
-    private String lexemaError;
-    private int lineNumberInError;
-    private int columnNumberInError;
-    private String errorLine;
-    private String descriptionError;
+import ar.edu.uns.cs.minijava.CompilerException;
 
-    public LexicalException(String lexema, int lineNumber, int columnNumber){
-        super(getErrorCodeMessage(lexema, lineNumber));
+public class LexicalException extends CompilerException {
+    private final String lexemaError;
+    private final int lineNumberInError;
+    private final int columnNumberInError;
+    private final String errorLine;
+    private final String descriptionError;
+
+    public LexicalException(String lexema, int lineNumber, int columnNumber, String errorLine, String descriptionError){
+        super("Error léxico en línea " +
+                lineNumber +
+                ", columna " +
+                columnNumber +
+                ": " +
+                lexema +
+                " " +
+                descriptionError +
+                "\n" +
+                getDetailedInformation(errorLine, columnNumber));
 
         this.lexemaError = lexema;
         this.lineNumberInError = lineNumber;
         this.columnNumberInError = columnNumber;
-        this.errorLine = "";
-        this.descriptionError = "";
+        this.errorLine = errorLine;
+        this.descriptionError = descriptionError;
     }
 
-    private static String getErrorCodeMessage(String lexema, int lineNumber) {
-        return "[Error:" + getFirstLine(lexema) + "|" + lineNumber + "]";
+    private static String getDetailedInformation(String errorLine, int columnNumber) {
+        String errorTitleInErrorLine = "Detalle: ";
+        StringBuilder errorIndication = new StringBuilder();
+
+        addSpacesDueToTitle(errorIndication, errorTitleInErrorLine);
+        addSpacesDueToLineInError(errorIndication, errorLine, columnNumber);
+
+        errorIndication.append("^");
+
+        return errorTitleInErrorLine + errorLine + "\n" + errorIndication;
     }
 
-    private static String getFirstLine(String text){
+    private static void addSpacesDueToTitle(StringBuilder errorIndication, String errorTitleInErrorLine) {
+        for(int i = 0; i < errorTitleInErrorLine.length(); i++){
+            errorIndication.append(" ");
+        }
+    }
+
+    private static void addSpacesDueToLineInError(StringBuilder errorIndication, String errorLine, int columnNumber) {
+        for(int i = 0; i < columnNumber-1; i++){
+            if(errorLine.charAt(i) != '\t'){
+                errorIndication.append(" ");
+            } else {
+                errorIndication.append("\t");
+            }
+        }
+    }
+
+    @Override
+    public String getErrorCodeMessage() {
+        return "[Error:" + getFirstLine(lexemaError) + "|" + lineNumberInError + "]";
+    }
+
+    private String getFirstLine(String text){
         int indexSaltoDeLinea = text.indexOf('\n');
         boolean haySaltoDeLinea = indexSaltoDeLinea != -1;
 
@@ -44,20 +84,12 @@ public class LexicalException extends Exception {
         return columnNumberInError;
     }
 
-    public void setErrorLine(String errorLine){
-        this.errorLine = errorLine;
-    }
-
     public String getErrorLine(){
         return errorLine;
     }
 
     public String getDescriptionError() {
         return descriptionError;
-    }
-
-    public void setDescriptionError(String descriptionError) {
-        this.descriptionError = descriptionError;
     }
 
 }

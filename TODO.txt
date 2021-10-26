@@ -1,18 +1,9 @@
+Etapa 3:
 
-* Es muy turbio leer todo el archivo primero y guardarlo en memoria? => Lo podemos hacer sin problemas. Me olvidé de cerrar el archivo!!!!
-* Entonces, si aparecen 14 dígitos seguidos mi analizador léxico debería consumir los 14 y marcar error al final, indicando que los 14 dígitos no son un token válido, no? => Si, acá deberíamos crear un error más preciso!!
-* [TAB] en la instrucción, me dificulta marcar en dónde se produjo el error => debemos solucionarlo igualmente!!!
-* Sacar todos los tokens a un archivo de constantes o un enum.
-* Crear una clase con todas las constantes de todos los errores léxicos posibles
-* Cerrar el archivo!!
-* Character.isDigit y isLetter se está usando es los otros automátas pero no en el estado inicial
-* Los comentarios no son tokens! Debería consumir y volver al estado inicial.
+* Estamos creando una instancia de la clase IntType cada vez que se crea un entero. Esta instancia no tiene mucho sentido crearla tantas veces como tantos enteros haya. Al menos por ahora, dado que no tiene ningún atributo de instancia interesante. Podríamos hacerla un singleton y evitar esta sobrecarga.
 
-* Eliminar lo del stackoverflow con while
+* crear excepción EntiyAlreadyExists como hija de SemanticException y usarla en nuestro mapeo EntityTable
 
+* Los parámetros de un método son iguales si están en el mismo orden, ojo con eso.
 
-
-
-* Hacer más casos de pruebas inteligentes.
-* Hacer informe.
-* Mover el error elegante al inicio de donde comienza el error.
+* Agregar que deba haber un main. No estoy seguro si únicamente uno o al menos uno.

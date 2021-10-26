@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava.syntaxanalyzer.gramatica;
 
+import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 import ar.edu.uns.cs.minijava.syntaxanalyzer.gramatica.core.Estado;
 import ar.edu.uns.cs.minijava.syntaxanalyzer.gramatica.core.Terminal;
@@ -44,7 +45,7 @@ public class Terminales {
         return instance;
     }
 
-    public Supplier<Estado> getTerminal(String tokenName){
+    public Supplier<Estado<?, ?>> getTerminal(String tokenName){
         return () -> terminalMap.get(tokenName);
     }
 }

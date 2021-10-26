@@ -134,13 +134,12 @@ public class HandlerAutomata {
         int firstColumnNumberInError = getFirstColumnNumberInError(
                 cantDeLineasEnLexema, firstLineInError, lexemaInLines[0].length());
 
-        LexicalException lexicalException = new LexicalException(
-                lexema.toString(), firstLineNumberInError, firstColumnNumberInError);
-
-        lexicalException.setErrorLine(firstLineInError);
-        lexicalException.setDescriptionError(errorDescription);
-
-        return lexicalException;
+        return new LexicalException(
+                lexema.toString(),
+                firstLineNumberInError,
+                firstColumnNumberInError,
+                firstLineInError,
+                errorDescription);
     }
 
     private int getFirstLineNumberInError(int cantDeLineasEnLexema){

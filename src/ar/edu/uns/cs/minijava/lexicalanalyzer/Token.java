@@ -1,17 +1,17 @@
 package ar.edu.uns.cs.minijava.lexicalanalyzer;
 
 public class Token {
-    private final String tokenName;
+    private final TokenName tokenName;
     private final String lexema;
     private final int lineNumber;
 
-    public Token(String tokenName, String lexema, int lineNumber){
+    public Token(TokenName tokenName, String lexema, int lineNumber){
         this.tokenName = tokenName;
         this.lexema = lexema;
         this.lineNumber = lineNumber;
     }
 
-    public String getTokenName() {
+    public TokenName getTokenName() {
         return tokenName;
     }
 

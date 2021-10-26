@@ -2,6 +2,7 @@ package ar.edu.uns.cs.minijava.lexicalanalyzer.automata;
 
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 
 abstract class Automata {
     protected HandlerAutomata handler;
@@ -10,7 +11,7 @@ abstract class Automata {
         handler = HandlerAutomata.getInstance();
     }
 
-    protected Token createToken(String tokenName){
+    protected Token createToken(TokenName tokenName){
         return new Token(tokenName, handler.getLexema(), handler.getGestorDeSource().getLineNumber());
     }
 

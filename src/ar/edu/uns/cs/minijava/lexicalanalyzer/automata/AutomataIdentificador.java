@@ -19,7 +19,7 @@ class AutomataIdentificador extends Automata {
             updateHandler();
         }
 
-        String palabraClave = searchPalabraClave();
+        TokenName palabraClave = searchPalabraClave();
         if(palabraClave != null){
             return createToken(palabraClave);
         }
@@ -33,7 +33,7 @@ class AutomataIdentificador extends Automata {
                 handler.getCurrentChar().equals('_');
     }
 
-    private String searchPalabraClave(){
+    private TokenName searchPalabraClave(){
         return PalabrasClaveHandler.getInstance().getPalabraClaveToken(handler.getLexema());
     }
 
@@ -43,7 +43,7 @@ class AutomataIdentificador extends Automata {
             updateHandler();
         }
 
-        String palabraClave = searchPalabraClave();
+        TokenName palabraClave = searchPalabraClave();
         if(palabraClave != null){
             return createToken(palabraClave);
         }

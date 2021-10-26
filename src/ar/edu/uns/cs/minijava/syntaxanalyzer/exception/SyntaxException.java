@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava.syntaxanalyzer.exception;
 
+import ar.edu.uns.cs.minijava.CompilerException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 
@@ -9,10 +10,10 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class SyntaxException extends Exception {
+public class SyntaxException extends CompilerException {
     private final Token tokenFound;
 
-    public SyntaxException(Token tokenFound, String expectedToken){
+    public SyntaxException(Token tokenFound, TokenName expectedToken){
         super(getLineNumberMessageError(tokenFound.getLineNumber()) +
                 ": Se esperaba " +
                 TokenNameDisplayable.getInstance().getTokenNameDisplayable(expectedToken) +
@@ -22,7 +23,7 @@ public class SyntaxException extends Exception {
         this.tokenFound = tokenFound;
     }
 
-    public SyntaxException(Token tokenFound, List<String> expectedTokens){
+    public SyntaxException(Token tokenFound, List<TokenName> expectedTokens){
         super(getLineNumberMessageError(tokenFound.getLineNumber()) +
                 ": Se esperaba alguno de los siguientes tokens: " +
                 arrayToString(expectedTokens) +
@@ -36,11 +37,11 @@ public class SyntaxException extends Exception {
         return "Error sintáctico en linea " + lineInError;
     }
 
-    private static String arrayToString(List<String> expectedTokens) {
+    private static String arrayToString(List<TokenName> expectedTokens) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\n");
 
-        for(String token: expectedTokens){
+        for(TokenName token: expectedTokens){
             stringBuilder
                     .append("(*) ")
                     .append(TokenNameDisplayable.getInstance().getTokenNameDisplayable(token))

@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava.syntaxanalyzer.gramatica;
 
+import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.syntaxanalyzer.gramatica.core.Derivacion;
 import ar.edu.uns.cs.minijava.syntaxanalyzer.gramatica.core.NoTerminal;
 import ar.edu.uns.cs.minijava.syntaxanalyzer.gramatica.core.NoTerminalConEpsilon;
@@ -14,11 +15,11 @@ public class NoTerminales {
 
     private final Terminales terminales = Terminales.getInstance();
 
-    private NoTerminal inicial;
+    private NoTerminal<Void, Void> inicial;
     private NoTerminal listaClases;
     private NoTerminal listaClasesAux;
     private NoTerminal clase;
-    private NoTerminal herencia;
+    private NoTerminal<Void, Token> herencia;
     private NoTerminal listaMiembros;
     private NoTerminal miembro;
     private NoTerminal atributo;
@@ -85,6 +86,17 @@ public class NoTerminales {
         return instance;
     }
 
+    public NoTerminal<Void, Void> inicial_(){
+        return Objects.requireNonNullElse(inicial,
+                inicial = NoTerminal
+                        .create()
+                        .appendDerivacion(
+                                Derivacion.create(CLASS_PR)
+                                        .appendEstado(this::listaClases)
+                        )
+                        .build());
+    }
+
     public NoTerminal inicial(){
         return Objects.requireNonNullElse(inicial,
                 inicial = NoTerminal
@@ -133,6 +145,19 @@ public class NoTerminales {
                                         .appendEstado(this::listaMiembros)
                                         .appendEstado(terminales.getTerminal(LLAVE_CIERRA))
                         )
+                        .build());
+    }
+
+    private NoTerminal<Void, Token> herencia_(){
+        return Objects.requireNonNullElse(herencia,
+                herencia = NoTerminalConEpsilon
+                        .create(Void.class, Token.class)
+                        .appendDerivacion(
+                                Derivacion.create(Token.class, EXTENDS_PR)
+                                        .appendEstado(terminales.getTerminal(EXTENDS_PR))
+                                        .appendEstado(terminales.getTerminal(IDENTIFICADOR_DE_CLASE))
+                        )
+                        .appendSiguientes(LLAVE_ABRE)
                         .build());
     }
 

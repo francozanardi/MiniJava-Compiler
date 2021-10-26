@@ -1,7 +1,9 @@
 package ar.edu.uns.cs.minijava.infodisplay;
 
+import ar.edu.uns.cs.minijava.CompilerException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.syntaxanalyzer.exception.SyntaxException;
 
 import java.io.IOException;
@@ -25,55 +27,7 @@ public class InfoDisplay {
         System.out.println(tokenInfo);
     }
 
-    public void mostrarLexicalException(LexicalException error) {
-        String errorMessage = "Error léxico en línea " +
-                error.getLineNumberInError() +
-                ", columna " +
-                error.getColumnNumberError() +
-                ": " +
-                error.getLexemaError() +
-                " " +
-                error.getDescriptionError();
-
-        System.out.println();
-        System.out.println(errorMessage);
-        System.out.println(error.getMessage());
-        mostrarInformacionDetallada(error);
-        System.out.println();
-    }
-
-
-    private void mostrarInformacionDetallada(LexicalException error) {
-        String errorTitleInErrorLine = "Detalle: ";
-        StringBuilder errorIndication = new StringBuilder();
-
-        addSpacesDueToTitle(errorIndication, errorTitleInErrorLine);
-        addSpacesDueToLineInError(errorIndication, error);
-
-        errorIndication.append("^");
-
-        System.out.println(errorTitleInErrorLine + error.getErrorLine());
-        System.out.println(errorIndication.toString());
-    }
-
-    private void addSpacesDueToTitle(StringBuilder errorIndication, String errorTitleInErrorLine) {
-        for(int i = 0; i < errorTitleInErrorLine.length(); i++){
-            errorIndication.append(" ");
-        }
-    }
-
-    private void addSpacesDueToLineInError(StringBuilder errorIndication, LexicalException error) {
-        String lineError = error.getErrorLine();
-        for(int i = 0; i < error.getColumnNumberError()-1; i++){
-            if(lineError.charAt(i) != '\t'){
-                errorIndication.append(" ");
-            } else {
-                errorIndication.append("\t");
-            }
-        }
-    }
-
-    public void mostrarSinErrores() {
+    public void showSuccess() {
         System.out.println();
         System.out.println("[SinErrores]");
     }
@@ -90,9 +44,9 @@ public class InfoDisplay {
                 " en todo el archivo fuente.");
     }
 
-    public void mostrarSyntaxException(SyntaxException syntaxException) {
-        System.out.println(syntaxException.getMessage());
+    public void showCompilerException(CompilerException compilerException) {
+        System.out.println(compilerException.getMessage());
         System.out.println();
-        System.out.println(syntaxException.getErrorCodeMessage());
+        System.out.println(compilerException.getErrorCodeMessage());
     }
 }

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TokenNameDisplayable {
-    private final Map<String, String> mapTokenName;
+    private final Map<TokenName, String> mapTokenName;
     private static final TokenNameDisplayable instance = new TokenNameDisplayable();
 
     private TokenNameDisplayable() {
@@ -71,7 +71,7 @@ public class TokenNameDisplayable {
         return instance;
     }
 
-    public String getTokenNameDisplayable(String tokenName){
+    public String getTokenNameDisplayable(TokenName tokenName){
         return mapTokenName.get(tokenName);
     }
 }
