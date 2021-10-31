@@ -14,11 +14,6 @@ public class Parameter extends EntityWithType {
     }
 
     @Override
-    public void checkDeclarations() {
-
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (obj == null || getClass() != obj.getClass()) {
             return false;

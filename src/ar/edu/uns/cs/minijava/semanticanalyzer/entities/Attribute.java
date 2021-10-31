@@ -21,8 +21,4 @@ public class Attribute extends EntityWithType {
         this.visibility = visibility;
     }
 
-    @Override
-    public void checkDeclarations() throws SemanticException {
-
-    }
 }

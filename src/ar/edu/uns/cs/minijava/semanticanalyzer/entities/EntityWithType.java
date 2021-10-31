@@ -22,7 +22,7 @@ public abstract class EntityWithType extends Entity {
         if(type.requireCheckExistence()){
             Class typeClass = SymbolTable.getInstance().getClassById(type.getType());
             if(typeClass == null){
-                throw new SemanticException(identifierToken, "La clase " + type.getType() + "no está definida.");
+                throw new SemanticException(identifierToken, "La clase " + type.getType() + " no está definida.");
             }
         }
     }

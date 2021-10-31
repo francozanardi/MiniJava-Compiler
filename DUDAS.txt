@@ -1,0 +1,3 @@
+* qué pasa con los métodos estáticos en minijava? Se heredan o no se heredan? Si llegasen a heredar, entonces qué pasa cuando extiendo de una clase con método main. En ese caso no habrían dos mains diferentes? (ya que cada uno sería de una clase diferente).
+
+https://stackoverflow.com/questions/2475259/can-i-override-and-overload-static-methods-in-java/5436790

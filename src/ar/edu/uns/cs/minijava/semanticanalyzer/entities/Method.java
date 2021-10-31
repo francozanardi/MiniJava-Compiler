@@ -49,4 +49,8 @@ public class Method extends EntityWithType {
             parameter.checkDeclarations();
         }
     }
+
+    public int getParameterNumber(){
+        return parameterNumber;
+    }
 }

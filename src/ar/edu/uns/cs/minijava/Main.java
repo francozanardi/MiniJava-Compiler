@@ -61,7 +61,7 @@ public class Main {
             infoDisplay.showCompilerException(compilerException);
         }
 
-        SymbolTable.getInstance().emptyClasses();
+        SymbolTable.getInstance().emptySymbolTable();
     }
 
 

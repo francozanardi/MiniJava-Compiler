@@ -207,16 +207,20 @@ public class SyntaxAnalyzer {
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             Token constructorIdentifier = currentToken;
             match(IDENTIFICADOR_DE_CLASE);
-            List<Parameter> parameters = argsFormales();
-            bloque();
 
             Class currentClass = SymbolTable.getInstance().getContext().getCurrentClass();
             Type constructorType = new ReferenceType(currentClass.getIdentifierToken().getLexema());
             Constructor constructor = new Constructor(constructorIdentifier, constructorType);
 
+            SymbolTable.getInstance().getContext().setCurrentMethod(constructor);
+
+            List<Parameter> parameters = argsFormales();
+
             for(Parameter parameter : parameters){
                 constructor.appendParameter(parameter.getIdentifierToken().getLexema(), parameter);
             }
+
+            bloque();
 
             currentClass.setConstructor(constructor);
         } else {
@@ -235,15 +239,17 @@ public class SyntaxAnalyzer {
             Type type = tipoMetodo();
             Token methodIdentifier = currentToken;
             match(IDENTIFICADOR_DE_METODO_O_VARIABLE);
-            List<Parameter> parameters = argsFormales();
-            bloque();
 
             Class currentClass = SymbolTable.getInstance().getContext().getCurrentClass();
             Method method = new Method(methodIdentifier, type, methodForm);
+            SymbolTable.getInstance().getContext().setCurrentMethod(method);
 
+            List<Parameter> parameters = argsFormales();
             for(Parameter parameter : parameters){
                 method.appendParameter(parameter.getIdentifierToken().getLexema(), parameter);
             }
+
+            bloque();
 
             currentClass.addMethod(methodIdentifier.getLexema(), method);
         } else {
