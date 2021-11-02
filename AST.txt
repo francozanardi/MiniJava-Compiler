@@ -1,0 +1,117 @@
+NodoBloque:
+	* Lista de NodoSentencia
+
+NodoSentencia:
+	| NodoVarLocal
+	| NodoReturn
+	| NodoIf
+	| NodoFor
+	| NodoBloque
+	| NodoAsignación
+	| NodoLlamada
+
+
+NodoAsignación:
+	| NodoAsignaciónIgual
+	| NodoAsginación++
+	| NodoASginación--
+	* NodoAcceso
+
+
+NodoAsignaciónIgual:
+	* NodoExpresión (expresión asignada)
+
+
+NodoLlamada:
+	* NodoAcceso
+
+
+NodoVarLocal (no sé si tiene que se un nodo o una entidad):
+	* Tipo
+	* Identificador
+	* NodoExpresión (expresión asignada, puede ser null)
+
+
+NodoReturn:
+	* NodoExpresión (expresión retornada, puede ser null si no retorna nada, es decir: 'return;')
+
+
+NodoIf:
+	* NodoExpresión (expresión boolean de condición)
+	* NodoSentencia (body)
+	* NodoSentencia (else body, puede ser null si no hay else)
+
+
+NodoFor:
+	* NodoVarLocal
+	* NodoExpresión (expresión booleana de corte)
+	* NodoAsignación
+	* NodoSentencia (el body)
+
+
+NodoExpresión:
+	| NodoExpresiónUnaria
+	| NodoExpresiónBinaria
+	| NodoOperando
+
+
+NodoExpresiónUnaria:
+	* NodoOperando
+	* OperadorUnario (el token del operador)
+
+
+NodoExpresiónBinaria:
+	* NodoExpresión (lado izquierdo)
+	* OperadorBinario (el token del operador)
+	* NodoExpresión (lado derecho)
+
+
+NodoOperando:
+	| NodoLiteral
+	| NodoAcceso
+
+
+NodoLiteral:
+	* Token (token del literal, o también podría crear un subtipo de NodoLiteral para cada uno de los posibles)
+
+
+NodoAcceso:
+	| NodoAccesoVar
+	| NodoAccesoMétodo
+	| NodoAccesoThis
+	| NodoAccesoConstructor
+	* TipoDeClase (para casting, puede ser null)
+	* Encadenado (puede ser null)
+
+
+NodoAccesoVar:
+	* Variable
+
+
+NodoAccesoMétodo:
+	* Método
+	* Lista de Expresión (parámetros para invocar al método)
+
+
+NodoAccesoThis:
+	* Token (token del this)
+
+
+NodoAccesoConstructor:
+	* Constructor
+	* Lista de Expresión (parámetros para invocar al constructor)
+
+
+NodoEncadenado:
+	| NodoVarEncadenado
+	| NodoMétodoEncadenado
+	* NodoEncadenado (siguiente encadenado)
+
+
+NodoVarEncadenado:
+	* Variable
+
+
+NodoMétodoEncadenado
+	* Método
+	* Lista de Expresión (parámetros)

@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava.syntaxanalyzer;
 
+import ar.edu.uns.cs.minijava.ast.expressions.ExpressionNode;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalAnalyzer;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
@@ -7,6 +8,7 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.*;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
+import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.EntityAlreadyExistsException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.access.Visibility;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
@@ -493,7 +495,7 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void bloque() throws LexicalException, SyntaxException {
+    private void bloque() throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(LLAVE_ABRE);
 
         List<TokenName> tokensExpected = new ArrayList<>();
@@ -508,7 +510,7 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void listaSentencias() throws LexicalException, SyntaxException {
+    private void listaSentencias() throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(PUNTO_Y_COMA, BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE, RETURN_PR, IF_PR, FOR_PR, LLAVE_ABRE, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE);
         List<TokenName> siguientes = List.of(LLAVE_CIERRA);
 
@@ -526,7 +528,7 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void sentencia() throws LexicalException, SyntaxException {
+    private void sentencia() throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(PUNTO_Y_COMA);
         List<TokenName> primerosDerivacion2 = List.of(BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE);
         List<TokenName> primerosDerivacion3 = List.of(RETURN_PR);
@@ -633,22 +635,33 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void varLocal() throws LexicalException, SyntaxException {
+    private void varLocal() throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE);
 
         List<TokenName> tokensExpected = new ArrayList<>();
         tokensExpected.addAll(primerosDerivacion1);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            tipo();
+            Type type = tipo();
+            Token identifier = currentToken;
+
             match(IDENTIFICADOR_DE_METODO_O_VARIABLE);
-            varLocalAux();
+
+            LocalVariable localVariable = new LocalVariable(identifier, type);
+            varLocalAux(localVariable);
+            SymbolTable
+                    .getInstance()
+                    .getContext()
+                    .getCurrentMethod()
+                    .addLocalVariable(identifier.getLexema(), localVariable);
+
+
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void varLocalAux() throws LexicalException, SyntaxException {
+    private void varLocalAux(LocalVariable localVariable) throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(ASIGNACION);
         List<TokenName> siguientes = List.of(PUNTO_Y_COMA);
 
@@ -658,7 +671,8 @@ public class SyntaxAnalyzer {
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             match(ASIGNACION);
-            expresion();
+            ExpressionNode expression = expresion();
+            localVariable.setExpressionAssigned(expression);
         } else if(siguientes.contains(currentToken.getTokenName())){
 
         } else if(!currentToken.getTokenName().equals(EOF)){
@@ -697,7 +711,7 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void if_() throws LexicalException, SyntaxException {
+    private void if_() throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(IF_PR);
 
         List<TokenName> tokensExpected = new ArrayList<>();
@@ -715,7 +729,7 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void else_() throws LexicalException, SyntaxException {
+    private void else_() throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(ELSE_PR);
         List<TokenName> siguientes = List.of(PUNTO_Y_COMA, BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE, RETURN_PR, IF_PR, FOR_PR, LLAVE_ABRE, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE, LLAVE_CIERRA, ELSE_PR);
 
@@ -733,7 +747,7 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void for_() throws LexicalException, SyntaxException {
+    private void for_() throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(FOR_PR);
 
         List<TokenName> tokensExpected = new ArrayList<>();

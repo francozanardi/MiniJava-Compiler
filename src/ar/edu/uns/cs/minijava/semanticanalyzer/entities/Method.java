@@ -11,6 +11,7 @@ import java.util.Objects;
 
 public class Method extends EntityWithType {
     protected final EntityTable<String, Parameter> parameters;
+    protected final EntityTable<String, LocalVariable> localVariables;
     protected final MethodForm methodForm;
     protected int parameterNumber;
 
@@ -18,6 +19,7 @@ public class Method extends EntityWithType {
         super(identifierToken, returnType);
         this.methodForm = methodForm;
         this.parameters = new EntityTable<>();
+        this.localVariables = new EntityTable<>();
         this.parameterNumber = 0;
     }
 
@@ -52,5 +54,16 @@ public class Method extends EntityWithType {
 
     public int getParameterNumber(){
         return parameterNumber;
+    }
+
+    public void addLocalVariable(String name, LocalVariable localVariable) throws EntityAlreadyExistsException {
+        Parameter parameterFound = parameters.get(name);
+
+        if(parameterFound != null){
+            throw new EntityAlreadyExistsException(localVariable.getIdentifierToken(),
+                    "Ya existe un parámetro definido en el método con el nombre de " + name);
+        }
+
+        localVariables.putAndCheck(name, localVariable);
     }
 }
