@@ -57,7 +57,7 @@ public class Class extends Entity {
         }
     }
 
-    private boolean hasThisAncestor(Class ancestor) throws SemanticException {
+    public boolean hasThisAncestor(Class ancestor) throws SemanticException {
         Class parentClass = getParentClass();
 
         if(parentClass == null){

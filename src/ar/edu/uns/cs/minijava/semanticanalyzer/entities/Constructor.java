@@ -21,4 +21,9 @@ public class Constructor extends Method {
                     type.getType());
         }
     }
+
+    @Override
+    public boolean canHasReturn() {
+        return false;
+    }
 }

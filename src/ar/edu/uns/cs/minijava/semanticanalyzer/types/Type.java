@@ -1,5 +1,7 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer.types;
 
+import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
+
 import java.util.Objects;
 
 public abstract class Type {
@@ -23,5 +25,6 @@ public abstract class Type {
     }
 
     public abstract boolean requireCheckExistence();
+    public abstract boolean isSubtypeOf(Type superType) throws SemanticException;
 
 }

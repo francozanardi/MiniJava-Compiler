@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer.entities;
 
+import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.EntityAlreadyExistsException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
@@ -11,15 +12,14 @@ import java.util.Objects;
 
 public class Method extends EntityWithType {
     protected final EntityTable<String, Parameter> parameters;
-    protected final EntityTable<String, LocalVariable> localVariables;
     protected final MethodForm methodForm;
     protected int parameterNumber;
+    protected BlockSentenceNodeImpl bodyBlock;
 
     public Method(Token identifierToken, Type returnType, MethodForm methodForm) {
         super(identifierToken, returnType);
         this.methodForm = methodForm;
         this.parameters = new EntityTable<>();
-        this.localVariables = new EntityTable<>();
         this.parameterNumber = 0;
     }
 
@@ -56,14 +56,15 @@ public class Method extends EntityWithType {
         return parameterNumber;
     }
 
-    public void addLocalVariable(String name, LocalVariable localVariable) throws EntityAlreadyExistsException {
-        Parameter parameterFound = parameters.get(name);
+    public BlockSentenceNodeImpl getBodyBlock() {
+        return bodyBlock;
+    }
 
-        if(parameterFound != null){
-            throw new EntityAlreadyExistsException(localVariable.getIdentifierToken(),
-                    "Ya existe un parámetro definido en el método con el nombre de " + name);
-        }
+    public void setBodyBlock(BlockSentenceNodeImpl bodyBlock) {
+        this.bodyBlock = bodyBlock;
+    }
 
-        localVariables.putAndCheck(name, localVariable);
+    public boolean canHasReturn(){
+        return true;
     }
 }
