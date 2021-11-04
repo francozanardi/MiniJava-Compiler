@@ -21,20 +21,13 @@ public class ForSentenceNode extends BlockSentenceNode {
         super(sentenceToken, containerMethod, containerBlock);
     }
 
-
     @Override
-    protected boolean hasLocalVariableInCurrentBlock(String localVariableName) {
-        return variable.getIdentifierToken().getLexema().equals(localVariableName);
-    }
-
-    @Override
-    protected boolean hasLocalVariableInAncestorBlocks(String localVariableName) {
-        if(containerBlock == null){
-            return false;
+    protected LocalVariable findLocalVariableInCurrentBlock(String localVariableName) {
+        if(variable.getIdentifierToken().getLexema().equals(localVariableName)){
+            return variable;
         }
 
-        return  containerBlock.hasLocalVariableInCurrentBlock(localVariableName) ||
-                containerBlock.hasLocalVariableInAncestorBlocks(localVariableName);
+        return null;
     }
 
     public LocalVariable getVariable() {

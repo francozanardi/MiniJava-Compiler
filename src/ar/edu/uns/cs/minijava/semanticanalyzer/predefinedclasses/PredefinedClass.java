@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer.predefinedclasses;
 
+import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.*;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.EntityAlreadyExistsException;
@@ -37,10 +38,15 @@ public abstract class PredefinedClass {
     protected abstract List<Attribute> createAttributes() throws EntityAlreadyExistsException;
 
     protected Constructor createConstructor() throws SemanticException {
-        return new Constructor(
+        Constructor constructor = new Constructor(
                 classCreated.getIdentifierToken(),
                 new ReferenceType(classCreated.getIdentifierToken().getLexema())
         );
+
+        constructor.setBodyBlock(new BlockSentenceNodeImpl(classCreated.getIdentifierToken(), constructor, null));
+        constructor.setClassContainer(classCreated);
+
+        return constructor;
     }
 
     public Class getClassCreated() {

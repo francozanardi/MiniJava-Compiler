@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer.predefinedclasses;
 
+import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.*;
@@ -32,6 +33,8 @@ public class Object extends PredefinedClass {
         );
 
         debugPrint.appendParameter("i", i);
+        debugPrint.setClassContainer(classCreated);
+        debugPrint.setBodyBlock(new BlockSentenceNodeImpl(debugPrint.getIdentifierToken(), debugPrint, null));
 
         return List.of(debugPrint);
     }

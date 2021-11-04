@@ -23,13 +23,41 @@ public abstract class BlockSentenceNode extends SentenceNode {
         return containerBlock;
     }
 
+    public abstract void addLocalVariable(LocalVariable localVariable) throws EntityAlreadyExistsException;
+    protected abstract LocalVariable findLocalVariableInCurrentBlock(String localVariableName);
+
+    protected LocalVariable findLocalVariableInAncestorBlocks(String localVariableName) {
+        if(containerBlock == null){
+            return null;
+        }
+
+        LocalVariable localVariableInParentBlock = containerBlock.findLocalVariableInCurrentBlock(localVariableName);
+        if(localVariableInParentBlock != null){
+            return localVariableInParentBlock;
+        }
+
+        return containerBlock.findLocalVariableInAncestorBlocks(localVariableName);
+    }
+
+    public LocalVariable getLocalVariable(String localVariableName){
+        LocalVariable localVariableInCurrentBlock = findLocalVariableInCurrentBlock(localVariableName);
+        if(localVariableInCurrentBlock != null){
+            return localVariableInCurrentBlock;
+        }
+
+        return findLocalVariableInAncestorBlocks(localVariableName);
+    }
+
+    protected boolean hasLocalVariableInAncestorBlocks(String localVariableName){
+        return findLocalVariableInAncestorBlocks(localVariableName) != null;
+    }
+
+    protected boolean hasLocalVariableInCurrentBlock(String localVariableName){
+        return findLocalVariableInCurrentBlock(localVariableName) != null;
+    }
+
     public boolean hasLocalVariable(String localVariableName){
         return  hasLocalVariableInCurrentBlock(localVariableName) ||
                 hasLocalVariableInAncestorBlocks(localVariableName);
     }
-
-    protected abstract boolean hasLocalVariableInCurrentBlock(String localVariableName);
-    protected abstract boolean hasLocalVariableInAncestorBlocks(String localVariableName);
-    public abstract void addLocalVariable(LocalVariable localVariable) throws EntityAlreadyExistsException;
-
 }

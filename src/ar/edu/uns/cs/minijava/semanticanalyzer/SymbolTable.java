@@ -63,6 +63,12 @@ public class SymbolTable {
         }
     }
 
+    public void checkSentences() throws SemanticException {
+        for(Class clazz : classes.values()){
+            clazz.checkSentences();
+        }
+    }
+
     public void emptySymbolTable(){
         classes = new EntityTable<>();
         addPredefinedClasses();

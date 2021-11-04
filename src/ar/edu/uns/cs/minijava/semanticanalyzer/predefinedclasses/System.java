@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer.predefinedclasses;
 
+import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.*;
@@ -57,10 +58,15 @@ public class System extends PredefinedClass {
     }
 
     private Method createMethod(String lexeme, Type type){
-        return new Method(
+        Method method = new Method(
                 new Token(TokenName.IDENTIFICADOR_DE_METODO_O_VARIABLE, lexeme, 0),
                 type,
                 MethodForm.STATIC);
+
+        method.setClassContainer(classCreated);
+        method.setBodyBlock(new BlockSentenceNodeImpl(method.getIdentifierToken(), method, null));
+
+        return method;
     }
 
     private void createAndAddParameter(String lexeme, Type type, Method method) throws EntityAlreadyExistsException {

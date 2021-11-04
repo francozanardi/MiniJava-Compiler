@@ -21,11 +21,6 @@ public class BlockSentenceNodeImpl extends BlockSentenceNode {
         this.localVariables = new EntityTable<>();
     }
 
-
-    public LocalVariable getLocalVariableByName(String name){
-        return localVariables.get(name);
-    }
-
     public void appendSentence(SentenceNode sentence){
         sentences.add(sentence);
     }
@@ -35,18 +30,8 @@ public class BlockSentenceNodeImpl extends BlockSentenceNode {
     }
 
     @Override
-    protected boolean hasLocalVariableInCurrentBlock(String localVariableName){
-        return localVariables.get(localVariableName) != null;
-    }
-
-    @Override
-    protected boolean hasLocalVariableInAncestorBlocks(String localVariableName){
-        if(containerBlock == null){
-            return false;
-        }
-
-        return  containerBlock.hasLocalVariableInCurrentBlock(localVariableName) ||
-                containerBlock.hasLocalVariableInAncestorBlocks(localVariableName);
+    protected LocalVariable findLocalVariableInCurrentBlock(String localVariableName) {
+        return localVariables.get(localVariableName);
     }
 
     @Override
@@ -69,6 +54,8 @@ public class BlockSentenceNodeImpl extends BlockSentenceNode {
 
     @Override
     public void check() throws SemanticException {
-
+        for(SentenceNode sentence : sentences){
+            sentence.check();
+        }
     }
 }

@@ -56,6 +56,7 @@ public class Main {
         try {
             syntaxAnalyzer.initGrammar();
             SymbolTable.getInstance().checkDeclarations();
+            SymbolTable.getInstance().checkSentences();
             infoDisplay.showSuccess();
         } catch (CompilerException compilerException) {
             infoDisplay.showCompilerException(compilerException);

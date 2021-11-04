@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer.entities;
 
+import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.EntityAlreadyExistsException;
@@ -43,9 +44,20 @@ public class Class extends Entity {
         }
     }
 
+    public void checkSentences() throws SemanticException {
+        constructor.checkSentences();
+
+        for(Method method : methods.values()){
+            method.checkSentences();
+        }
+
+    }
+
     private void tryToCreateDefaultConstructor() throws SemanticException {
         if(constructor == null){
             constructor = new Constructor(identifierToken, new ReferenceType(identifierToken.getLexema()));
+            constructor.setBodyBlock(new BlockSentenceNodeImpl(identifierToken, constructor, null));
+            constructor.setClassContainer(this);
         }
     }
 
@@ -192,5 +204,13 @@ public class Class extends Entity {
 
     public void setTokenOfParentClass(Token tokenOfParentClass) {
         this.tokenOfParentClass = tokenOfParentClass;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Class aClass = (Class) o;
+        return Objects.equals(this.identifierToken.getLexema(), aClass.identifierToken.getLexema());
     }
 }

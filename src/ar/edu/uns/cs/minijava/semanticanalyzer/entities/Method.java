@@ -8,29 +8,36 @@ import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 import ar.edu.uns.cs.minijava.semanticanalyzer.utils.EntityTable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Method extends EntityWithType {
     protected final EntityTable<String, Parameter> parameters;
     protected final MethodForm methodForm;
-    protected int parameterNumber;
+    protected final List<Parameter> parametersInOrder;
     protected BlockSentenceNodeImpl bodyBlock;
+    protected Class classContainer;
 
     public Method(Token identifierToken, Type returnType, MethodForm methodForm) {
         super(identifierToken, returnType);
         this.methodForm = methodForm;
         this.parameters = new EntityTable<>();
-        this.parameterNumber = 0;
+        this.parametersInOrder = new ArrayList<>();
     }
 
     public Parameter getParameterById(String parameterId) {
         return parameters.get(parameterId);
     }
 
+    public List<Parameter> getParametersInOrder(){
+        return parametersInOrder;
+    }
+
     public void appendParameter(String identifier, Parameter parameter) throws EntityAlreadyExistsException {
         this.parameters.putAndCheck(identifier, parameter);
-        parameter.setPosition(parameterNumber);
-        parameterNumber++;
+        parameter.setPosition(parametersInOrder.size());
+        parametersInOrder.add(parameter);
     }
 
     public MethodForm getMethodForm() {
@@ -52,8 +59,12 @@ public class Method extends EntityWithType {
         }
     }
 
+    public void checkSentences() throws SemanticException {
+        bodyBlock.check();
+    }
+
     public int getParameterNumber(){
-        return parameterNumber;
+        return parametersInOrder.size();
     }
 
     public BlockSentenceNodeImpl getBodyBlock() {
@@ -62,6 +73,14 @@ public class Method extends EntityWithType {
 
     public void setBodyBlock(BlockSentenceNodeImpl bodyBlock) {
         this.bodyBlock = bodyBlock;
+    }
+
+    public Class getClassContainer() {
+        return classContainer;
+    }
+
+    public void setClassContainer(Class classContainer) {
+        this.classContainer = classContainer;
     }
 
     public boolean canHasReturn(){

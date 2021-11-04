@@ -2,10 +2,12 @@ package ar.edu.uns.cs.minijava.ast.expressions.binaryexpressions;
 
 import ar.edu.uns.cs.minijava.ast.expressions.ExpressionNode;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
+import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 
 public abstract class BinaryExpressionNode extends ExpressionNode {
-    private ExpressionNode leftExpression;
-    private ExpressionNode rightExpression;
+    protected ExpressionNode leftExpression;
+    protected ExpressionNode rightExpression;
 
     public BinaryExpressionNode(Token sentenceToken) {
         super(sentenceToken);

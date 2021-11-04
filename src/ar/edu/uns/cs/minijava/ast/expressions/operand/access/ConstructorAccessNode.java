@@ -2,32 +2,26 @@ package ar.edu.uns.cs.minijava.ast.expressions.operand.access;
 
 import ar.edu.uns.cs.minijava.ast.expressions.ExpressionNode;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
+import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
+import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Method;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class ConstructorAccessNode extends AccessNode {
-    private Token constructorToken;
-    private List<ExpressionNode> parameters;
+public class ConstructorAccessNode extends MethodAccessNode {
 
-    public ConstructorAccessNode(Token constructorToken) {
-        this.constructorToken = constructorToken;
-        this.parameters = new ArrayList<>();
+    public ConstructorAccessNode(Token constructorToken, Method methodWhereIsUsed, List<ExpressionNode> arguments) {
+        super(constructorToken, methodWhereIsUsed, arguments);
     }
 
-    public List<ExpressionNode> getParameters() {
-        return parameters;
-    }
+    @Override
+    protected Method findMethodCalled() {
+        Class classToInstantiate = SymbolTable.getInstance().getClassById(sentenceToken.getLexema());
 
-    public void setParameters(List<ExpressionNode> parameters) {
-        this.parameters = parameters;
-    }
+        if(classToInstantiate != null){
+            return classToInstantiate.getConstructor();
+        }
 
-    public Token getConstructorToken() {
-        return constructorToken;
-    }
-
-    public void setConstructorToken(Token constructorToken) {
-        this.constructorToken = constructorToken;
+        return null;
     }
 }

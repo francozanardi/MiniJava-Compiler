@@ -2,8 +2,7 @@ Etapa 3:
 
 * Estamos creando una instancia de la clase IntType cada vez que se crea un entero. Esta instancia no tiene mucho sentido crearla tantas veces como tantos enteros haya. Al menos por ahora, dado que no tiene ningún atributo de instancia interesante. Podríamos hacerla un singleton y evitar esta sobrecarga.
 
-* crear excepción EntiyAlreadyExists como hija de SemanticException y usarla en nuestro mapeo EntityTable
-
-* Los parámetros de un método son iguales si están en el mismo orden, ojo con eso.
 
 * Agregar que deba haber un main. No estoy seguro si únicamente uno o al menos uno.
+
+* Un método no puede llamarse como la clase. Ah, igualmente es imposible, porque la clase comienza con mayúscula y el método sí o sí con minúscula.

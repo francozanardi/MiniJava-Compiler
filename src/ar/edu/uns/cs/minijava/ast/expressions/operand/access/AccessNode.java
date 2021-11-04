@@ -3,14 +3,13 @@ package ar.edu.uns.cs.minijava.ast.expressions.operand.access;
 import ar.edu.uns.cs.minijava.ast.expressions.operand.OperandNode;
 import ar.edu.uns.cs.minijava.ast.expressions.operand.access.chained.ChainedNode;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
+import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.reference.ReferenceType;
 
 public abstract class AccessNode extends OperandNode {
     protected ReferenceType castingType;
     protected ChainedNode chained;
-//    protected ChainedNode lastElementChained;
-    // TODO: crear un puntero al último elemento del encadenado, para evitar iterar por todo el encadenado.
-    // Aunque son pocos elementos. Quizás no vale la pena.
 
     public AccessNode(Token sentenceToken) {
         super(sentenceToken);
@@ -61,6 +60,20 @@ public abstract class AccessNode extends OperandNode {
         return isAssignable();
     }
 
-    public abstract boolean isCallable();
+    protected Type checkCasting(Type finalType) throws SemanticException {
+        if(castingType != null){
+            if(!castingType.isSubtypeOf(finalType)){
+                throw new SemanticException(sentenceToken, "Se produjo un error al realizar el casting. " +
+                        castingType.getType() + " no es un subtipo de " +
+                        finalType.getType());
+            }
+
+            return castingType;
+        }
+
+        return finalType;
+    }
+
     public abstract boolean isAssignable();
+    public abstract boolean isCallable();
 }

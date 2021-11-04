@@ -2,6 +2,9 @@ package ar.edu.uns.cs.minijava.syntaxanalyzer;
 
 import ar.edu.uns.cs.minijava.ast.expressions.ExpressionNode;
 import ar.edu.uns.cs.minijava.ast.expressions.binaryexpressions.*;
+import ar.edu.uns.cs.minijava.ast.expressions.binaryexpressions.classtype.ComparatorBinaryExpressionNode;
+import ar.edu.uns.cs.minijava.ast.expressions.binaryexpressions.classtype.DistinctBinaryExpressionNode;
+import ar.edu.uns.cs.minijava.ast.expressions.binaryexpressions.primitivetype.*;
 import ar.edu.uns.cs.minijava.ast.expressions.operand.OperandNode;
 import ar.edu.uns.cs.minijava.ast.expressions.operand.access.*;
 import ar.edu.uns.cs.minijava.ast.expressions.operand.access.chained.ChainedNode;
@@ -236,6 +239,7 @@ public class SyntaxAnalyzer {
 
             BlockSentenceNodeImpl block = bloque();
             constructor.setBodyBlock(block);
+            constructor.setClassContainer(currentClass);
 
             currentClass.setConstructor(constructor);
         } else {
@@ -256,7 +260,10 @@ public class SyntaxAnalyzer {
             match(IDENTIFICADOR_DE_METODO_O_VARIABLE);
 
             Class currentClass = SymbolTable.getInstance().getContext().getCurrentClass();
+
             Method method = new Method(methodIdentifier, type, methodForm);
+            method.setClassContainer(currentClass);
+
             SymbolTable.getInstance().getContext().setCurrentMethod(method);
 
             List<Parameter> parameters = argsFormales();
@@ -519,15 +526,21 @@ public class SyntaxAnalyzer {
             BlockSentenceNode currentBlock = SymbolTable.getInstance().getContext().getCurrentBlock();
             Method currentMethod = SymbolTable.getInstance().getContext().getCurrentMethod();
 
-            BlockSentenceNodeImpl block = new BlockSentenceNodeImpl(currentMethod, currentBlock);
-
-            SymbolTable.getInstance().getContext().setCurrentBlock(block);
+            Token blockBegin = currentToken;
             match(LLAVE_ABRE);
+
+            BlockSentenceNodeImpl block = new BlockSentenceNodeImpl(blockBegin, currentMethod, currentBlock);
+            SymbolTable.getInstance().getContext().setCurrentBlock(block);
+
             List<SentenceNode> sentences = new ArrayList<>();
             listaSentencias(sentences);
+
             match(LLAVE_CIERRA);
 
             block.setSentences(sentences);
+
+            //volvemos a poner el bloque que estaba (bloque padre) como actual en el contexto
+            SymbolTable.getInstance().getContext().setCurrentBlock(currentBlock);
 
             return block;
         } else {
@@ -625,7 +638,7 @@ public class SyntaxAnalyzer {
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             return tipoDeAsignacion(access);
         } else if(siguientes.contains(currentToken.getTokenName())){
-            return new CallSentenceNode(access);
+            return new CallSentenceNode(access.getSentenceToken(), access);
         } else if(!currentToken.getTokenName().equals(EOF)){
             throw new SyntaxException(currentToken, tokensExpected);
         }
@@ -657,16 +670,20 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion2);
         tokensExpected.addAll(primerosDerivacion3);
 
+        Token assignationToken;
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
+            assignationToken = currentToken;
             match(ASIGNACION);
             ExpressionNode expression = expresion();
-            return new EqualAssignmentNode(access, expression);
+            return new EqualAssignmentNode(assignationToken, access, expression);
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
+            assignationToken = currentToken;
             match(INCREMENTOR);
-            return new IncrementAssignmentNode(access);
+            return new IncrementAssignmentNode(assignationToken, access);
         } else if(primerosDerivacion3.contains(currentToken.getTokenName())){
+            assignationToken = currentToken;
             match(DECREMENTOR);
-            return new DecrementAssignmentNode(access);
+            return new DecrementAssignmentNode(assignationToken, access);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
@@ -692,11 +709,6 @@ public class SyntaxAnalyzer {
                     .getContext()
                     .getCurrentBlock()
                     .addLocalVariable(localVariable);
-
-            //TODO: en el for tener en cuenta que se debería agregar al bloque que sea body del for
-            //en realidad el for no necesariamente va a tener un bloque como body.
-            // Por lo tanto, en ese caso en qué bloque deberíamos declarar la variable local?
-            // Por ahora queda así, pero hay que tener en cuenta esto.
 
             return localVariable;
         } else {
@@ -809,10 +821,14 @@ public class SyntaxAnalyzer {
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             BlockSentenceNode currentBlock = SymbolTable.getInstance().getContext().getCurrentBlock();
             Method currentMethod = SymbolTable.getInstance().getContext().getCurrentMethod();
-            ForSentenceNode forNode = new ForSentenceNode(currentMethod, currentBlock);
+
+
+            Token forToken = currentToken;
+            match(FOR_PR);
+
+            ForSentenceNode forNode = new ForSentenceNode(forToken, currentMethod, currentBlock);
             SymbolTable.getInstance().getContext().setCurrentBlock(forNode);
 
-            match(FOR_PR);
             match(PARENTESIS_ABRE);
             varLocal();
             match(PUNTO_Y_COMA);
@@ -898,45 +914,59 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion12);
         tokensExpected.addAll(primerosDerivacion13);
 
+        Token operatorToken;
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(OR);
-            return new OrBinaryExpressionNode();
+            return new OrBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(AND);
-            return new AndBinaryExpressionNode();
+            return new AndBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion3.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(COMPARACION);
-            return new ComparatorBinaryExpressionNode();
+            return new ComparatorBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion4.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(DISTINTO);
-            return new DistinctBinaryExpressionNode();
+            return new DistinctBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion5.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(MENOR);
-            return new LessBinaryExpressionNode();
+            return new LessBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion6.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(MAYOR);
-            return new GreaterBinaryExpressionNode();
+            return new GreaterBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion7.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(MENOR_IGUAL);
-            return new LessOrEqualBinaryExpressionNode();
+            return new LessOrEqualBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion8.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(MAYOR_IGUAL);
-            return new GreaterOrEqualBinaryExpressionNode();
+            return new GreaterOrEqualBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion9.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(SUMA);
-            return new PlusBinaryExpressionNode();
+            return new PlusBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion10.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(RESTA);
-            return new MinusBinaryExpressionNode();
+            return new MinusBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion11.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(PRODUCTO);
-            return new MultiplicationBinaryExpressionNode();
+            return new MultiplicationBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion12.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(DIVISION);
-            return new DivisionBinaryExpressionNode();
+            return new DivisionBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion13.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(MODULO);
-            return new ModuleBinaryExpressionNode();
+            return new ModuleBinaryExpressionNode(operatorToken);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
@@ -958,7 +988,7 @@ public class SyntaxAnalyzer {
             return operator;
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
             OperandNode operand = operando();
-            UnaryExpressionNode unaryExpression = new WithoutOperatorUnaryExpressionNode();
+            UnaryExpressionNode unaryExpression = new WithoutOperatorUnaryExpressionNode(operand.getSentenceToken());
             unaryExpression.setOperand(operand);
 
             return unaryExpression;
@@ -977,15 +1007,19 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion2);
         tokensExpected.addAll(primerosDerivacion3);
 
+        Token operatorToken;
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(SUMA);
-            return new PlusUnaryExpressionNode();
+            return new PlusUnaryExpressionNode(operatorToken);
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(RESTA);
-            return new MinusUnaryExpressionNode();
+            return new MinusUnaryExpressionNode(operatorToken);
         } else if(primerosDerivacion3.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(NEGACION);
-            return new NegationUnaryExpressionNode();
+            return new NegationUnaryExpressionNode(operatorToken);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
@@ -1024,25 +1058,31 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion5);
         tokensExpected.addAll(primerosDerivacion6);
 
+        Token literalToken;
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            Token sentenceToken = currentToken;
+            literalToken = currentToken;
             match(NULL_PR);
-            return new NullLiteralNode(sentenceToken);
+            return new NullLiteralNode(literalToken);
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
+            literalToken = currentToken;
             match(TRUE_PR);
-            return new TrueLiteralNode();
+            return new TrueLiteralNode(literalToken);
         } else if(primerosDerivacion3.contains(currentToken.getTokenName())){
+            literalToken = currentToken;
             match(FALSE_PR);
-            return new FalseLiteralNode();
+            return new FalseLiteralNode(literalToken);
         } else if(primerosDerivacion4.contains(currentToken.getTokenName())){
+            literalToken = currentToken;
             match(ENTERO);
-            return new IntLiteralNode();
+            return new IntLiteralNode(literalToken);
         } else if(primerosDerivacion5.contains(currentToken.getTokenName())){
+            literalToken = currentToken;
             match(CARACTER);
-            return new CharLiteralNode();
+            return new CharLiteralNode(literalToken);
         } else if(primerosDerivacion6.contains(currentToken.getTokenName())){
+            literalToken = currentToken;
             match(STRING);
-            return new StringLiteralNode();
+            return new StringLiteralNode(literalToken);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
@@ -1105,7 +1145,7 @@ public class SyntaxAnalyzer {
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
             ExpressionNode expression = expresion();
             match(PARENTESIS_CIERRA);
-            return new ExpressionAccessNode(expression);
+            return new ExpressionAccessNode(expression.getSentenceToken(), expression);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
@@ -1121,7 +1161,7 @@ public class SyntaxAnalyzer {
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             ExpressionNode expression = expresionParentizada();
-            return new ExpressionAccessNode(expression);
+            return new ExpressionAccessNode(expression.getSentenceToken(), expression);
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
             return primarioSinExpresionParentizada();
         } else {
@@ -1191,9 +1231,9 @@ public class SyntaxAnalyzer {
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             List<ExpressionNode> parameters = argsActuales();
-            return new MethodAccessNode(identifier, parameters);
+            return new MethodAccessNode(identifier, SymbolTable.getInstance().getContext().getCurrentMethod(), parameters);
         } else if(siguientes.contains(currentToken.getTokenName())){
-            return new VariableAccessNode(identifier);
+            return new VariableAccessNode(identifier, SymbolTable.getInstance().getContext().getCurrentBlock());
         } else if(!currentToken.getTokenName().equals(EOF)){
             throw new SyntaxException(currentToken, tokensExpected);
         }
@@ -1210,7 +1250,7 @@ public class SyntaxAnalyzer {
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             Token thisToken = currentToken;
             match(THIS_PR);
-            return new ThisAccessNode(thisToken);
+            return new ThisAccessNode(thisToken, SymbolTable.getInstance().getContext().getCurrentMethod());
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
@@ -1227,11 +1267,9 @@ public class SyntaxAnalyzer {
             Token identifier = currentToken;
             match(IDENTIFICADOR_DE_CLASE);
 
-            ConstructorAccessNode constructor = new ConstructorAccessNode(identifier);
-            List<ExpressionNode> parameters = argsActuales();
-            constructor.setParameters(parameters);
+            List<ExpressionNode> arguments = argsActuales();
 
-            return constructor;
+            return new ConstructorAccessNode(identifier, SymbolTable.getInstance().getContext().getCurrentMethod(), arguments);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
@@ -1361,7 +1399,7 @@ public class SyntaxAnalyzer {
             return new MethodChainedNode(identifier, parameters);
 
         } else if(siguientes.contains(currentToken.getTokenName())){
-            return new VariableChainedNode(identifier);
+            return new VariableChainedNode(identifier, SymbolTable.getInstance().getContext().getCurrentBlock());
 
         } else if(!currentToken.getTokenName().equals(EOF)){
             throw new SyntaxException(currentToken, tokensExpected);

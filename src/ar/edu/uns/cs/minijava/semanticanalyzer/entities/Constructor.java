@@ -9,7 +9,7 @@ import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 
 public class Constructor extends Method {
     public Constructor(Token identifierToken, Type returnType) throws SemanticException {
-        super(identifierToken, returnType, MethodForm.DYNAMIC);
+        super(identifierToken, returnType, MethodForm.CONSTRUCTOR);
         checkConstructorName();
     }
 

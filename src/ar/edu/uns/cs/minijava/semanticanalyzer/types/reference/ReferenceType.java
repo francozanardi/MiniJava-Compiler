@@ -24,6 +24,6 @@ public class ReferenceType extends Type {
         Class subtypeClass = SymbolTable.getInstance().getClassById(type);
         Class supertypeClass = SymbolTable.getInstance().getClassById(supertype.getType());
 
-        return subtypeClass.hasThisAncestor(supertypeClass);
+        return subtypeClass != null && supertypeClass != null && subtypeClass.hasThisAncestor(supertypeClass);
     }
 }
