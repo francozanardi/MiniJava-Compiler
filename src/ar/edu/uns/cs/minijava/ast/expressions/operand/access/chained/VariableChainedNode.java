@@ -38,12 +38,13 @@ public class VariableChainedNode extends ChainedNode {
             }
 
             if( attributeFound.getVisibility().equals(Visibility.PRIVATE) &&
-                    classWhereToSearch.equals(blockWhereIsUsed.getContainerMethod().getClassContainer())){
+                attributeFound.getClassContainer().equals(blockWhereIsUsed.getContainerMethod().getClassContainer())){
                 return attributeFound;
             }
 
             throw new SemanticException(sentenceToken, "El atributo " + sentenceToken.getLexema() +
-                    " es inaccesible desde la clase " + classWhereToSearch.getIdentifierToken().getLexema());
+                    " es inaccesible desde la clase " +
+                    blockWhereIsUsed.getContainerMethod().getClassContainer().getIdentifierToken().getLexema());
         }
 
         throw new SemanticException(sentenceToken, "El atributo " + sentenceToken.getLexema() +

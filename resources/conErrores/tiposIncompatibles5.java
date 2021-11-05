@@ -1,4 +1,4 @@
-///[Error:=|7]
+///[Error:x|7]
 
 class A {
 	public int a1;

@@ -1,4 +1,4 @@
-///[Error:x|13]
+///[Error:debugPrint|15]
 
 class A {
 	public B b;
@@ -8,7 +8,7 @@ class A {
 
 	}
 	
-	static A test(){
+	dynamic A test(){
 		for(A x = this; null != null; this.b = null){
 			{
 				{

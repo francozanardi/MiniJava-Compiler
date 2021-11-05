@@ -21,7 +21,13 @@ public class ThisAccessNode extends AccessNode {
             throw new SemanticException(sentenceToken, "No se puede utilizar la palabra reservada 'this' en un método estático.");
         }
 
-        return checkCasting(new ReferenceType(methodContainer.getClassContainer().getIdentifierToken().getLexema()));
+        ReferenceType typeOfClassContainer = new ReferenceType(methodContainer.getClassContainer().getIdentifierToken().getLexema());
+
+        if(chained != null){
+            return checkCasting(chained.check(typeOfClassContainer));
+        }
+
+        return checkCasting(typeOfClassContainer);
     }
 
     @Override

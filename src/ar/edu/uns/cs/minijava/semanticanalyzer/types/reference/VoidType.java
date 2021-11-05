@@ -15,6 +15,6 @@ public class VoidType extends ReferenceType {
 
     @Override
     public boolean isSubtypeOf(Type supertype) throws SemanticException {
-        return this.equals(supertype);
+        return false;
     }
 }

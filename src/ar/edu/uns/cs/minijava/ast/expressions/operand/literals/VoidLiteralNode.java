@@ -7,7 +7,7 @@ import ar.edu.uns.cs.minijava.semanticanalyzer.types.reference.VoidType;
 
 public class VoidLiteralNode extends LiteralNode {
     public VoidLiteralNode() {
-        super(null);
+        super(new Token(null, "void", 0));
     }
 
     @Override

@@ -8,7 +8,7 @@ class A {
 
 	}
 	
-	static A test(){
+	dynamic A test(){
 		for(A x = this; 0 <= 3*(-234); 0--){
 			{
 				{

@@ -1,4 +1,4 @@
-//[Error:x|20]
+//[Error:x|19]
 // La variable x ya fue declarada
 
 class A {

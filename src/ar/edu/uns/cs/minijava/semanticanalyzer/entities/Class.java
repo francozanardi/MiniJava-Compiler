@@ -120,16 +120,17 @@ public class Class extends Entity {
         return classConsolidated;
     }
 
-    private void consolidateMethods(Class parent) throws EntityAlreadyExistsException {
+    private void consolidateMethods(Class parent) throws SemanticException {
         for(Map.Entry<String, Method> entry : parent.methods.entrySet()){
-            if(entry.getValue().getMethodForm().equals(MethodForm.STATIC)){
-                continue;
-            }
-
             try {
                 this.methods.putAndCheck(entry.getKey(), entry.getValue());
             } catch (EntityAlreadyExistsException unused) {
                 Method methodRedefined = this.methods.get(entry.getKey());
+
+                if(isMainMethod(methodRedefined)){
+                    SymbolTable.getInstance().setMainMethod(this, methodRedefined);
+                }
+
                 if(!methodRedefined.haveEqualHeaders(entry.getValue())){
                     throw new EntityAlreadyExistsException(methodRedefined.identifierToken,
                                     "El método " +

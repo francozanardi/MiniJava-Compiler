@@ -1,4 +1,4 @@
-///[Error:=|12]
+///[Error:x|12]
 
 class A {
 	public B b;

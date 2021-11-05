@@ -1,22 +1,22 @@
-///[Error:a|12]
 
 class A {
 	public B b;
 	private B bPrivado;
+	private int a1;
 	
 	A(){
 		b = new B(null, 0, "", null);
 	}
 	
-	static B test(B otroB){
+	dynamic B test(B otroB){
 		((A)((A)otroB.getO()).b.getO()).bPrivado.getO().debugPrint(this.m2(otroB.x, otroB));
 	}
 	
 	dynamic void m1(int p1){
 		B obj = new B(null, 0, "0", this);
-		boolean b = (a1 - m2(this.a1, new B(obj, 0, "", new System()))) * p1;
+		int b = (a1 - m2(this.a1, new B(obj, 0, "", new System()))) * p1;
 		
-		A self = (B)b.getO();
+		A self = (B)obj.getO();
 		
 	}
 	
@@ -40,7 +40,7 @@ class B extends A {
 		this.o = o;
 	}
 	
-	public Object getO(){
+	dynamic Object getO(){
 		return o;
 	}
 }

@@ -17,14 +17,16 @@ public class LocalVariableSentenceNode extends SentenceNode {
     @Override
     public void check() throws SemanticException {
         ExpressionNode expressionAssigned = localVariable.getExpressionAssigned();
-        Type expressionAssignedType = expressionAssigned.check();
+        if(expressionAssigned != null){
+            Type expressionAssignedType = expressionAssigned.check();
 
-        if(!expressionAssignedType.isSubtypeOf(localVariable.getType())){
-            throw new SemanticException(sentenceToken, "Incompatibilidad de tipos. " +
-                    "La variable local esperaba un subtipo del tipo '" +
-                    localVariable.getType().getType() +
-                    "'. Sin embargo, se le está asginando una expresión con el tipo '" +
-                    expressionAssignedType.getType() + "'");
+            if(!expressionAssignedType.isSubtypeOf(localVariable.getType())){
+                throw new SemanticException(sentenceToken, "Incompatibilidad de tipos. " +
+                        "La variable local esperaba un subtipo del tipo '" +
+                        localVariable.getType().getType() +
+                        "'. Sin embargo, se le está asginando una expresión con el tipo '" +
+                        expressionAssignedType.getType() + "'");
+            }
         }
     }
 

@@ -34,7 +34,7 @@ class B extends A {
 		this.o = o;
 	}
 	
-	public Object getO(){
+	dynamic Object getO(){
 		return o;
 	}
 }

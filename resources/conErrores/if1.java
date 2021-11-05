@@ -1,21 +1,22 @@
-///[Error:==|22]
+///[Error:==|23]
 
 class A {
 	public B b;
 	private B bPrivado;
+	public int z;
 	
 	A(){
 
 	}
 	
 	dynamic A test(){
-		for(A x = this; 0 <= 3*(-234); b--){
+		for(A x = this; 0 <= 3*(-234); z--){
 			{
 				{
 					debugPrint(1);
 				}
 				{
-					for(int y = x.b.i; x < 0; x++){
+					for(int y = x.b.i; x.b.i < 0; x.b.i++){
 						x.b.i = 0;						
 					}
 					

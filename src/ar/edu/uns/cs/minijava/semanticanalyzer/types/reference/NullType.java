@@ -17,6 +17,10 @@ public class NullType extends ReferenceType {
 
     @Override
     public boolean isSubtypeOf(Type supertype) throws SemanticException {
+        if(this.equals(supertype)){ //si se trata de una comparación entre dos nulls
+            return true;
+        }
+
         Class supertypeClass = SymbolTable.getInstance().getClassById(supertype.getType());
 
         return supertypeClass != null;

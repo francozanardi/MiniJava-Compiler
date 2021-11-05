@@ -1,5 +1,3 @@
-///[Error:y|19]
-
 class A {
 	public B b;
 	private B bPrivado;
@@ -8,14 +6,15 @@ class A {
 
 	}
 	
-	static A test(){
-		for(A x = this; 0 <= 3*(-234); b--){
+	dynamic A test(){
+		int z;
+		for(A x = this; 0 <= 3*(-234); z--){
 			{
 				{
 					debugPrint(1);
 				}
 				{
-					for(int y = x.b.i; x < 0; x++){
+					for(int y = x.b.i; x.b.i < 0; x.b.i++){
 						x.b.i = 0;
 						debugPrint(x.b.getI());
 						

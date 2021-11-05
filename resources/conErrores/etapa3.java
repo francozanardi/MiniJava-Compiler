@@ -1,4 +1,4 @@
-///[Error:String|24]
+///[Error:String|23]
 
 class A {
 	public B b;

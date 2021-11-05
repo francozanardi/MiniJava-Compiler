@@ -8,7 +8,7 @@ class A {
 
 	}
 	
-	static A test(){
+	dynamic A test(){
 		for(A x = this; null != null; this.b = null){
 			int x = 0;
 		}

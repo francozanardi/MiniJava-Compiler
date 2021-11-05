@@ -27,4 +27,8 @@ public abstract class Type {
     public abstract boolean requireCheckExistence();
     public abstract boolean isSubtypeOf(Type superType) throws SemanticException;
 
+    @Override
+    public String toString() {
+        return type;
+    }
 }

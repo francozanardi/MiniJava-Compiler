@@ -208,6 +208,7 @@ public class SyntaxAnalyzer {
 
             for(Token token : identifiers){
                 attribute = new Attribute(token, type, visibility);
+                attribute.setClassContainer(currentClass);
                 currentClass.addAttribute(token.getLexema(), attribute);
             }
         } else {
@@ -585,8 +586,9 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion7);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
+            Token emptySentence = currentToken;
             match(PUNTO_Y_COMA);
-            return new EmptySentenceNode();
+            return new EmptySentenceNode(emptySentence);
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
             LocalVariable localVariable = varLocal();
 
@@ -779,14 +781,25 @@ public class SyntaxAnalyzer {
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             Token sentenceToken = currentToken;
+            Method currentMethod = SymbolTable.getInstance().getContext().getCurrentMethod();
+            BlockSentenceNode currentBlock = SymbolTable.getInstance().getContext().getCurrentBlock();
             match(IF_PR);
             match(PARENTESIS_ABRE);
             ExpressionNode condition = expresion();
             match(PARENTESIS_CIERRA);
-            SentenceNode body = sentencia();
+
+            //estos bloques son wrappers para sentencias como declaraciones de variables globales.
+            //dado que si se declara una variable global como body de un if, no debería ser accesible fuera del scope de ese body.
+            BlockSentenceNodeImpl ifBlock = new BlockSentenceNodeImpl(sentenceToken, currentMethod, currentBlock);
+            SymbolTable.getInstance().getContext().setCurrentBlock(ifBlock);
+            SentenceNode ifBody = sentencia();
+
+            BlockSentenceNodeImpl elseBlock = new BlockSentenceNodeImpl(sentenceToken, currentMethod, currentBlock);
+            SymbolTable.getInstance().getContext().setCurrentBlock(elseBlock);
             SentenceNode elseBody = else_();
 
-            return new IfSentenceNode(sentenceToken, condition, body, elseBody);
+            SymbolTable.getInstance().getContext().setCurrentBlock(currentBlock); //volvemos al bloque original
+            return new IfSentenceNode(sentenceToken, condition, ifBody, elseBody);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
@@ -837,6 +850,9 @@ public class SyntaxAnalyzer {
             forNode.setAssignment(asignacion());
             match(PARENTESIS_CIERRA);
             forNode.setBody(sentencia());
+
+            SymbolTable.getInstance().getContext().setCurrentBlock(currentBlock);
+            //volvemos a poner el bloque padre como bloque actual
 
             return forNode;
         } else {

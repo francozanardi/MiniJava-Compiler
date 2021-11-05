@@ -1,13 +1,13 @@
-///[Error:=|10]
+///[Error:B|8]
 
 class A {
 	public int a1;
 	
 	dynamic void m1(int p1){
 		B obj = new B(null, 0, "0", this);
-		boolean b = (a1 - m2(this.a1, new B(obj, 0, "", new System()))) * p1;
+		int i = (a1 - m2(this.a1, new B(obj, 0, "", new System()))) * p1;
 		
-		A self = (B)b.getO();
+		A self = (B)obj.getO();
 	}
 	
 	dynamic int m2(int x, B b){
@@ -30,7 +30,7 @@ class B extends Object {
 		this.o = o;
 	}
 	
-	public Object getO(){
+	dynamic Object getO(){
 		return o;
 	}
 }

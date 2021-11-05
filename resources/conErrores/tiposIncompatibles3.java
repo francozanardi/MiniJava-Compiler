@@ -1,4 +1,4 @@
-///[Error:=|7]
+///[Error:x|7]
 // Asignando a una variable de tipo int un método void.
 class A {
 	public int a1;

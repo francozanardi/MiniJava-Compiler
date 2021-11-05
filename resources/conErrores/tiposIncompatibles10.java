@@ -1,4 +1,4 @@
-///[Error:this|7]
+///[Error:B|7]
 
 class A {
 	public int a1;
@@ -30,7 +30,7 @@ class B extends A {
 		this.o = o;
 	}
 	
-	public Object getO(){
+	dynamic Object getO(){
 		return o;
 	}
 }

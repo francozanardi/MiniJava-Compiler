@@ -1,6 +1,7 @@
-///[Error:bPrivado|48]
+///[Error:bPrivado|49]
 
 class A {
+	public int a1;
 	public B b;
 	private B bPrivado;
 	
@@ -8,12 +9,12 @@ class A {
 		b = new B(null, 0, "", null);
 	}
 	
-	static B test(B otroB){
+	dynamic B test(B otroB){
 	}
 	
 	dynamic void m1(int p1){
 		B obj = new B(null, 0, "0", this);
-		boolean b = (a1 - m2(this.a1, new B(obj, 0, "", new System()))) * p1;
+		int i = (p1 - m2(this.a1, new B(obj, 0, "", new System()))) * p1;
 		
 		A self = (B)b.getO();
 		
@@ -44,7 +45,7 @@ class B extends A {
 	}
 	
 	
-	dynamic void test(){
+	dynamic void testb(){
 		this.test(this).bPrivado = null;
 	}
 }

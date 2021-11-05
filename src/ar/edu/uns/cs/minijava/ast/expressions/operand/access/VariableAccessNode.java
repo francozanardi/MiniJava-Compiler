@@ -3,10 +3,13 @@ package ar.edu.uns.cs.minijava.ast.expressions.operand.access;
 
 import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNode;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Attribute;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.EntityWithType;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
+import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.access.Visibility;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
+import org.w3c.dom.Attr;
 
 public class VariableAccessNode extends AccessNode {
     private final BlockSentenceNode blockWhereIsUsed;
@@ -49,14 +52,22 @@ public class VariableAccessNode extends AccessNode {
     }
 
     private EntityWithType searchAttribute() throws SemanticException {
-        EntityWithType entityFound = blockWhereIsUsed.getContainerMethod().getClassContainer().getAttributeById(sentenceToken.getLexema());
-        if(entityFound != null){
-            if(!blockWhereIsUsed.getContainerMethod().getMethodForm().equals(MethodForm.STATIC)){
-                return entityFound;
+        Attribute attributeFound = blockWhereIsUsed.getContainerMethod().getClassContainer().getAttributeById(sentenceToken.getLexema());
+        if(attributeFound != null){
+            if(blockWhereIsUsed.getContainerMethod().getMethodForm().equals(MethodForm.STATIC)){
+                throw new SemanticException(sentenceToken, "No se puede acceder al atributo de instancia " +
+                        sentenceToken.getLexema() + " desde un método estático");
             }
 
-            throw new SemanticException(sentenceToken, "No se puede acceder al atributo de instancia " +
-                    sentenceToken.getLexema() + " desde un método estático");
+            if( attributeFound.getVisibility().equals(Visibility.PRIVATE) &&
+                !blockWhereIsUsed.getContainerMethod().getClassContainer().equals(attributeFound.getClassContainer())){
+                throw new SemanticException(sentenceToken, "El atributo de instancia " +
+                        sentenceToken.getLexema() +
+                        " es inaccesible desde la clase " +
+                        blockWhereIsUsed.getContainerMethod().getClassContainer().getIdentifierToken().getLexema());
+            }
+
+            return attributeFound;
         }
 
         return null;
