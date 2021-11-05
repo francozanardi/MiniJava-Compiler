@@ -47,7 +47,7 @@ public class Method extends EntityWithType {
     public boolean haveEqualHeaders(Method another){
         return  Objects.equals(this.methodForm, another.methodForm) &&
                 Objects.equals(this.type, another.type) &&
-                Objects.equals(this.parameters, another.parameters);
+                Objects.equals(this.parametersInOrder, another.parametersInOrder);
     }
 
     @Override

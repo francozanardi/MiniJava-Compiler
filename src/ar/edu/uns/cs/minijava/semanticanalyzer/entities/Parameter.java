@@ -22,8 +22,7 @@ public class Parameter extends EntityWithType {
         Parameter another = (Parameter) obj;
 
         return  Objects.equals(this.type, another.type) &&
-                this.position == another.position &&
-                Objects.equals(this.identifierToken.getLexema(), another.identifierToken.getLexema());
+                this.position == another.position;
     }
 
 
