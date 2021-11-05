@@ -21,8 +21,8 @@ public class LocalVariableSentenceNode extends SentenceNode {
 
         if(!expressionAssignedType.isSubtypeOf(localVariable.getType())){
             throw new SemanticException(sentenceToken, "Incompatibilidad de tipos. " +
-                    "La variable locale esperaba un subtipo del tipo '" +
-                    localVariable.getType() +
+                    "La variable local esperaba un subtipo del tipo '" +
+                    localVariable.getType().getType() +
                     "'. Sin embargo, se le está asginando una expresión con el tipo '" +
                     expressionAssignedType.getType() + "'");
         }

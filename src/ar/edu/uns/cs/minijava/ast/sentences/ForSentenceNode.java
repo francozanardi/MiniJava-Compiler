@@ -23,7 +23,7 @@ public class ForSentenceNode extends BlockSentenceNode {
 
     @Override
     protected LocalVariable findLocalVariableInCurrentBlock(String localVariableName) {
-        if(variable.getIdentifierToken().getLexema().equals(localVariableName)){
+        if(variable != null && variable.getIdentifierToken().getLexema().equals(localVariableName)){
             return variable;
         }
 
