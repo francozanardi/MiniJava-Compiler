@@ -1,12 +1,18 @@
 package ar.edu.uns.cs.minijava.ast.expressions.operand.access;
 
 import ar.edu.uns.cs.minijava.ast.expressions.ExpressionNode;
+import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.OneArgumentInstruction;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.ZeroArgumentInstruction;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Method;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Parameter;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
+import ar.edu.uns.cs.minijava.semanticanalyzer.types.reference.VoidType;
 
 import java.util.List;
 
@@ -22,7 +28,7 @@ public class MethodAccessNode extends AccessNode {
 
     @Override
     public Type check() throws SemanticException {
-        Method methodFound = findMethodCalled();
+        Method methodFound = searchMethodCalled();
 
         checkMethodExistence(methodFound);
         checkIfMethodIsCallable(methodFound);
@@ -35,7 +41,7 @@ public class MethodAccessNode extends AccessNode {
         return checkCasting(methodFound.getType());
     }
 
-    protected Method findMethodCalled(){
+    protected Method searchMethodCalled(){
         return methodWhereIsCalled.getClassContainer().getMethodById(sentenceToken.getLexema());
     }
 
@@ -84,5 +90,59 @@ public class MethodAccessNode extends AccessNode {
     @Override
     public boolean isAssignable() {
         return false;
+    }
+
+    @Override
+    public void generate() throws CodeGeneratorException {
+        //TODO: estoy asumiendo que estoy llamando un método dinámico
+        //Si llamase un método estático no sería necesario reservar el this ni ir a la VT
+        //se supone que el método estático se conoce su ubicación en tiempo de ejecución.
+        //Asumo que usando una label podemos hacerlo.
+        loadThis();
+        saveReturnSpaceIfExists();
+        loadArguments();
+        loadVirtualTable();
+        loadMethodCalledOffset();
+
+        SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.CALL));
+
+        if(chained != null){
+            chained.generate();
+        }
+    }
+
+    private void loadThis() throws CodeGeneratorException {
+        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.LOAD, 3));
+    }
+
+    protected void saveReturnSpaceIfExists() throws CodeGeneratorException {
+        Method methodCalled = searchMethodCalled();
+        Type returnType = methodCalled.getType();
+
+        if(!returnType.equals(new VoidType())){
+            SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.RMEM, 1));
+            addSwap();
+        }
+    }
+
+    protected void addSwap() throws CodeGeneratorException {
+        SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.SWAP));
+    }
+
+    protected void loadArguments() throws CodeGeneratorException {
+        for(ExpressionNode argument : arguments) {
+           argument.generate();
+           addSwap(); //bajamos el this
+        }
+    }
+
+    protected void loadVirtualTable() throws CodeGeneratorException {
+        SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.DUP));
+        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.LOADREF, 0));
+    }
+
+    protected void loadMethodCalledOffset() throws CodeGeneratorException {
+        SymbolTable.getInstance().appendInstruction(
+                new Instruction(OneArgumentInstruction.LOADREF, searchMethodCalled().getOffset()));
     }
 }

@@ -1,6 +1,10 @@
 package ar.edu.uns.cs.minijava.ast.expressions.operand.access;
 
+import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.OneArgumentInstruction;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Method;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
@@ -38,5 +42,14 @@ public class ThisAccessNode extends AccessNode {
     @Override
     public boolean isAssignable() {
         return false;
+    }
+
+    @Override
+    public void generate() throws CodeGeneratorException {
+        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.LOAD, 3));
+
+        if(chained != null){
+            chained.generate();
+        }
     }
 }

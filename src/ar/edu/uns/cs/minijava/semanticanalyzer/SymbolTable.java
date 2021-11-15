@@ -1,5 +1,8 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer;
 
+import ar.edu.uns.cs.minijava.codegenerator.CodeGenerator;
+import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
@@ -11,6 +14,7 @@ import ar.edu.uns.cs.minijava.semanticanalyzer.predefinedclasses.PredefinedClass
 import ar.edu.uns.cs.minijava.semanticanalyzer.predefinedclasses.System;
 import ar.edu.uns.cs.minijava.semanticanalyzer.utils.EntityTable;
 
+import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.Map;
 
@@ -19,21 +23,22 @@ public class SymbolTable {
     private Context context;
     private EntityTable<String, Class> classes;
     private Map.Entry<Class, Method> mainMethod;
+    private CodeGenerator codeGenerator;
 
     private SymbolTable() {
         context = new Context();
         classes = new EntityTable<>();
         mainMethod = null;
-        addPredefinedClasses();
     }
 
-    private void addPredefinedClasses() {
+    public void initialize(String outputPath) throws IOException {
         PredefinedClass object = new Object();
-        classes.put(object.getClassCreated().getIdentifierToken().getLexema(), object.getClassCreated());
+        object.addClassToSymbolTable();
 
         PredefinedClass system = new System();
-        classes.put(system.getClassCreated().getIdentifierToken().getLexema(), system.getClassCreated());
-        system.getClassCreated().setTokenOfParentClass(object.getClassCreated().getIdentifierToken());
+        system.addClassToSymbolTable();
+
+        codeGenerator = new CodeGenerator(outputPath);
     }
 
     public static SymbolTable getInstance(){
@@ -69,11 +74,11 @@ public class SymbolTable {
         }
     }
 
-    public void emptySymbolTable(){
+    public void reloadSymbolTable(String outputPath) throws IOException {
         classes = new EntityTable<>();
-        addPredefinedClasses();
         context = new Context();
         mainMethod = null;
+        initialize(outputPath);
     }
 
     public void setMainMethod(Class classContainer, Method method) throws SemanticException {
@@ -85,4 +90,10 @@ public class SymbolTable {
 
         mainMethod = new AbstractMap.SimpleEntry<>(classContainer, method);
     }
+
+    public void appendInstruction(Instruction instruction) throws CodeGeneratorException {
+        codeGenerator.appendInstruction(instruction);
+    }
+
+
 }

@@ -10,9 +10,11 @@ import ar.edu.uns.cs.minijava.semanticanalyzer.types.reference.ReferenceType;
 public abstract class AccessNode extends OperandNode {
     protected ReferenceType castingType;
     protected ChainedNode chained;
+    protected boolean isWriteMode;
 
     public AccessNode(Token sentenceToken) {
         super(sentenceToken);
+        this.isWriteMode = false;
     }
 
     public ReferenceType getCastingType() {
@@ -76,4 +78,12 @@ public abstract class AccessNode extends OperandNode {
 
     public abstract boolean isAssignable();
     public abstract boolean isCallable();
+
+    public void enableWriteMode(){
+        if(chained != null){
+            getLastElementChained().enableWriteMode();
+        } else if(isAssignable()) {
+            this.isWriteMode = true;
+        }
+    }
 }

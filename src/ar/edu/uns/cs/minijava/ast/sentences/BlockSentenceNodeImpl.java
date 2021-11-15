@@ -49,6 +49,7 @@ public class BlockSentenceNodeImpl extends BlockSentenceNode {
                     "Ya existe una variable local definida en el método con el nombre de " + name);
         }
 
+        localVariable.setOffset((-1)*getLocalVariablesNumberInMethod());
         localVariables.putAndCheck(name, localVariable);
     }
 
@@ -57,5 +58,14 @@ public class BlockSentenceNodeImpl extends BlockSentenceNode {
         for(SentenceNode sentence : sentences){
             sentence.check();
         }
+    }
+
+    @Override
+    public int getLocalVariablesNumberInMethod() {
+        if(containerBlock != null){
+            return containerBlock.getLocalVariablesNumberInMethod() + localVariables.size();
+        }
+
+        return localVariables.size();
     }
 }

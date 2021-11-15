@@ -1,6 +1,7 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer.predefinedclasses;
 
 import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
+import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.*;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.EntityAlreadyExistsException;
@@ -10,7 +11,7 @@ import ar.edu.uns.cs.minijava.semanticanalyzer.types.reference.ReferenceType;
 import java.util.List;
 
 public abstract class PredefinedClass {
-    protected Class classCreated;
+    protected final Class classCreated;
 
     public PredefinedClass(Class classCreated) {
         this.classCreated = classCreated;
@@ -20,6 +21,10 @@ public abstract class PredefinedClass {
         } catch (SemanticException ignored) {
             //una clase bien predefinida no debería lanzar errores semánticos.
         }
+    }
+
+    public Class getClassCreated() {
+        return classCreated;
     }
 
     protected void create() throws SemanticException {
@@ -35,6 +40,7 @@ public abstract class PredefinedClass {
     }
 
     protected abstract List<Method> createMethods() throws EntityAlreadyExistsException;
+
     protected abstract List<Attribute> createAttributes() throws EntityAlreadyExistsException;
 
     protected Constructor createConstructor() throws SemanticException {
@@ -49,11 +55,17 @@ public abstract class PredefinedClass {
         return constructor;
     }
 
-    public Class getClassCreated() {
-        return classCreated;
-    }
+    public void addClassToSymbolTable(){
+        Class objectClass = SymbolTable.getInstance().getClassById("Object");
 
-    public void setClassCreated(Class classCreated) {
-        this.classCreated = classCreated;
+        try {
+            SymbolTable.getInstance().addClass(classCreated.getIdentifierToken().getLexema(), classCreated);
+        } catch (EntityAlreadyExistsException ignored) {
+            //una clase predefinida no debería existir por lo que podemos asumir que no producirá esta excepción
+        }
+
+        if(objectClass != null){
+            classCreated.setTokenOfParentClass(objectClass.getIdentifierToken());
+        }
     }
 }

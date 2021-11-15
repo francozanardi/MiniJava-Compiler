@@ -37,6 +37,13 @@ public class Method extends EntityWithType {
     public void appendParameter(String identifier, Parameter parameter) throws EntityAlreadyExistsException {
         this.parameters.putAndCheck(identifier, parameter);
         parameter.setPosition(parametersInOrder.size());
+
+        if(methodForm.equals(MethodForm.STATIC)){
+            parameter.setOffset(parametersInOrder.size() + 3);
+        } else {
+            parameter.setOffset(parametersInOrder.size() + 4);
+        }
+
         parametersInOrder.add(parameter);
     }
 

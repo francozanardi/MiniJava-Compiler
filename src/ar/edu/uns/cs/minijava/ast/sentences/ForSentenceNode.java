@@ -49,6 +49,7 @@ public class ForSentenceNode extends BlockSentenceNode {
                     "Ya existe una variable local definida en el método con el nombre de " + name);
         }
 
+        localVariable.setDeclarationPosition(containerBlock.getLocalVariablesNumberInMethod());
         this.variable = localVariable;
     }
 
@@ -92,5 +93,14 @@ public class ForSentenceNode extends BlockSentenceNode {
                             conditionType.getType() +
                             "'");
         }
+    }
+
+    @Override
+    public int getLocalVariablesNumberInMethod() {
+        if(containerBlock != null){
+            return containerBlock.getLocalVariablesNumberInMethod() + 1;
+        }
+
+        return 1;
     }
 }

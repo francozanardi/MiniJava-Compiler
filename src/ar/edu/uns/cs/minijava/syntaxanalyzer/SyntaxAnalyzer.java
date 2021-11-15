@@ -765,7 +765,7 @@ public class SyntaxAnalyzer {
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             return expresion();
         } else if(siguientes.contains(currentToken.getTokenName())){
-            return new VoidLiteralNode();
+            return null;
         } else if(!currentToken.getTokenName().equals(EOF)){
             throw new SyntaxException(currentToken, tokensExpected);
         }

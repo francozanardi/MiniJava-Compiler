@@ -2,14 +2,23 @@ package ar.edu.uns.cs.minijava.ast.expressions.operand.access;
 
 
 import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNode;
+import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.OneArgumentInstruction;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.ZeroArgumentInstruction;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Attribute;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.EntityWithType;
+import ar.edu.uns.cs.minijava.semanticanalyzer.entities.LocalVariable;
+import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Parameter;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.access.Visibility;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 import org.w3c.dom.Attr;
+
+import java.util.Optional;
 
 public class VariableAccessNode extends AccessNode {
     private final BlockSentenceNode blockWhereIsUsed;
@@ -52,7 +61,9 @@ public class VariableAccessNode extends AccessNode {
     }
 
     private EntityWithType searchAttribute() throws SemanticException {
-        Attribute attributeFound = blockWhereIsUsed.getContainerMethod().getClassContainer().getAttributeById(sentenceToken.getLexema());
+        Attribute attributeFound = blockWhereIsUsed.getContainerMethod()
+                .getClassContainer().getAttributeById(sentenceToken.getLexema());
+
         if(attributeFound != null){
             if(blockWhereIsUsed.getContainerMethod().getMethodForm().equals(MethodForm.STATIC)){
                 throw new SemanticException(sentenceToken, "No se puede acceder al atributo de instancia " +
@@ -81,5 +92,62 @@ public class VariableAccessNode extends AccessNode {
     @Override
     public boolean isAssignable() {
         return true;
+    }
+
+    @Override
+    public void generate() throws CodeGeneratorException {
+        if(!generateIfIAmLocalVariableOrParameter()){
+            generateIfIAmAttribute();
+        }
+
+        if(chained != null){
+            chained.generate();
+        }
+    }
+
+    private boolean generateIfIAmLocalVariableOrParameter() throws CodeGeneratorException {
+        EntityWithType variableOrParameter = searchLocalVariableOrParameter();
+        Instruction instruction;
+
+        if(variableOrParameter != null){
+            if(isWriteMode){
+                instruction = new Instruction(OneArgumentInstruction.STORE, variableOrParameter.getOffset());
+            } else {
+                instruction = new Instruction(OneArgumentInstruction.LOAD, variableOrParameter.getOffset());
+            }
+
+            SymbolTable.getInstance().appendInstruction(instruction);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private void generateIfIAmAttribute() throws CodeGeneratorException {
+        Attribute attributeFound = blockWhereIsUsed.getContainerMethod()
+                .getClassContainer().getAttributeById(sentenceToken.getLexema());
+
+        if(attributeFound != null){
+            SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.LOAD, 3));
+
+            if(isWriteMode){
+                SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.SWAP));
+                SymbolTable.getInstance().appendInstruction(
+                        new Instruction(OneArgumentInstruction.STOREREF, attributeFound.getOffset()));
+            } else {
+                SymbolTable.getInstance().appendInstruction(
+                        new Instruction(OneArgumentInstruction.LOADREF, attributeFound.getOffset()));
+            }
+        }
+    }
+
+    private EntityWithType searchLocalVariableOrParameter(){
+        EntityWithType localVariable = searchLocalVariable();
+        if(localVariable != null){
+            return localVariable;
+        }
+
+        return searchParameter();
     }
 }

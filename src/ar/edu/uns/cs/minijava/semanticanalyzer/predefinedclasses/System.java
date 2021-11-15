@@ -3,6 +3,7 @@ package ar.edu.uns.cs.minijava.semanticanalyzer.predefinedclasses;
 import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
+import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.*;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.EntityAlreadyExistsException;
@@ -18,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class System extends PredefinedClass {
-
 
     public System() {
         super(new Class(new Token(TokenName.IDENTIFICADOR_DE_CLASE, "System", 0)));

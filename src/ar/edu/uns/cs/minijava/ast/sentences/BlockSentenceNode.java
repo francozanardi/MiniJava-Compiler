@@ -60,4 +60,6 @@ public abstract class BlockSentenceNode extends SentenceNode {
         return  hasLocalVariableInCurrentBlock(localVariableName) ||
                 hasLocalVariableInAncestorBlocks(localVariableName);
     }
+
+    public abstract int getLocalVariablesNumberInMethod();
 }

@@ -2,6 +2,7 @@ package ar.edu.uns.cs.minijava.ast.sentences.assignments;
 
 import ar.edu.uns.cs.minijava.ast.expressions.ExpressionNode;
 import ar.edu.uns.cs.minijava.ast.expressions.operand.access.AccessNode;
+import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
@@ -12,6 +13,7 @@ public class EqualAssignmentNode extends AssignmentNode {
     public EqualAssignmentNode(Token sentenceToken, AccessNode assignableNode, ExpressionNode expressionToAssign) {
         super(sentenceToken, assignableNode);
         this.expressionToAssign = expressionToAssign;
+        this.assignableNode.enableWriteMode();
     }
 
     @Override
@@ -29,5 +31,11 @@ public class EqualAssignmentNode extends AssignmentNode {
                     " a una entidad de tipo " +
                     typeOfAssignableEntity.getType());
         }
+    }
+
+    @Override
+    public void generate() throws CodeGeneratorException {
+        expressionToAssign.generate();
+        assignableNode.generate();
     }
 }

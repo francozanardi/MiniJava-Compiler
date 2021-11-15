@@ -9,6 +9,7 @@ import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 
 public abstract class ChainedNode extends Node {
     protected ChainedNode nextChained;
+    protected boolean isWriteMode;
 
     public ChainedNode(Token sentenceToken) {
         super(sentenceToken);
@@ -25,6 +26,14 @@ public abstract class ChainedNode extends Node {
     public abstract Type check(Type previousType) throws SemanticException;
     public abstract boolean isCallable();
     public abstract boolean isAssignable();
+
+    public void enableWriteMode(){
+        if(nextChained != null){
+            nextChained.enableWriteMode();
+        } else if(isAssignable()) {
+            isWriteMode = true;
+        }
+    }
 
     protected Class getClassAssociatedToType(Type type) throws SemanticException {
         Class classAssociated = SymbolTable.getInstance().getClassById(type.getType());
