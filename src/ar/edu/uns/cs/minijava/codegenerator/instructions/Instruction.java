@@ -24,12 +24,17 @@ public class Instruction {
         this.fullInstruction = dwDirective.getDirective();
     }
 
-    public Instruction(String fullInstruction) {
-        this.fullInstruction = fullInstruction;
+    public Instruction(Label label) {
+        this.fullInstruction = "";
+        this.label = label;
     }
 
     public String getFullInstruction() {
-        return fullInstruction;
+        if(label == null){
+            return fullInstruction;
+        }
+
+        return label.getName() + ": " + fullInstruction;
     }
 
     public Label getLabel() {

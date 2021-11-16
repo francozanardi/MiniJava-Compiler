@@ -1,16 +1,22 @@
 package ar.edu.uns.cs.minijava.ast.expressions.operand.access.chained;
 
 import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNode;
+import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.OneArgumentInstruction;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.ZeroArgumentInstruction;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Attribute;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
+import ar.edu.uns.cs.minijava.semanticanalyzer.entities.EntityWithType;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.access.Visibility;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 
 public class VariableChainedNode extends ChainedNode {
     private final BlockSentenceNode blockWhereIsUsed;
+    private Attribute attributeUsed;
 
     public VariableChainedNode(Token variableToken, BlockSentenceNode blockWhereIsUsed) {
         super(variableToken);
@@ -20,13 +26,13 @@ public class VariableChainedNode extends ChainedNode {
     @Override
     public Type check(Type previousType) throws SemanticException {
         Class classAssociatedToType = getClassAssociatedToType(previousType);
-        Attribute attributeFound = searchAttribute(classAssociatedToType);
+        attributeUsed = searchAttribute(classAssociatedToType);
 
         if(nextChained != null){
-            return nextChained.check(attributeFound.getType());
+            return nextChained.check(attributeUsed.getType());
         }
 
-        return attributeFound.getType();
+        return attributeUsed.getType();
     }
 
     private Attribute searchAttribute(Class classWhereToSearch) throws SemanticException {
@@ -59,5 +65,21 @@ public class VariableChainedNode extends ChainedNode {
     @Override
     public boolean isAssignable() {
         return true;
+    }
+
+    @Override
+    public void generate() throws CodeGeneratorException {
+        if(isWriteMode){
+            SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.SWAP));
+            SymbolTable.getInstance().appendInstruction(
+                    new Instruction(OneArgumentInstruction.STOREREF, attributeUsed.getOffset()));
+        } else {
+            SymbolTable.getInstance().appendInstruction(
+                    new Instruction(OneArgumentInstruction.LOADREF, attributeUsed.getOffset()));
+        }
+
+        if(nextChained != null){
+            nextChained.generate();
+        }
     }
 }

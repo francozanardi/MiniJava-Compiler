@@ -2,7 +2,12 @@ package ar.edu.uns.cs.minijava.ast.sentences;
 
 import ar.edu.uns.cs.minijava.ast.expressions.ExpressionNode;
 import ar.edu.uns.cs.minijava.ast.sentences.assignments.AssignmentNode;
+import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.Label;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.OneArgumentInstruction;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.LocalVariable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Method;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Parameter;
@@ -49,7 +54,7 @@ public class ForSentenceNode extends BlockSentenceNode {
                     "Ya existe una variable local definida en el método con el nombre de " + name);
         }
 
-        localVariable.setDeclarationPosition(containerBlock.getLocalVariablesNumberInMethod());
+        localVariable.setOffset((-1)*containerBlock.getLocalVariablesNumberInMethod());
         this.variable = localVariable;
     }
 
@@ -102,5 +107,26 @@ public class ForSentenceNode extends BlockSentenceNode {
         }
 
         return 1;
+    }
+
+    @Override
+    public void generate() throws CodeGeneratorException {
+        Label forEnd = new Label("for_end");
+        Label forConditional = new Label("for_conditional");
+
+        variable.getSentence().generate();
+
+        SymbolTable.getInstance().appendInstruction(new Instruction(forConditional));
+        condition.generate();
+        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.BF, forEnd));
+
+        body.generate();
+
+        assignment.generate();
+        SymbolTable.getInstance().appendInstruction(new Instruction(forConditional));
+
+        SymbolTable.getInstance().appendInstruction(new Instruction(forEnd));
+        SymbolTable.getInstance().appendInstruction(
+                new Instruction(OneArgumentInstruction.FMEM, 1));
     }
 }

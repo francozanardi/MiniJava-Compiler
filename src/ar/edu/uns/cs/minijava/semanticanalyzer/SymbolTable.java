@@ -3,6 +3,7 @@ package ar.edu.uns.cs.minijava.semanticanalyzer;
 import ar.edu.uns.cs.minijava.codegenerator.CodeGenerator;
 import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
 import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
+import ar.edu.uns.cs.minijava.codegenerator.predefinedrutines.PredefinedRoutine;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
@@ -16,6 +17,8 @@ import ar.edu.uns.cs.minijava.semanticanalyzer.utils.EntityTable;
 
 import java.io.IOException;
 import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class SymbolTable {
@@ -24,19 +27,23 @@ public class SymbolTable {
     private EntityTable<String, Class> classes;
     private Map.Entry<Class, Method> mainMethod;
     private CodeGenerator codeGenerator;
+    private final List<PredefinedClass> predefinedClasses;
 
     private SymbolTable() {
         context = new Context();
         classes = new EntityTable<>();
         mainMethod = null;
+        predefinedClasses = new ArrayList<>();
     }
 
     public void initialize(String outputPath) throws IOException {
         PredefinedClass object = new Object();
         object.addClassToSymbolTable();
+        predefinedClasses.add(object);
 
         PredefinedClass system = new System();
         system.addClassToSymbolTable();
+        predefinedClasses.add(system);
 
         codeGenerator = new CodeGenerator(outputPath);
     }
@@ -91,9 +98,27 @@ public class SymbolTable {
         mainMethod = new AbstractMap.SimpleEntry<>(classContainer, method);
     }
 
+    public Method getMainMethod(){
+        return mainMethod.getValue();
+    }
+
     public void appendInstruction(Instruction instruction) throws CodeGeneratorException {
         codeGenerator.appendInstruction(instruction);
     }
 
+    public PredefinedRoutine getMalloc(){
+        return codeGenerator.getMalloc();
+    }
 
+    public void generate() throws CodeGeneratorException {
+        codeGenerator.init();
+
+        for (PredefinedClass predefinedClass : predefinedClasses) {
+            predefinedClass.getClassCreated().generate();
+        }
+
+        for (Class clazz : classes.values()) {
+            clazz.generate();
+        }
+    }
 }

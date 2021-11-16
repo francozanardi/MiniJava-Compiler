@@ -7,8 +7,6 @@ import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 
 public class Constructor extends Method {
-    private Label label;
-
     public Constructor(Token identifierToken, Type returnType) throws SemanticException {
         super(identifierToken, returnType, MethodForm.CONSTRUCTOR);
         checkConstructorName();
@@ -32,10 +30,6 @@ public class Constructor extends Method {
     public void setClassContainer(Class classContainer) {
         super.setClassContainer(classContainer);
 
-        label = new Label("constructorOf" + classContainer.getIdentifierToken().getLexema());
-    }
-
-    public Label getLabel() {
-        return label;
+        label = new Label("constructor_" + classContainer.getIdentifierToken().getLexema());
     }
 }

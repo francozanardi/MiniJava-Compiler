@@ -4,10 +4,15 @@ import ar.edu.uns.cs.minijava.codegenerator.instructions.Label;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Method;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class VirtualTable extends TableWithOffsets<Method>{
+    private final Label label;
+    private final String suffix;
+
+    public VirtualTable(String suffix) {
+        this.suffix = suffix;
+        this.label = new Label("VT_" + suffix);
+    }
+
     @Override
     protected Integer getOffsetFromPositionInTable(int position) {
         return position;
@@ -27,13 +32,18 @@ public class VirtualTable extends TableWithOffsets<Method>{
         }
     }
 
-    public Label[] getLabels(String prefix){
+    public Label[] assignAndGetLabels(){
         Label[] labels = new Label[table.size()];
 
         for(int i = 0; i < table.size(); i++){
-            labels[i] = new Label(prefix + "_" + table.get(i).getIdentifierToken().getLexema());
+            table.get(i).createLabelIfDoesNotExist();
+            labels[i] = table.get(i).getLabel();
         }
 
         return labels;
+    }
+
+    public Label getLabel() {
+        return label;
     }
 }

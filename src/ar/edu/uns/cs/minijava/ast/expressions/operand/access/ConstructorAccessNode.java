@@ -20,7 +20,7 @@ public class ConstructorAccessNode extends MethodAccessNode {
 
     @Override
     protected Method searchMethodCalled() {
-        Class classToInstantiate = SymbolTable.getInstance().getClassById(sentenceToken.getLexema());
+        Class classToInstantiate = getClassToInstantiate();
 
         if(classToInstantiate != null){
             return classToInstantiate.getConstructor();
@@ -29,15 +29,18 @@ public class ConstructorAccessNode extends MethodAccessNode {
         return null;
     }
 
+    private Class getClassToInstantiate(){
+        return SymbolTable.getInstance().getClassById(sentenceToken.getLexema());
+    }
+
     @Override
     public void generate() throws CodeGeneratorException {
         saveReturnSpaceIfExists();
         loadCIRSpace();
+        loadMallocCall();
+        associateVirtualTableToCIR();
         loadArguments();
-        loadVirtualTable();
-        loadMethodCalledOffset();
-
-        SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.CALL));
+        callConstructor();
 
         if(chained != null){
             chained.generate();
@@ -48,5 +51,29 @@ public class ConstructorAccessNode extends MethodAccessNode {
         Class classToCreate = searchMethodCalled().getClassContainer();
         SymbolTable.getInstance().appendInstruction(
                 new Instruction(OneArgumentInstruction.PUSH, classToCreate.getAttributesNumber()+1));
+    }
+
+    private void loadMallocCall() throws CodeGeneratorException {
+        SymbolTable.getInstance().appendInstruction(
+                new Instruction(OneArgumentInstruction.PUSH, SymbolTable.getInstance().getMalloc().getLabel()));
+
+        SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.CALL));
+    }
+
+    private void associateVirtualTableToCIR() throws CodeGeneratorException {
+        SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.DUP));
+
+        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.PUSH,
+                getClassToInstantiate().getVirtualTableLabel()));
+
+        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.STOREREF, 0));
+
+        SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.DUP));
+    }
+
+    private void callConstructor() throws CodeGeneratorException {
+        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.PUSH,
+                searchMethodCalled().getLabel()));
+        SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.CALL));
     }
 }

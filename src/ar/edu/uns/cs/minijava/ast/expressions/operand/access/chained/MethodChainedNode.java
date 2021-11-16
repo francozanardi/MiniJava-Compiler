@@ -1,18 +1,25 @@
 package ar.edu.uns.cs.minijava.ast.expressions.operand.access.chained;
 
 import ar.edu.uns.cs.minijava.ast.expressions.ExpressionNode;
+import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.OneArgumentInstruction;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.ZeroArgumentInstruction;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Method;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Parameter;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
+import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
+import ar.edu.uns.cs.minijava.semanticanalyzer.types.reference.VoidType;
 
 import java.util.List;
 
 public class MethodChainedNode extends ChainedNode {
     private final List<ExpressionNode> arguments;
+    private Method methodCalled;
 
     public MethodChainedNode(Token methodToken, List<ExpressionNode> arguments) {
         super(methodToken);
@@ -22,15 +29,15 @@ public class MethodChainedNode extends ChainedNode {
     @Override
     public Type check(Type previousType) throws SemanticException {
         Class classAssociatedWithType = getClassAssociatedToType(previousType);
-        Method methodFound = searchMethodCalled(classAssociatedWithType);
+        methodCalled = searchMethodCalled(classAssociatedWithType);
 
-        checkParameters(methodFound);
+        checkParameters(methodCalled);
 
         if(nextChained != null){
-            return nextChained.check(methodFound.getType());
+            return nextChained.check(methodCalled.getType());
         }
 
-        return methodFound.getType();
+        return methodCalled.getType();
     }
 
     private Method searchMethodCalled(Class classWhereToSearch) throws SemanticException {
@@ -75,5 +82,69 @@ public class MethodChainedNode extends ChainedNode {
     @Override
     public boolean isAssignable() {
         return false;
+    }
+
+    @Override
+    public void generate() throws CodeGeneratorException {
+        removeThisIfIsStatic();
+        saveReturnSpaceIfExists();
+        loadArguments();
+        loadVirtualTableIfIsNotStatic();
+        loadMethodCalled();
+
+        SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.CALL));
+
+        if(nextChained != null){
+            nextChained.generate();
+        }
+    }
+
+    private void removeThisIfIsStatic() throws CodeGeneratorException {
+        if(!methodCalledIsNotStatic()){
+            SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.POP));
+        }
+    }
+
+    private boolean methodCalledIsNotStatic(){
+        return !methodCalled.getMethodForm().equals(MethodForm.STATIC);
+    }
+
+    protected void saveReturnSpaceIfExists() throws CodeGeneratorException {
+        Type returnType = methodCalled.getType();
+
+        if(!returnType.equals(new VoidType())){
+            SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.RMEM, 1));
+            addSwapIfIsNotStatic();
+        }
+    }
+
+    protected void addSwapIfIsNotStatic() throws CodeGeneratorException {
+        if(methodCalledIsNotStatic()){
+            SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.SWAP));
+        }
+    }
+
+    protected void loadArguments() throws CodeGeneratorException {
+        for(ExpressionNode argument : arguments) {
+            argument.generate();
+            addSwapIfIsNotStatic(); //bajamos el this
+        }
+    }
+
+    protected void loadVirtualTableIfIsNotStatic() throws CodeGeneratorException {
+        if(methodCalledIsNotStatic()){
+            SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.DUP));
+            SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.LOADREF, 0));
+        }
+    }
+
+    protected void loadMethodCalled() throws CodeGeneratorException {
+        if(methodCalledIsNotStatic()){
+            SymbolTable.getInstance().appendInstruction(
+                    new Instruction(OneArgumentInstruction.LOADREF, methodCalled.getOffset()));
+        } else {
+            SymbolTable.getInstance().appendInstruction(
+                    new Instruction(OneArgumentInstruction.PUSH, methodCalled.getLabel()));
+        }
     }
 }

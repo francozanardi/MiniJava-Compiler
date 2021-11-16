@@ -1,7 +1,10 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer.entities;
 
 import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
+import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.*;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.EntityAlreadyExistsException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
@@ -18,12 +21,14 @@ public class Method extends EntityWithType {
     protected final List<Parameter> parametersInOrder;
     protected BlockSentenceNodeImpl bodyBlock;
     protected Class classContainer;
+    protected Label label;
 
     public Method(Token identifierToken, Type returnType, MethodForm methodForm) {
         super(identifierToken, returnType);
         this.methodForm = methodForm;
         this.parameters = new EntityTable<>();
         this.parametersInOrder = new ArrayList<>();
+        this.label = null;
     }
 
     public Parameter getParameterById(String parameterId) {
@@ -92,5 +97,47 @@ public class Method extends EntityWithType {
 
     public boolean canHasReturn(){
         return true;
+    }
+
+    public void generate() throws CodeGeneratorException {
+        createLabelIfDoesNotExist();
+
+        SymbolTable.getInstance().appendInstruction(new Instruction(CodeSection.CODE));
+        initMethodRA();
+        bodyBlock.generate();
+        finishMethodRA();
+    }
+
+    private void initMethodRA() throws CodeGeneratorException {
+        Instruction firstInstruction = new Instruction(ZeroArgumentInstruction.LOADFP);
+        firstInstruction.setLabel(label);
+        SymbolTable.getInstance().appendInstruction(firstInstruction);
+
+        SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.LOADSP));
+        SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.STOREFP));
+    }
+
+    private void finishMethodRA() throws CodeGeneratorException {
+        if(SymbolTable.getInstance().getMainMethod() != this){
+            int spacesToFree = parameters.size();
+
+            if(!methodForm.equals(MethodForm.STATIC)){
+                spacesToFree++;
+            }
+
+            SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.STOREFP));
+            SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.RET, spacesToFree));
+        }
+    }
+
+    public void createLabelIfDoesNotExist() {
+        if(label != null){
+            label = new Label(identifierToken.getLexema() +
+                    "_" + classContainer.getIdentifierToken().getLexema());
+        }
+    }
+
+    public Label getLabel() {
+        return label;
     }
 }

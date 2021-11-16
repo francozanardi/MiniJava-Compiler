@@ -94,15 +94,11 @@ public class MethodAccessNode extends AccessNode {
 
     @Override
     public void generate() throws CodeGeneratorException {
-        //TODO: estoy asumiendo que estoy llamando un método dinámico
-        //Si llamase un método estático no sería necesario reservar el this ni ir a la VT
-        //se supone que el método estático se conoce su ubicación en tiempo de ejecución.
-        //Asumo que usando una label podemos hacerlo.
-        loadThis();
+        loadThisIfIsNotStatic();
         saveReturnSpaceIfExists();
         loadArguments();
-        loadVirtualTable();
-        loadMethodCalledOffset();
+        loadVirtualTableIfIsNotStatic();
+        loadMethodCalled();
 
         SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.CALL));
 
@@ -111,8 +107,14 @@ public class MethodAccessNode extends AccessNode {
         }
     }
 
-    private void loadThis() throws CodeGeneratorException {
-        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.LOAD, 3));
+    private void loadThisIfIsNotStatic() throws CodeGeneratorException {
+        if(methodCalledIsNotStatic()){
+            SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.LOAD, 3));
+        }
+    }
+
+    private boolean methodCalledIsNotStatic(){
+        return !searchMethodCalled().getMethodForm().equals(MethodForm.STATIC);
     }
 
     protected void saveReturnSpaceIfExists() throws CodeGeneratorException {
@@ -121,28 +123,37 @@ public class MethodAccessNode extends AccessNode {
 
         if(!returnType.equals(new VoidType())){
             SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.RMEM, 1));
-            addSwap();
+            addSwapIfIsNotStatic();
         }
     }
 
-    protected void addSwap() throws CodeGeneratorException {
-        SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.SWAP));
+    protected void addSwapIfIsNotStatic() throws CodeGeneratorException {
+        if(methodCalledIsNotStatic()){
+            SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.SWAP));
+        }
     }
 
     protected void loadArguments() throws CodeGeneratorException {
         for(ExpressionNode argument : arguments) {
            argument.generate();
-           addSwap(); //bajamos el this
+           addSwapIfIsNotStatic(); //bajamos el this
         }
     }
 
-    protected void loadVirtualTable() throws CodeGeneratorException {
-        SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.DUP));
-        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.LOADREF, 0));
+    protected void loadVirtualTableIfIsNotStatic() throws CodeGeneratorException {
+        if(methodCalledIsNotStatic()){
+            SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.DUP));
+            SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.LOADREF, 0));
+        }
     }
 
-    protected void loadMethodCalledOffset() throws CodeGeneratorException {
-        SymbolTable.getInstance().appendInstruction(
-                new Instruction(OneArgumentInstruction.LOADREF, searchMethodCalled().getOffset()));
+    protected void loadMethodCalled() throws CodeGeneratorException {
+        if(methodCalledIsNotStatic()){
+            SymbolTable.getInstance().appendInstruction(
+                    new Instruction(OneArgumentInstruction.LOADREF, searchMethodCalled().getOffset()));
+        } else {
+            SymbolTable.getInstance().appendInstruction(
+                    new Instruction(OneArgumentInstruction.PUSH, searchMethodCalled().getLabel()));
+        }
     }
 }

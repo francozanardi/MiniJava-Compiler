@@ -35,7 +35,7 @@ public class Class extends Entity {
         tokenOfParentClass = null;
         constructor = null;
         classConsolidated = false;
-        virtualTable = new VirtualTable();
+        virtualTable = new VirtualTable(identifierToken.getLexema());
         classInstanceRecord = new ClassInstanceRecord();
     }
 
@@ -245,17 +245,22 @@ public class Class extends Entity {
         SymbolTable.getInstance().appendInstruction(new Instruction(CodeSection.CODE));
 
         for(Method method : methods.values()){
-//            method.generate();
+            method.generate();
         }
+
+        constructor.generate();
     }
 
     private void addVirtualTableLabels() throws CodeGeneratorException {
         SymbolTable.getInstance().appendInstruction(new Instruction(CodeSection.DATA));
 
-        Label label = new Label("VT_" + identifierToken.getLexema());
-        DWDirective dw = new DWDirective(virtualTable.getLabels(identifierToken.getLexema()));
+        DWDirective dw = new DWDirective(virtualTable.assignAndGetLabels());
         Instruction instruction = new Instruction(dw);
-        instruction.setLabel(label);
+        instruction.setLabel(virtualTable.getLabel());
         SymbolTable.getInstance().appendInstruction(instruction);
+    }
+
+    public Label getVirtualTableLabel(){
+        return virtualTable.getLabel();
     }
 }

@@ -1,6 +1,10 @@
 package ar.edu.uns.cs.minijava.ast.sentences;
 
+import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.OneArgumentInstruction;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.LocalVariable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Method;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Parameter;
@@ -67,5 +71,15 @@ public class BlockSentenceNodeImpl extends BlockSentenceNode {
         }
 
         return localVariables.size();
+    }
+
+    @Override
+    public void generate() throws CodeGeneratorException {
+        for (SentenceNode sentence : sentences) {
+            sentence.generate();
+        }
+
+        SymbolTable.getInstance().appendInstruction(
+                new Instruction(OneArgumentInstruction.FMEM, localVariables.size()));
     }
 }

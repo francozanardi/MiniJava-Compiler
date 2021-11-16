@@ -1,9 +1,14 @@
 package ar.edu.uns.cs.minijava.ast.sentences;
 
 import ar.edu.uns.cs.minijava.ast.expressions.ExpressionNode;
+import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.OneArgumentInstruction;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Method;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
+import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.reference.VoidType;
 
@@ -26,7 +31,7 @@ public class ReturnSentenceNode extends SentenceNode {
         }
 
         checkIfExpressionIsVoid();
-        checkIfExpressionIsNotVoid();
+        checkIfExpressionIsTypeCompatible();
     }
 
     private void checkIfExpressionIsVoid() throws SemanticException {
@@ -40,7 +45,7 @@ public class ReturnSentenceNode extends SentenceNode {
         }
     }
 
-    private void checkIfExpressionIsNotVoid() throws SemanticException {
+    private void checkIfExpressionIsTypeCompatible() throws SemanticException {
         if(expressionToReturn != null){
             Type expressionType = expressionToReturn.check();
             Type methodReturnType = methodContainer.getType();
@@ -54,5 +59,24 @@ public class ReturnSentenceNode extends SentenceNode {
                         "'");
             }
         }
+    }
+
+    @Override
+    public void generate() throws CodeGeneratorException {
+        if(expressionToReturn != null){
+            expressionToReturn.generate();
+            SymbolTable.getInstance().appendInstruction(
+                    new Instruction(OneArgumentInstruction.STORE, getRASize()));
+        }
+    }
+
+    private int getRASize() {
+        int raSize = methodContainer.getParameterNumber() + 3;
+
+        if(!methodContainer.getMethodForm().equals(MethodForm.STATIC)){
+            raSize++;
+        }
+
+        return raSize;
     }
 }
