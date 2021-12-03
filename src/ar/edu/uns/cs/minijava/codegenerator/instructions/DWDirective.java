@@ -33,7 +33,7 @@ public class DWDirective {
 
         StringBuilder arguments = new StringBuilder();
 
-        for( int i = 0; i < list.length-1; i++){
+        for(int i = 0; i < list.length-1; i++){
             arguments.append(listElementToArg.apply(list[i].toString())).append(", ");
         }
 

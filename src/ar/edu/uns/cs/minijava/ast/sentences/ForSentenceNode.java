@@ -111,22 +111,25 @@ public class ForSentenceNode extends BlockSentenceNode {
 
     @Override
     public void generate() throws CodeGeneratorException {
-        Label forEnd = new Label("for_end");
-        Label forConditional = new Label("for_conditional");
+        Label forEndLabel = SymbolTable.getInstance().getUniqueLabel();
+        Label forConditionalLabel = SymbolTable.getInstance().getUniqueLabel();
 
         variable.getSentence().generate();
+        modifyMemoryReservedWith(1);
 
-        SymbolTable.getInstance().appendInstruction(new Instruction(forConditional));
+        SymbolTable.getInstance().appendInstruction(new Instruction(forConditionalLabel));
         condition.generate();
-        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.BF, forEnd));
+        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.BF, forEndLabel));
 
         body.generate();
 
         assignment.generate();
-        SymbolTable.getInstance().appendInstruction(new Instruction(forConditional));
+        SymbolTable.getInstance().appendInstruction(
+                new Instruction(OneArgumentInstruction.JUMP, forConditionalLabel));
 
-        SymbolTable.getInstance().appendInstruction(new Instruction(forEnd));
+        SymbolTable.getInstance().appendInstruction(new Instruction(forEndLabel));
         SymbolTable.getInstance().appendInstruction(
                 new Instruction(OneArgumentInstruction.FMEM, 1));
+        modifyMemoryReservedWith(-1);
     }
 }

@@ -35,8 +35,11 @@ public class IncrementAssignmentNode extends AssignmentNode {
 
     @Override
     public void generate() throws CodeGeneratorException {
+        assignableNode.disableWriteMode();
         assignableNode.generate();
         SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.PUSH, 1));
         SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.ADD));
+        assignableNode.enableWriteMode();
+        assignableNode.generate();
     }
 }

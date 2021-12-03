@@ -6,4 +6,4 @@ compilar:
 
 ejecutar: 
 	> cd myOut
-	> java ar.edu.uns.cs.minijava.Main pathfile
+	> java ar.edu.uns.cs.minijava.Main pathfileToCompile pathfileOfCompiled

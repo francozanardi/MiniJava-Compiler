@@ -748,7 +748,10 @@ public class SyntaxAnalyzer {
             match(RETURN_PR);
             ExpressionNode expression = expresionOVacio();
 
-            return new ReturnSentenceNode(sentenceToken, expression, SymbolTable.getInstance().getContext().getCurrentMethod());
+            return new ReturnSentenceNode(sentenceToken, expression,
+                    SymbolTable.getInstance().getContext().getCurrentMethod(),
+                    SymbolTable.getInstance().getContext().getCurrentBlock()
+            );
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }

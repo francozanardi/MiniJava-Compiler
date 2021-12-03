@@ -1,7 +1,9 @@
 package ar.edu.uns.cs.minijava.ast.sentences;
 
 import ar.edu.uns.cs.minijava.ast.expressions.ExpressionNode;
-import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.OneArgumentInstruction;
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.LocalVariable;
@@ -49,5 +51,19 @@ public class LocalVariableSentenceNode extends SentenceNode {
 
     public LocalVariable getLocalVariable() {
         return localVariable;
+    }
+
+    @Override
+    public void generate() throws CodeGeneratorException {
+        ExpressionNode expression = localVariable.getExpressionAssigned();
+
+        if(expression != null){
+            expression.generate();
+        } else {
+            SymbolTable.getInstance().appendInstruction(
+                    new Instruction(OneArgumentInstruction.RMEM, 1));
+        }
+
+        modifyMemoryReservedWith(1);
     }
 }

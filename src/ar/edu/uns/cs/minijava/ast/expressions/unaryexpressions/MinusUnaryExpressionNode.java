@@ -21,6 +21,7 @@ public class MinusUnaryExpressionNode extends UnaryExpressionNode {
 
     @Override
     public void generate() throws CodeGeneratorException {
+        operand.generate();
         SymbolTable.getInstance().appendInstruction(
                 new Instruction(ZeroArgumentInstruction.NEG));
     }

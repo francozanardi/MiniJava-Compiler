@@ -125,8 +125,8 @@ public class MethodChainedNode extends ChainedNode {
     }
 
     protected void loadArguments() throws CodeGeneratorException {
-        for(ExpressionNode argument : arguments) {
-            argument.generate();
+        for(int i = arguments.size()-1; i >= 0; i--) {
+            arguments.get(i).generate();
             addSwapIfIsNotStatic(); //bajamos el this
         }
     }
@@ -144,7 +144,7 @@ public class MethodChainedNode extends ChainedNode {
                     new Instruction(OneArgumentInstruction.LOADREF, methodCalled.getOffset()));
         } else {
             SymbolTable.getInstance().appendInstruction(
-                    new Instruction(OneArgumentInstruction.PUSH, methodCalled.getLabel()));
+                    new Instruction(OneArgumentInstruction.PUSH, methodCalled.getBeginMethodLabel()));
         }
     }
 }

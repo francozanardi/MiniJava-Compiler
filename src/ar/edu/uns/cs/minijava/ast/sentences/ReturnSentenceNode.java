@@ -15,11 +15,13 @@ import ar.edu.uns.cs.minijava.semanticanalyzer.types.reference.VoidType;
 public class ReturnSentenceNode extends SentenceNode {
     private final ExpressionNode expressionToReturn;
     private final Method methodContainer;
+    private final BlockSentenceNode blockContainer;
 
-    public ReturnSentenceNode(Token sentenceToken, ExpressionNode expressionToReturn, Method methodContainer) {
+    public ReturnSentenceNode(Token sentenceToken, ExpressionNode expressionToReturn, Method methodContainer, BlockSentenceNode blockContainer) {
         super(sentenceToken);
         this.expressionToReturn = expressionToReturn;
         this.methodContainer = methodContainer;
+        this.blockContainer = blockContainer;
     }
 
     @Override
@@ -68,6 +70,15 @@ public class ReturnSentenceNode extends SentenceNode {
             SymbolTable.getInstance().appendInstruction(
                     new Instruction(OneArgumentInstruction.STORE, getRASize()));
         }
+
+        freeMemoryReserved();
+
+        SymbolTable.getInstance().appendInstruction(
+                new Instruction(
+                        OneArgumentInstruction.JUMP,
+                        methodContainer.getEndMethodLabel()
+                )
+        );
     }
 
     private int getRASize() {
@@ -78,5 +89,16 @@ public class ReturnSentenceNode extends SentenceNode {
         }
 
         return raSize;
+    }
+
+    private void freeMemoryReserved() throws CodeGeneratorException {
+        if(blockContainer.getCurrentMemoryReservedInMethod() > 0) {
+            SymbolTable.getInstance().appendInstruction(
+                    new Instruction(
+                            OneArgumentInstruction.FMEM,
+                            blockContainer.getCurrentMemoryReservedInMethod()
+                    )
+            );
+        }
     }
 }

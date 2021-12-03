@@ -2,10 +2,7 @@ package ar.edu.uns.cs.minijava.semanticanalyzer.entities;
 
 import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
 import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
-import ar.edu.uns.cs.minijava.codegenerator.instructions.CodeSection;
-import ar.edu.uns.cs.minijava.codegenerator.instructions.DWDirective;
-import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
-import ar.edu.uns.cs.minijava.codegenerator.instructions.Label;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.*;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.EntityAlreadyExistsException;
@@ -40,12 +37,13 @@ public class Class extends Entity {
     }
 
     @Override
-    public void checkDeclarations() throws SemanticException {
+    public void checkDeclarations() throws SemanticException, CodeGeneratorException {
         tryToCreateDefaultConstructor();
         checkCircularInheritance();
         consolidate();
         virtualTable.assignOffsetToEntities();
         classInstanceRecord.assignOffsetToEntities();
+        addVirtualTableLabels();
 
         for(Entity method : methods.values()){
             method.checkDeclarations();
@@ -121,14 +119,30 @@ public class Class extends Entity {
                 parent.consolidate();
             }
 
+            classInstanceRecord.addTableToBegin(parent.classInstanceRecord);
+
             consolidateMethods(parent);
             consolidateAttributes(parent);
 
-            virtualTable.addTableToBegin(parent.virtualTable);
-            classInstanceRecord.addTableToBegin(parent.classInstanceRecord);
         }
 
         classConsolidated = true;
+    }
+
+    private void addVirtualTableLabels() throws CodeGeneratorException {
+        Instruction addVtInstruction;
+
+        if(!virtualTable.isEmpty()){
+            SymbolTable.getInstance().appendInstruction(new Instruction(CodeSection.DATA));
+
+            DWDirective dw = new DWDirective(virtualTable.assignAndGetLabels());
+            addVtInstruction = new Instruction(dw);
+        } else {
+            addVtInstruction = new Instruction(ZeroArgumentInstruction.NOP);
+        }
+
+        addVtInstruction.setLabel(virtualTable.getLabel());
+        SymbolTable.getInstance().appendInstruction(addVtInstruction);
     }
 
     private boolean hasBeenConsolidated(){
@@ -136,9 +150,14 @@ public class Class extends Entity {
     }
 
     private void consolidateMethods(Class parent) throws SemanticException {
+        VirtualTable newVirtualTable = new VirtualTable(identifierToken.getLexema());
+
         for(Map.Entry<String, Method> entry : parent.methods.entrySet()){
             try {
                 this.methods.putAndCheck(entry.getKey(), entry.getValue());
+                newVirtualTable.setEntityInPosition(entry.getValue(),
+                        parent.virtualTable.getEntityPosition(entry.getValue()));
+
             } catch (EntityAlreadyExistsException unused) {
                 Method methodRedefined = this.methods.get(entry.getKey());
 
@@ -155,11 +174,13 @@ public class Class extends Entity {
                             );
                 }
 
-                virtualTable.setEntityInPosition(methodRedefined,
+                newVirtualTable.setEntityInPosition(methodRedefined,
                         parent.virtualTable.getEntityPosition(entry.getValue()));
+                virtualTable.removeEntity(methodRedefined);
             }
-
         }
+
+        virtualTable.addTableToBegin(newVirtualTable);
     }
 
     private void consolidateAttributes(Class parent) throws EntityAlreadyExistsException {
@@ -241,7 +262,6 @@ public class Class extends Entity {
     }
 
     public void generate() throws CodeGeneratorException {
-        addVirtualTableLabels();
         SymbolTable.getInstance().appendInstruction(new Instruction(CodeSection.CODE));
 
         for(Method method : methods.values()){
@@ -249,15 +269,6 @@ public class Class extends Entity {
         }
 
         constructor.generate();
-    }
-
-    private void addVirtualTableLabels() throws CodeGeneratorException {
-        SymbolTable.getInstance().appendInstruction(new Instruction(CodeSection.DATA));
-
-        DWDirective dw = new DWDirective(virtualTable.assignAndGetLabels());
-        Instruction instruction = new Instruction(dw);
-        instruction.setLabel(virtualTable.getLabel());
-        SymbolTable.getInstance().appendInstruction(instruction);
     }
 
     public Label getVirtualTableLabel(){

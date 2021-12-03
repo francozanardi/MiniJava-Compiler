@@ -86,4 +86,12 @@ public abstract class AccessNode extends OperandNode {
             this.isWriteMode = true;
         }
     }
+
+    public void disableWriteMode(){
+        if(chained != null){
+            getLastElementChained().disableWriteMode();
+        } else if(isAssignable()) {
+            this.isWriteMode = false;
+        }
+    }
 }

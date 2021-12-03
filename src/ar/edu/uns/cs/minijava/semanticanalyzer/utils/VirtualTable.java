@@ -6,10 +6,8 @@ import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
 
 public class VirtualTable extends TableWithOffsets<Method>{
     private final Label label;
-    private final String suffix;
 
     public VirtualTable(String suffix) {
-        this.suffix = suffix;
         this.label = new Label("VT_" + suffix);
     }
 
@@ -26,9 +24,9 @@ public class VirtualTable extends TableWithOffsets<Method>{
     }
 
     @Override
-    public void setEntityInPosition(Method method, int position) {
-        if(method.getMethodForm().equals(MethodForm.DYNAMIC)){
-            super.setEntityInPosition(method, position);
+    public void setEntityInPosition(Method entity, int position) {
+        if(entity.getMethodForm().equals(MethodForm.DYNAMIC)){
+            super.setEntityInPosition(entity, position);
         }
     }
 
@@ -37,7 +35,7 @@ public class VirtualTable extends TableWithOffsets<Method>{
 
         for(int i = 0; i < table.size(); i++){
             table.get(i).createLabelIfDoesNotExist();
-            labels[i] = table.get(i).getLabel();
+            labels[i] = table.get(i).getBeginMethodLabel();
         }
 
         return labels;
@@ -45,5 +43,12 @@ public class VirtualTable extends TableWithOffsets<Method>{
 
     public Label getLabel() {
         return label;
+    }
+
+    @Override
+    public void removeEntity(Method entity) {
+        if(entity.getMethodForm().equals(MethodForm.DYNAMIC)){
+            super.removeEntity(entity);
+        }
     }
 }

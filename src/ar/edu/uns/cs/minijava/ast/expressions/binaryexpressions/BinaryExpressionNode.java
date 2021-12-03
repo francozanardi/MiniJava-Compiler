@@ -34,6 +34,8 @@ public abstract class BinaryExpressionNode extends ExpressionNode {
 
     @Override
     public void generate() throws CodeGeneratorException {
+        leftExpression.generate();
+        rightExpression.generate();
         SymbolTable.getInstance().appendInstruction(generateInstruction());
     }
 

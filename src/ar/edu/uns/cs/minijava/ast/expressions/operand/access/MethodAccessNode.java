@@ -117,7 +117,7 @@ public class MethodAccessNode extends AccessNode {
         return !searchMethodCalled().getMethodForm().equals(MethodForm.STATIC);
     }
 
-    protected void saveReturnSpaceIfExists() throws CodeGeneratorException {
+    private void saveReturnSpaceIfExists() throws CodeGeneratorException {
         Method methodCalled = searchMethodCalled();
         Type returnType = methodCalled.getType();
 
@@ -134,8 +134,8 @@ public class MethodAccessNode extends AccessNode {
     }
 
     protected void loadArguments() throws CodeGeneratorException {
-        for(ExpressionNode argument : arguments) {
-           argument.generate();
+        for(int i = arguments.size()-1; i >= 0; i--) {
+           arguments.get(i).generate();
            addSwapIfIsNotStatic(); //bajamos el this
         }
     }
@@ -153,7 +153,7 @@ public class MethodAccessNode extends AccessNode {
                     new Instruction(OneArgumentInstruction.LOADREF, searchMethodCalled().getOffset()));
         } else {
             SymbolTable.getInstance().appendInstruction(
-                    new Instruction(OneArgumentInstruction.PUSH, searchMethodCalled().getLabel()));
+                    new Instruction(OneArgumentInstruction.PUSH, searchMethodCalled().getBeginMethodLabel()));
         }
     }
 }

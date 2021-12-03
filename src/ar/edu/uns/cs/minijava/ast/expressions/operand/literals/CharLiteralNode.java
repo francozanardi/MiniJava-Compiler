@@ -22,6 +22,7 @@ public class CharLiteralNode extends LiteralNode {
     @Override
     protected Instruction generateInstruction() {
         int value = sentenceToken.getLexema().charAt(1); //assuming a character saved in single quotes
+        //TODO: chequear qué pasa con carácteres como \n o \'
         return new Instruction(OneArgumentInstruction.PUSH, value);
     }
 }

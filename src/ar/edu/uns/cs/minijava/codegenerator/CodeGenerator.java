@@ -1,9 +1,9 @@
 package ar.edu.uns.cs.minijava.codegenerator;
 
 import ar.edu.uns.cs.minijava.codegenerator.instructions.*;
-import ar.edu.uns.cs.minijava.codegenerator.predefinedrutines.InitHeapRoutine;
-import ar.edu.uns.cs.minijava.codegenerator.predefinedrutines.MallocRoutine;
-import ar.edu.uns.cs.minijava.codegenerator.predefinedrutines.PredefinedRoutine;
+import ar.edu.uns.cs.minijava.codegenerator.predefinedcode.routines.InitHeapRoutine;
+import ar.edu.uns.cs.minijava.codegenerator.predefinedcode.routines.MallocRoutine;
+import ar.edu.uns.cs.minijava.codegenerator.predefinedcode.routines.PredefinedRoutine;
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 
 import java.io.File;
@@ -18,12 +18,14 @@ public class CodeGenerator {
     private final FileWriter fileWriter;
     private final PredefinedRoutine initHeap;
     private final PredefinedRoutine malloc;
+    private int uniqueLabelNumber;
 
     public CodeGenerator(String pathname) throws IOException {
         File file = new File(pathname);
         this.fileWriter = new FileWriter(file);
         this.initHeap = new InitHeapRoutine();
         this.malloc = new MallocRoutine();
+        this.uniqueLabelNumber = 0;
     }
 
     public void appendInstruction(Instruction instruction) throws CodeGeneratorException {
@@ -45,7 +47,7 @@ public class CodeGenerator {
 
         appendInstruction(new Instruction(PUSH, initHeap.getLabel()));
         appendInstruction(new Instruction(CALL));
-        appendInstruction(new Instruction(PUSH, SymbolTable.getInstance().getMainMethod().getLabel()));
+        appendInstruction(new Instruction(PUSH, SymbolTable.getInstance().getMainMethod().getBeginMethodLabel()));
         appendInstruction(new Instruction(CALL));
         appendInstruction(new Instruction(HALT));
 
@@ -53,7 +55,7 @@ public class CodeGenerator {
         appendAllInstructions(malloc.getInstructions());
     }
 
-    private void appendAllInstructions(List<Instruction> instructions) throws CodeGeneratorException {
+    public void appendAllInstructions(List<Instruction> instructions) throws CodeGeneratorException {
         for (Instruction instruction : instructions) {
             appendInstruction(instruction);
         }
@@ -65,5 +67,9 @@ public class CodeGenerator {
 
     public PredefinedRoutine getMalloc() {
         return malloc;
+    }
+
+    public Label getUniqueLabel() {
+        return new Label("label_" + uniqueLabelNumber++);
     }
 }

@@ -1,7 +1,13 @@
 package ar.edu.uns.cs.minijava.ast.sentences;
 
 import ar.edu.uns.cs.minijava.ast.expressions.ExpressionNode;
+import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.Label;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.OneArgumentInstruction;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.ZeroArgumentInstruction;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.primitive.BooleanType;
@@ -32,4 +38,28 @@ public class IfSentenceNode extends SentenceNode {
             elseBody.check();
         }
     }
+
+    @Override
+    public void generate() throws CodeGeneratorException {
+        Label elseLabel = SymbolTable.getInstance().getUniqueLabel();
+        Label endIfLabel = SymbolTable.getInstance().getUniqueLabel();
+
+        condition.generate();
+        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.BF, elseLabel));
+
+        ifBody.generate();
+        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.JUMP, endIfLabel));
+
+        SymbolTable.getInstance().appendInstruction(new Instruction(elseLabel));
+        if(elseBody != null){
+            elseBody.generate();
+        } else {
+            SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.NOP));
+        }
+
+        Instruction endIfInstruction = new Instruction(ZeroArgumentInstruction.NOP);
+        endIfInstruction.setLabel(endIfLabel);
+        SymbolTable.getInstance().appendInstruction(endIfInstruction);
+    }
+
 }

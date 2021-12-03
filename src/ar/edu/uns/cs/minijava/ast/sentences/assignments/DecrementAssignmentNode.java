@@ -35,8 +35,11 @@ public class DecrementAssignmentNode extends AssignmentNode {
 
     @Override
     public void generate() throws CodeGeneratorException {
+        assignableNode.disableWriteMode();
         assignableNode.generate();
         SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.PUSH, 1));
         SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.SUB));
+        assignableNode.enableWriteMode();
+        assignableNode.generate();
     }
 }

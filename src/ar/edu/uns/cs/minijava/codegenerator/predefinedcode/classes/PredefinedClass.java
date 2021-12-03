@@ -1,6 +1,8 @@
-package ar.edu.uns.cs.minijava.semanticanalyzer.predefinedclasses;
+package ar.edu.uns.cs.minijava.codegenerator.predefinedcode.classes;
 
 import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
+import ar.edu.uns.cs.minijava.codegenerator.CodeGenerator;
+import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.*;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
@@ -18,7 +20,7 @@ public abstract class PredefinedClass {
 
         try {
             create();
-        } catch (SemanticException ignored) {
+        } catch (SemanticException | CodeGeneratorException ignored) {
             //una clase bien predefinida no debería lanzar errores semánticos.
         }
     }
@@ -27,19 +29,20 @@ public abstract class PredefinedClass {
         return classCreated;
     }
 
-    protected void create() throws SemanticException {
+    protected void create() throws SemanticException, CodeGeneratorException {
         for(Attribute attribute : createAttributes()){
             classCreated.addAttribute(attribute.getIdentifierToken().getLexema(), attribute);
         }
 
-        for(Method method : createMethods()){
-            classCreated.addMethod(method.getIdentifierToken().getLexema(), method);
+        for(PredefinedMethod predefinedMethod : createMethods()){
+            classCreated.addMethod(predefinedMethod.getMethod().getIdentifierToken().getLexema(),
+                    predefinedMethod.getMethod());
         }
 
         classCreated.setConstructor(createConstructor());
     }
 
-    protected abstract List<Method> createMethods() throws EntityAlreadyExistsException;
+    protected abstract List<PredefinedMethod> createMethods() throws EntityAlreadyExistsException, CodeGeneratorException;
 
     protected abstract List<Attribute> createAttributes() throws EntityAlreadyExistsException;
 

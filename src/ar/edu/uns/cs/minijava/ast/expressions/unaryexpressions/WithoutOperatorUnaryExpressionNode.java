@@ -22,6 +22,6 @@ public class WithoutOperatorUnaryExpressionNode extends UnaryExpressionNode {
 
     @Override
     public void generate() throws CodeGeneratorException {
-
+        operand.generate();
     }
 }

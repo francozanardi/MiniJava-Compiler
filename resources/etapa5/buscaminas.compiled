@@ -1,0 +1,2317 @@
+.DATA
+VT_MineGenerator: DW setDifficultyToEasy_MineGenerator, setDifficultyToMedium_MineGenerator, setDifficultyToHard_MineGenerator, setDifficultyToImpossible_MineGenerator, getNextCell_MineGenerator, decideIfIsMine_MineGenerator
+.DATA
+VT_Game: DW greet_Game, initRandom_Game, startGame_Game, readMovement_Game, showFinishGameMessage_Game, getBoard_Game
+.DATA
+VT_Board: DW fillBoard_Board, getCellInPosition_Board, isIndexOutsideOfBoard_Board, getMinesNumberAroundOf_Board, countMineInPosition_Board, updateAndShowBoard_Board, showColumnsNumber_Board, showRowNumber_Board, showCell_Board, checkIfCellIsOpenable_Board, openCellInPosition_Board, openAdjacentsWithZeroMines_Board, openAdjacentsWithZeroMinesIfHasZeroMines_Board, thereIsOpenableCells_Board
+.DATA
+VT_Random: DW generateRandomNumberBetween_Random, randomizarSeed_Random, getAGoodModifierWithTwoArguments_Random
+VT_Object: NOP
+.DATA
+VT_CellPosition: DW getRow_CellPosition, getColumn_CellPosition
+.DATA
+VT_ListItem: DW getElement_ListItem, getNext_ListItem, getPrev_ListItem, setNext_ListItem, setPrev_ListItem, setElement_ListItem
+VT_Math: NOP
+VT_Main: NOP
+.DATA
+VT_Cell: DW isMine_Cell, isOpen_Cell, getPosition_Cell, open_Cell
+VT_System: NOP
+.DATA
+VT_LinkedList: DW appendElement_LinkedList, setElementInPosition_LinkedList, getElementInPosition_LinkedList, getFirst_LinkedList, getLast_LinkedList, getSize_LinkedList
+.CODE
+PUSH init_heap
+CALL
+PUSH main_Main
+CALL
+HALT
+init_heap: RET 0
+simple_malloc: LOADFP
+LOADSP
+STOREFP
+LOADHL
+DUP
+PUSH 1
+ADD
+STORE 4
+LOAD 3
+ADD
+STOREHL
+STOREFP
+RET 1
+.CODE
+getNextCell_MineGenerator: LOADFP
+LOADSP
+STOREFP
+RMEM 1
+PUSH 5
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_Cell
+STOREREF 0
+DUP
+LOAD 3
+LOADREF 3
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 5
+CALL
+SWAP
+LOAD 4
+SWAP
+LOAD 3
+RMEM 1
+SWAP
+LOAD 4
+SWAP
+DUP
+LOADREF 0
+LOADREF 5
+CALL
+SWAP
+PUSH constructor_Cell
+CALL
+STORE 5
+JUMP getNextCell_MineGenerator_end
+getNextCell_MineGenerator_end: STOREFP
+RET 2
+decideIfIsMine_MineGenerator: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 2
+RMEM 1
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+SWAP
+DUP
+LOADREF 0
+LOADREF 2
+CALL
+LOAD 3
+LOADREF 2
+RMEM 1
+SWAP
+LOAD 0
+SWAP
+PUSH 127
+SWAP
+PUSH 0
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+LOAD -1
+PUSH 25
+LOAD 3
+LOADREF 1
+ADD
+LT
+STORE 5
+FMEM 2
+JUMP decideIfIsMine_MineGenerator_end
+FMEM 2
+decideIfIsMine_MineGenerator_end: STOREFP
+RET 2
+setDifficultyToImpossible_MineGenerator: LOADFP
+LOADSP
+STOREFP
+PUSH 50
+LOAD 3
+SWAP
+STOREREF 1
+setDifficultyToImpossible_MineGenerator_end: STOREFP
+RET 1
+debugPrint_Object: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+IPRINT
+PRNLN
+debugPrint_Object_end: STOREFP
+RET 1
+setDifficultyToEasy_MineGenerator: LOADFP
+LOADSP
+STOREFP
+PUSH 0
+LOAD 3
+SWAP
+STOREREF 1
+setDifficultyToEasy_MineGenerator_end: STOREFP
+RET 1
+setDifficultyToHard_MineGenerator: LOADFP
+LOADSP
+STOREFP
+PUSH 30
+LOAD 3
+SWAP
+STOREREF 1
+setDifficultyToHard_MineGenerator_end: STOREFP
+RET 1
+setDifficultyToMedium_MineGenerator: LOADFP
+LOADSP
+STOREFP
+PUSH 10
+LOAD 3
+SWAP
+STOREREF 1
+setDifficultyToMedium_MineGenerator_end: STOREFP
+RET 1
+constructor_MineGenerator: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+LOAD 4
+LOAD 3
+SWAP
+STOREREF 2
+LOAD 5
+LOAD 3
+SWAP
+STOREREF 3
+constructor_MineGenerator_end: STOREFP
+RET 3
+.CODE
+readMovement_Game: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 2
+POP
+.DATA
+label_0: DW "Input your movement [row-col, i.e: 5-3]: ", 0
+.CODE
+PUSH label_0
+PUSH printS_System
+CALL
+LOAD 3
+LOADREF 2
+POP
+RMEM 1
+PUSH read_System
+CALL
+PUSH 48
+SUB
+LOAD 3
+LOADREF 2
+POP
+RMEM 1
+PUSH read_System
+CALL
+LOAD 3
+LOADREF 2
+POP
+RMEM 1
+PUSH read_System
+CALL
+PUSH 48
+SUB
+LOAD 3
+LOADREF 2
+POP
+RMEM 1
+PUSH read_System
+CALL
+STORE -1
+LOAD 3
+LOADREF 2
+POP
+RMEM 1
+PUSH read_System
+CALL
+STORE -1
+LOAD 3
+LOADREF 2
+POP
+PUSH println_System
+CALL
+RMEM 1
+PUSH 3
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_CellPosition
+STOREREF 0
+DUP
+LOAD -2
+SWAP
+LOAD 0
+SWAP
+PUSH constructor_CellPosition
+CALL
+STORE 4
+FMEM 3
+JUMP readMovement_Game_end
+FMEM 3
+readMovement_Game_end: STOREFP
+RET 1
+getBoard_Game: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 3
+STORE 4
+JUMP getBoard_Game_end
+getBoard_Game_end: STOREFP
+RET 1
+showFinishGameMessage_Game: LOADFP
+LOADSP
+STOREFP
+LOAD 4
+BF label_1
+LOAD 3
+LOADREF 2
+POP
+.DATA
+label_3: DW "You won! Congratulations :)", 0
+.CODE
+PUSH label_3
+PUSH printSln_System
+CALL
+JUMP label_2
+label_1: 
+LOAD 3
+LOADREF 3
+DUP
+LOADREF 0
+LOADREF 5
+CALL
+LOAD 3
+LOADREF 2
+POP
+.DATA
+label_4: DW "Ohhhh, try again :(", 0
+.CODE
+PUSH label_4
+PUSH printSln_System
+CALL
+label_2: NOP
+showFinishGameMessage_Game_end: STOREFP
+RET 2
+greet_Game: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 2
+POP
+.DATA
+label_5: DW "Welcome to Minesweeper in MiniJava", 0
+.CODE
+PUSH label_5
+PUSH printSln_System
+CALL
+greet_Game_end: STOREFP
+RET 1
+startGame_Game: LOADFP
+LOADSP
+STOREFP
+PUSH 1
+PUSH 0
+label_7: 
+LOAD 0
+LOAD 3
+LOADREF 3
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 13
+CALL
+AND
+BF label_6
+LOAD 3
+LOADREF 3
+DUP
+LOADREF 0
+LOADREF 5
+CALL
+LOAD 3
+LOADREF 3
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 13
+CALL
+BF label_8
+LOAD 3
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 3
+CALL
+LOAD 3
+LOADREF 3
+RMEM 1
+SWAP
+LOAD -2
+SWAP
+DUP
+LOADREF 0
+LOADREF 10
+CALL
+STORE 0
+FMEM 1
+JUMP label_9
+label_8: 
+NOP
+label_9: NOP
+LOAD -1
+PUSH 1
+ADD
+STORE -1
+JUMP label_7
+label_6: 
+FMEM 1
+LOAD 3
+LOAD 0
+SWAP
+DUP
+LOADREF 0
+LOADREF 4
+CALL
+FMEM 1
+startGame_Game_end: STOREFP
+RET 1
+initRandom_Game: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 2
+POP
+.DATA
+label_10: DW "Input a random number: ", 0
+.CODE
+PUSH label_10
+PUSH printS_System
+CALL
+PUSH 0
+LOAD 3
+LOADREF 2
+POP
+RMEM 1
+PUSH read_System
+CALL
+label_12: 
+LOAD -1
+PUSH 10
+NE
+BF label_11
+LOAD 0
+LOAD -1
+ADD
+STORE 0
+LOAD 3
+LOADREF 2
+POP
+RMEM 1
+PUSH read_System
+CALL
+STORE -1
+JUMP label_12
+label_11: 
+FMEM 1
+LOAD 3
+LOADREF 2
+POP
+PUSH println_System
+CALL
+RMEM 1
+PUSH 5
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_Random
+STOREREF 0
+DUP
+LOAD 0
+SWAP
+PUSH constructor_Random
+CALL
+LOAD 3
+SWAP
+STOREREF 1
+FMEM 1
+initRandom_Game_end: STOREFP
+RET 1
+constructor_Game: LOADFP
+LOADSP
+STOREFP
+RMEM 1
+PUSH 1
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_System
+STOREREF 0
+DUP
+PUSH constructor_System
+CALL
+LOAD 3
+SWAP
+STOREREF 2
+LOAD 3
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+LOAD 3
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+RMEM 1
+PUSH 4
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_MineGenerator
+STOREREF 0
+DUP
+LOAD 3
+SWAP
+LOAD 3
+LOADREF 1
+SWAP
+PUSH constructor_MineGenerator
+CALL
+LOAD 3
+SWAP
+STOREREF 4
+RMEM 1
+PUSH 6
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_Board
+STOREREF 0
+DUP
+LOAD 3
+LOADREF 4
+SWAP
+PUSH constructor_Board
+CALL
+LOAD 3
+SWAP
+STOREREF 3
+LOAD 3
+DUP
+LOADREF 0
+LOADREF 2
+CALL
+constructor_Game_end: STOREFP
+RET 1
+.CODE
+fillBoard_Board: LOADFP
+LOADSP
+STOREFP
+PUSH 0
+label_14: 
+LOAD 0
+LOAD 3
+LOADREF 4
+LT
+BF label_13
+RMEM 1
+PUSH 4
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_LinkedList
+STOREREF 0
+DUP
+PUSH constructor_LinkedList
+CALL
+PUSH 0
+label_16: 
+LOAD -2
+LOAD 3
+LOADREF 4
+LT
+BF label_15
+LOAD -1
+LOAD 3
+LOADREF 2
+RMEM 1
+SWAP
+RMEM 1
+PUSH 3
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_CellPosition
+STOREREF 0
+DUP
+LOAD -2
+SWAP
+LOAD 0
+SWAP
+PUSH constructor_CellPosition
+CALL
+SWAP
+DUP
+LOADREF 0
+LOADREF 4
+CALL
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+LOAD -2
+PUSH 1
+ADD
+STORE -2
+JUMP label_16
+label_15: 
+FMEM 1
+LOAD 3
+LOADREF 1
+LOAD -1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+LOAD 3
+LOADREF 1
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 4
+CALL
+FMEM 2
+LOAD 0
+PUSH 1
+ADD
+STORE 0
+JUMP label_14
+label_13: 
+FMEM 1
+fillBoard_Board_end: STOREFP
+RET 1
+showRowNumber_Board: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 3
+POP
+.DATA
+label_17: DW "|", 0
+.CODE
+PUSH label_17
+PUSH printS_System
+CALL
+LOAD 3
+LOADREF 3
+POP
+LOAD 4
+PUSH printI_System
+CALL
+LOAD 3
+LOADREF 3
+POP
+.DATA
+label_18: DW "| ", 0
+.CODE
+PUSH label_18
+PUSH printS_System
+CALL
+showRowNumber_Board_end: STOREFP
+RET 2
+getCellInPosition_Board: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+RMEM 1
+SWAP
+LOAD 4
+SWAP
+DUP
+LOADREF 0
+LOADREF 2
+CALL
+LOAD 3
+RMEM 1
+SWAP
+LOAD 5
+SWAP
+DUP
+LOADREF 0
+LOADREF 2
+CALL
+OR
+BF label_19
+PUSH 0
+STORE 6
+JUMP getCellInPosition_Board_end
+JUMP label_20
+label_19: 
+NOP
+label_20: NOP
+LOAD 3
+LOADREF 1
+RMEM 1
+SWAP
+LOAD 4
+SWAP
+DUP
+LOADREF 0
+LOADREF 2
+CALL
+LOAD 0
+RMEM 1
+SWAP
+LOAD 5
+SWAP
+DUP
+LOADREF 0
+LOADREF 2
+CALL
+STORE 6
+FMEM 1
+JUMP getCellInPosition_Board_end
+FMEM 1
+getCellInPosition_Board_end: STOREFP
+RET 3
+checkIfCellIsOpenable_Board: LOADFP
+LOADSP
+STOREFP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+NOT
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+NOT
+AND
+BF label_21
+PUSH 1
+LOAD 3
+SWAP
+STOREREF 5
+JUMP label_22
+label_21: 
+NOP
+label_22: NOP
+checkIfCellIsOpenable_Board_end: STOREFP
+RET 2
+openCellInPosition_Board: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+RMEM 1
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+LOAD 0
+PUSH 0
+EQ
+BF label_23
+PUSH 1
+STORE 5
+FMEM 1
+JUMP openCellInPosition_Board_end
+JUMP label_24
+label_23: 
+NOP
+label_24: NOP
+LOAD 0
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+BF label_25
+LOAD 0
+DUP
+LOADREF 0
+LOADREF 3
+CALL
+PUSH 0
+STORE 5
+FMEM 1
+JUMP openCellInPosition_Board_end
+JUMP label_26
+label_25: 
+NOP
+label_26: NOP
+LOAD 0
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+BF label_27
+PUSH 1
+STORE 5
+FMEM 1
+JUMP openCellInPosition_Board_end
+JUMP label_28
+label_27: 
+NOP
+label_28: NOP
+LOAD 3
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+SWAP
+DUP
+LOADREF 0
+LOADREF 12
+CALL
+LOAD 0
+DUP
+LOADREF 0
+LOADREF 3
+CALL
+PUSH 1
+STORE 5
+FMEM 1
+JUMP openCellInPosition_Board_end
+FMEM 1
+openCellInPosition_Board_end: STOREFP
+RET 2
+showColumnsNumber_Board: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 3
+POP
+.DATA
+label_29: DW "    ", 0
+.CODE
+PUSH label_29
+PUSH printS_System
+CALL
+PUSH 0
+label_31: 
+LOAD 0
+LOAD 3
+LOADREF 4
+LT
+BF label_30
+LOAD 3
+LOADREF 3
+POP
+.DATA
+label_32: DW "|", 0
+.CODE
+PUSH label_32
+PUSH printS_System
+CALL
+LOAD 3
+LOADREF 3
+POP
+LOAD 0
+PUSH printI_System
+CALL
+LOAD 3
+LOADREF 3
+POP
+.DATA
+label_33: DW "|", 0
+.CODE
+PUSH label_33
+PUSH printS_System
+CALL
+LOAD 0
+PUSH 1
+ADD
+STORE 0
+JUMP label_31
+label_30: 
+FMEM 1
+LOAD 3
+LOADREF 3
+POP
+PUSH println_System
+CALL
+LOAD 3
+LOADREF 3
+POP
+.DATA
+label_34: DW "    ", 0
+.CODE
+PUSH label_34
+PUSH printS_System
+CALL
+PUSH 0
+label_36: 
+LOAD 0
+LOAD 3
+LOADREF 4
+LT
+BF label_35
+LOAD 3
+LOADREF 3
+POP
+.DATA
+label_37: DW "---", 0
+.CODE
+PUSH label_37
+PUSH printS_System
+CALL
+LOAD 0
+PUSH 1
+ADD
+STORE 0
+JUMP label_36
+label_35: 
+FMEM 1
+LOAD 3
+LOADREF 3
+POP
+PUSH println_System
+CALL
+showColumnsNumber_Board_end: STOREFP
+RET 1
+getMinesNumberAroundOf_Board: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+RMEM 1
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+PUSH 1
+SUB
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+PUSH 1
+SUB
+SWAP
+DUP
+LOADREF 0
+LOADREF 4
+CALL
+LOAD 3
+RMEM 1
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+PUSH 1
+SUB
+SWAP
+DUP
+LOADREF 0
+LOADREF 4
+CALL
+LOAD 3
+RMEM 1
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+PUSH 1
+ADD
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+PUSH 1
+SUB
+SWAP
+DUP
+LOADREF 0
+LOADREF 4
+CALL
+LOAD 3
+RMEM 1
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+PUSH 1
+SUB
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+SWAP
+DUP
+LOADREF 0
+LOADREF 4
+CALL
+LOAD 3
+RMEM 1
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+PUSH 1
+ADD
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+SWAP
+DUP
+LOADREF 0
+LOADREF 4
+CALL
+LOAD 3
+RMEM 1
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+PUSH 1
+SUB
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+PUSH 1
+ADD
+SWAP
+DUP
+LOADREF 0
+LOADREF 4
+CALL
+LOAD 3
+RMEM 1
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+PUSH 1
+ADD
+SWAP
+DUP
+LOADREF 0
+LOADREF 4
+CALL
+LOAD 3
+RMEM 1
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+PUSH 1
+ADD
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+PUSH 1
+ADD
+SWAP
+DUP
+LOADREF 0
+LOADREF 4
+CALL
+ADD
+ADD
+ADD
+ADD
+ADD
+ADD
+ADD
+STORE 5
+JUMP getMinesNumberAroundOf_Board_end
+getMinesNumberAroundOf_Board_end: STOREFP
+RET 2
+openAdjacentsWithZeroMines_Board: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOAD 5
+PUSH 1
+SUB
+SWAP
+LOAD 4
+PUSH 1
+SUB
+SWAP
+DUP
+LOADREF 0
+LOADREF 12
+CALL
+LOAD 3
+LOAD 5
+SWAP
+LOAD 4
+PUSH 1
+SUB
+SWAP
+DUP
+LOADREF 0
+LOADREF 12
+CALL
+LOAD 3
+LOAD 5
+PUSH 1
+ADD
+SWAP
+LOAD 4
+PUSH 1
+SUB
+SWAP
+DUP
+LOADREF 0
+LOADREF 12
+CALL
+LOAD 3
+LOAD 5
+PUSH 1
+SUB
+SWAP
+LOAD 4
+SWAP
+DUP
+LOADREF 0
+LOADREF 12
+CALL
+LOAD 3
+LOAD 5
+PUSH 1
+ADD
+SWAP
+LOAD 4
+SWAP
+DUP
+LOADREF 0
+LOADREF 12
+CALL
+LOAD 3
+LOAD 5
+PUSH 1
+SUB
+SWAP
+LOAD 4
+PUSH 1
+ADD
+SWAP
+DUP
+LOADREF 0
+LOADREF 12
+CALL
+LOAD 3
+LOAD 5
+SWAP
+LOAD 4
+PUSH 1
+ADD
+SWAP
+DUP
+LOADREF 0
+LOADREF 12
+CALL
+LOAD 3
+LOAD 5
+PUSH 1
+ADD
+SWAP
+LOAD 4
+PUSH 1
+ADD
+SWAP
+DUP
+LOADREF 0
+LOADREF 12
+CALL
+openAdjacentsWithZeroMines_Board_end: STOREFP
+RET 3
+isIndexOutsideOfBoard_Board: LOADFP
+LOADSP
+STOREFP
+LOAD 4
+PUSH 0
+LT
+LOAD 4
+LOAD 3
+LOADREF 4
+GE
+OR
+BF label_38
+PUSH 1
+STORE 5
+JUMP isIndexOutsideOfBoard_Board_end
+JUMP label_39
+label_38: 
+NOP
+label_39: NOP
+PUSH 0
+STORE 5
+JUMP isIndexOutsideOfBoard_Board_end
+isIndexOutsideOfBoard_Board_end: STOREFP
+RET 2
+thereIsOpenableCells_Board: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 5
+STORE 4
+JUMP thereIsOpenableCells_Board_end
+thereIsOpenableCells_Board_end: STOREFP
+RET 1
+countMineInPosition_Board: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+RMEM 1
+SWAP
+LOAD 5
+SWAP
+LOAD 4
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+LOAD 0
+PUSH 0
+NE
+BF label_40
+LOAD 0
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+BF label_42
+PUSH 1
+STORE 6
+FMEM 1
+JUMP countMineInPosition_Board_end
+JUMP label_43
+label_42: 
+NOP
+label_43: NOP
+JUMP label_41
+label_40: 
+NOP
+label_41: NOP
+PUSH 0
+STORE 6
+FMEM 1
+JUMP countMineInPosition_Board_end
+FMEM 1
+countMineInPosition_Board_end: STOREFP
+RET 3
+showCell_Board: LOADFP
+LOADSP
+STOREFP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+NOT
+BF label_44
+LOAD 3
+LOADREF 3
+POP
+.DATA
+label_46: DW "[x]", 0
+.CODE
+PUSH label_46
+PUSH printS_System
+CALL
+JUMP label_45
+label_44: 
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+BF label_47
+LOAD 3
+LOADREF 3
+POP
+.DATA
+label_49: DW "[*]", 0
+.CODE
+PUSH label_49
+PUSH printS_System
+CALL
+JUMP label_48
+label_47: 
+LOAD 3
+LOADREF 3
+POP
+.DATA
+label_50: DW "[", 0
+.CODE
+PUSH label_50
+PUSH printS_System
+CALL
+LOAD 3
+LOADREF 3
+POP
+LOAD 3
+RMEM 1
+SWAP
+LOAD 4
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 2
+CALL
+SWAP
+DUP
+LOADREF 0
+LOADREF 3
+CALL
+PUSH printI_System
+CALL
+LOAD 3
+LOADREF 3
+POP
+.DATA
+label_51: DW "]", 0
+.CODE
+PUSH label_51
+PUSH printS_System
+CALL
+label_48: NOP
+label_45: NOP
+showCell_Board_end: STOREFP
+RET 2
+updateAndShowBoard_Board: LOADFP
+LOADSP
+STOREFP
+PUSH 0
+LOAD 3
+SWAP
+STOREREF 5
+LOAD 3
+DUP
+LOADREF 0
+LOADREF 6
+CALL
+PUSH 0
+label_53: 
+LOAD 0
+LOAD 3
+LOADREF 4
+LT
+BF label_52
+LOAD 3
+LOADREF 1
+RMEM 1
+SWAP
+LOAD 0
+SWAP
+DUP
+LOADREF 0
+LOADREF 2
+CALL
+LOAD 3
+LOAD 0
+SWAP
+DUP
+LOADREF 0
+LOADREF 7
+CALL
+PUSH 0
+label_55: 
+LOAD -2
+LOAD 3
+LOADREF 4
+LT
+BF label_54
+LOAD -1
+RMEM 1
+SWAP
+LOAD -2
+SWAP
+DUP
+LOADREF 0
+LOADREF 2
+CALL
+LOAD 3
+LOAD -3
+SWAP
+DUP
+LOADREF 0
+LOADREF 8
+CALL
+LOAD 3
+LOAD -3
+SWAP
+DUP
+LOADREF 0
+LOADREF 9
+CALL
+FMEM 1
+LOAD -2
+PUSH 1
+ADD
+STORE -2
+JUMP label_55
+label_54: 
+FMEM 1
+LOAD 3
+LOADREF 3
+POP
+PUSH println_System
+CALL
+FMEM 1
+LOAD 0
+PUSH 1
+ADD
+STORE 0
+JUMP label_53
+label_52: 
+FMEM 1
+LOAD 3
+LOADREF 3
+POP
+PUSH println_System
+CALL
+updateAndShowBoard_Board_end: STOREFP
+RET 1
+openAdjacentsWithZeroMinesIfHasZeroMines_Board: LOADFP
+LOADSP
+STOREFP
+RMEM 1
+PUSH 3
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_CellPosition
+STOREREF 0
+DUP
+LOAD 5
+SWAP
+LOAD 4
+SWAP
+PUSH constructor_CellPosition
+CALL
+LOAD 3
+RMEM 1
+SWAP
+LOAD 0
+SWAP
+DUP
+LOADREF 0
+LOADREF 3
+CALL
+PUSH 0
+EQ
+BF label_56
+LOAD 3
+RMEM 1
+SWAP
+LOAD 5
+SWAP
+LOAD 4
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+LOAD -1
+PUSH 0
+NE
+BF label_58
+LOAD -1
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+LOAD -1
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+OR
+BF label_60
+FMEM 2
+JUMP openAdjacentsWithZeroMinesIfHasZeroMines_Board_end
+JUMP label_61
+label_60: 
+NOP
+label_61: NOP
+LOAD -1
+DUP
+LOADREF 0
+LOADREF 3
+CALL
+LOAD 3
+LOAD 5
+SWAP
+LOAD 4
+SWAP
+DUP
+LOADREF 0
+LOADREF 11
+CALL
+JUMP label_59
+label_58: 
+NOP
+label_59: NOP
+FMEM 1
+JUMP label_57
+label_56: 
+NOP
+label_57: NOP
+FMEM 1
+openAdjacentsWithZeroMinesIfHasZeroMines_Board_end: STOREFP
+RET 3
+constructor_Board: LOADFP
+LOADSP
+STOREFP
+PUSH 8
+LOAD 3
+SWAP
+STOREREF 4
+LOAD 4
+LOAD 3
+SWAP
+STOREREF 2
+RMEM 1
+PUSH 4
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_LinkedList
+STOREREF 0
+DUP
+PUSH constructor_LinkedList
+CALL
+LOAD 3
+SWAP
+STOREREF 1
+RMEM 1
+PUSH 1
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_System
+STOREREF 0
+DUP
+PUSH constructor_System
+CALL
+LOAD 3
+SWAP
+STOREREF 3
+PUSH 1
+LOAD 3
+SWAP
+STOREREF 5
+LOAD 3
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+constructor_Board_end: STOREFP
+RET 2
+.CODE
+generateRandomNumberBetween_Random: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 4
+POP
+RMEM 1
+LOAD 5
+LOAD 4
+PUSH max_Math
+CALL
+LOAD 3
+LOADREF 4
+POP
+RMEM 1
+LOAD 5
+LOAD 4
+PUSH min_Math
+CALL
+LOAD 0
+LOAD -1
+SUB
+LOAD 3
+LOADREF 3
+LOAD -2
+MOD
+LOAD 3
+LOAD 6
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+LOAD -3
+LOAD -1
+ADD
+STORE 7
+FMEM 4
+JUMP generateRandomNumberBetween_Random_end
+FMEM 4
+generateRandomNumberBetween_Random_end: STOREFP
+RET 4
+randomizarSeed_Random: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 3
+LOAD 4
+ADD
+LOAD 3
+SWAP
+STOREREF 3
+randomizarSeed_Random_end: STOREFP
+RET 2
+getAGoodModifierWithTwoArguments_Random: LOADFP
+LOADSP
+STOREFP
+LOAD 4
+LOAD 5
+LOAD 3
+LOADREF 2
+PUSH 1
+ADD
+ADD
+ADD
+STORE 6
+JUMP getAGoodModifierWithTwoArguments_Random_end
+getAGoodModifierWithTwoArguments_Random_end: STOREFP
+RET 3
+constructor_Random: LOADFP
+LOADSP
+STOREFP
+PUSH 131071
+LOAD 3
+SWAP
+STOREREF 1
+PUSH 8191
+LOAD 3
+SWAP
+STOREREF 2
+LOAD 3
+LOADREF 1
+LOAD 4
+ADD
+LOAD 3
+SWAP
+STOREREF 3
+RMEM 1
+PUSH 1
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_Math
+STOREREF 0
+DUP
+PUSH constructor_Math
+CALL
+LOAD 3
+SWAP
+STOREREF 4
+constructor_Random_end: STOREFP
+RET 2
+.CODE
+constructor_Object: LOADFP
+LOADSP
+STOREFP
+constructor_Object_end: STOREFP
+RET 1
+.CODE
+getColumn_CellPosition: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 2
+STORE 4
+JUMP getColumn_CellPosition_end
+getColumn_CellPosition_end: STOREFP
+RET 1
+getRow_CellPosition: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 1
+STORE 4
+JUMP getRow_CellPosition_end
+getRow_CellPosition_end: STOREFP
+RET 1
+constructor_CellPosition: LOADFP
+LOADSP
+STOREFP
+LOAD 4
+LOAD 3
+SWAP
+STOREREF 1
+LOAD 5
+LOAD 3
+SWAP
+STOREREF 2
+constructor_CellPosition_end: STOREFP
+RET 3
+.CODE
+getElement_ListItem: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 1
+STORE 4
+JUMP getElement_ListItem_end
+getElement_ListItem_end: STOREFP
+RET 1
+setNext_ListItem: LOADFP
+LOADSP
+STOREFP
+LOAD 4
+LOAD 3
+SWAP
+STOREREF 2
+setNext_ListItem_end: STOREFP
+RET 2
+getNext_ListItem: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 2
+STORE 4
+JUMP getNext_ListItem_end
+getNext_ListItem_end: STOREFP
+RET 1
+setPrev_ListItem: LOADFP
+LOADSP
+STOREFP
+LOAD 4
+LOAD 3
+SWAP
+STOREREF 3
+setPrev_ListItem_end: STOREFP
+RET 2
+setElement_ListItem: LOADFP
+LOADSP
+STOREFP
+LOAD 4
+LOAD 3
+SWAP
+STOREREF 1
+setElement_ListItem_end: STOREFP
+RET 2
+getPrev_ListItem: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 3
+STORE 4
+JUMP getPrev_ListItem_end
+getPrev_ListItem_end: STOREFP
+RET 1
+constructor_ListItem: LOADFP
+LOADSP
+STOREFP
+LOAD 4
+LOAD 3
+SWAP
+STOREREF 1
+LOAD 6
+LOAD 3
+SWAP
+STOREREF 2
+LOAD 5
+LOAD 3
+SWAP
+STOREREF 3
+constructor_ListItem_end: STOREFP
+RET 4
+.CODE
+abs_Math: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+PUSH 0
+LT
+BF label_62
+LOAD 3
+PUSH 1
+NEG
+MUL
+STORE 4
+JUMP abs_Math_end
+JUMP label_63
+label_62: 
+NOP
+label_63: NOP
+LOAD 3
+STORE 4
+JUMP abs_Math_end
+abs_Math_end: STOREFP
+RET 1
+min_Math: LOADFP
+LOADSP
+STOREFP
+LOAD 4
+LOAD 3
+LT
+BF label_64
+LOAD 4
+STORE 5
+JUMP min_Math_end
+JUMP label_65
+label_64: 
+NOP
+label_65: NOP
+LOAD 3
+STORE 5
+JUMP min_Math_end
+min_Math_end: STOREFP
+RET 2
+max_Math: LOADFP
+LOADSP
+STOREFP
+LOAD 4
+LOAD 3
+GT
+BF label_66
+LOAD 4
+STORE 5
+JUMP max_Math_end
+JUMP label_67
+label_66: 
+NOP
+label_67: NOP
+LOAD 3
+STORE 5
+JUMP max_Math_end
+max_Math_end: STOREFP
+RET 2
+constructor_Math: LOADFP
+LOADSP
+STOREFP
+constructor_Math_end: STOREFP
+RET 1
+.CODE
+main_Main: LOADFP
+LOADSP
+STOREFP
+RMEM 1
+PUSH 5
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_Game
+STOREREF 0
+DUP
+PUSH constructor_Game
+CALL
+FMEM 1
+main_Main_end: STOREFP
+RET 0
+constructor_Main: LOADFP
+LOADSP
+STOREFP
+constructor_Main_end: STOREFP
+RET 1
+.CODE
+isOpen_Cell: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 2
+STORE 4
+JUMP isOpen_Cell_end
+isOpen_Cell_end: STOREFP
+RET 1
+getPosition_Cell: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 3
+STORE 4
+JUMP getPosition_Cell_end
+getPosition_Cell_end: STOREFP
+RET 1
+isMine_Cell: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 1
+STORE 4
+JUMP isMine_Cell_end
+isMine_Cell_end: STOREFP
+RET 1
+open_Cell: LOADFP
+LOADSP
+STOREFP
+PUSH 1
+LOAD 3
+SWAP
+STOREREF 2
+open_Cell_end: STOREFP
+RET 1
+constructor_Cell: LOADFP
+LOADSP
+STOREFP
+LOAD 4
+LOAD 3
+SWAP
+STOREREF 1
+LOAD 5
+LOAD 3
+SWAP
+STOREREF 3
+PUSH 0
+LOAD 3
+SWAP
+STOREREF 2
+LOAD 6
+LOAD 3
+SWAP
+STOREREF 4
+constructor_Cell_end: STOREFP
+RET 4
+.CODE
+printC_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+CPRINT
+printC_System_end: STOREFP
+RET 1
+printS_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+SPRINT
+printS_System_end: STOREFP
+RET 1
+println_System: LOADFP
+LOADSP
+STOREFP
+PRNLN
+println_System_end: STOREFP
+RET 0
+printCln_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+CPRINT
+PRNLN
+printCln_System_end: STOREFP
+RET 1
+printSln_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+SPRINT
+PRNLN
+printSln_System_end: STOREFP
+RET 1
+read_System: LOADFP
+LOADSP
+STOREFP
+READ
+STORE 3
+read_System_end: STOREFP
+RET 0
+printB_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+BPRINT
+printB_System_end: STOREFP
+RET 1
+printIln_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+IPRINT
+PRNLN
+printIln_System_end: STOREFP
+RET 1
+printI_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+IPRINT
+printI_System_end: STOREFP
+RET 1
+printBln_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+BPRINT
+PRNLN
+printBln_System_end: STOREFP
+RET 1
+constructor_System: LOADFP
+LOADSP
+STOREFP
+constructor_System_end: STOREFP
+RET 1
+.CODE
+getSize_LinkedList: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 1
+STORE 4
+JUMP getSize_LinkedList_end
+getSize_LinkedList_end: STOREFP
+RET 1
+getElementInPosition_LinkedList: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 2
+PUSH 0
+label_69: 
+LOAD -1
+LOAD 4
+LT
+BF label_68
+LOAD 0
+PUSH 0
+EQ
+BF label_70
+PUSH 0
+STORE 5
+FMEM 2
+JUMP getElementInPosition_LinkedList_end
+JUMP label_71
+label_70: 
+NOP
+label_71: NOP
+LOAD 0
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+STORE 0
+LOAD -1
+PUSH 1
+ADD
+STORE -1
+JUMP label_69
+label_68: 
+FMEM 1
+LOAD 0
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+STORE 5
+FMEM 1
+JUMP getElementInPosition_LinkedList_end
+FMEM 1
+getElementInPosition_LinkedList_end: STOREFP
+RET 2
+getFirst_LinkedList: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 2
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+STORE 4
+JUMP getFirst_LinkedList_end
+getFirst_LinkedList_end: STOREFP
+RET 1
+appendElement_LinkedList: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 2
+PUSH 0
+EQ
+BF label_72
+RMEM 1
+PUSH 4
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_ListItem
+STOREREF 0
+DUP
+PUSH 0
+SWAP
+PUSH 0
+SWAP
+LOAD 4
+SWAP
+PUSH constructor_ListItem
+CALL
+LOAD 3
+SWAP
+STOREREF 2
+LOAD 3
+LOADREF 2
+LOAD 3
+SWAP
+STOREREF 3
+JUMP label_73
+label_72: 
+RMEM 1
+PUSH 4
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_ListItem
+STOREREF 0
+DUP
+PUSH 0
+SWAP
+LOAD 3
+LOADREF 3
+SWAP
+LOAD 4
+SWAP
+PUSH constructor_ListItem
+CALL
+LOAD 3
+LOADREF 3
+LOAD 0
+SWAP
+DUP
+LOADREF 0
+LOADREF 3
+CALL
+LOAD 0
+LOAD 3
+SWAP
+STOREREF 3
+FMEM 1
+label_73: NOP
+LOAD 3
+LOADREF 1
+PUSH 1
+ADD
+LOAD 3
+SWAP
+STOREREF 1
+appendElement_LinkedList_end: STOREFP
+RET 2
+getLast_LinkedList: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 3
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+STORE 4
+JUMP getLast_LinkedList_end
+getLast_LinkedList_end: STOREFP
+RET 1
+setElementInPosition_LinkedList: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 2
+PUSH 0
+label_75: 
+LOAD -1
+LOAD 4
+LT
+BF label_74
+LOAD 0
+PUSH 0
+EQ
+BF label_76
+FMEM 2
+JUMP setElementInPosition_LinkedList_end
+JUMP label_77
+label_76: 
+NOP
+label_77: NOP
+LOAD 0
+RMEM 1
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+STORE 0
+LOAD -1
+PUSH 1
+ADD
+STORE -1
+JUMP label_75
+label_74: 
+FMEM 1
+LOAD 0
+LOAD 5
+SWAP
+DUP
+LOADREF 0
+LOADREF 5
+CALL
+FMEM 1
+setElementInPosition_LinkedList_end: STOREFP
+RET 3
+constructor_LinkedList: LOADFP
+LOADSP
+STOREFP
+PUSH 0
+LOAD 3
+SWAP
+STOREREF 1
+PUSH 0
+LOAD 3
+SWAP
+STOREREF 2
+PUSH 0
+LOAD 3
+SWAP
+STOREREF 3
+constructor_LinkedList_end: STOREFP
+RET 1

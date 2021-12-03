@@ -1,0 +1,381 @@
+.DATA
+VT_A: DW esPrimo_A, getMaxiumFactorOfTheMiniumPossibleFactors_A
+.DATA
+VT_B: DW esPrimo_A, getMaxiumFactorOfTheMiniumPossibleFactors_B
+VT_Test: NOP
+VT_Object: NOP
+VT_Math: NOP
+VT_System: NOP
+.CODE
+PUSH init_heap
+CALL
+PUSH main_Test
+CALL
+HALT
+init_heap: RET 0
+simple_malloc: LOADFP
+LOADSP
+STOREFP
+LOADHL
+DUP
+PUSH 1
+ADD
+STORE 4
+LOAD 3
+ADD
+STOREHL
+STOREFP
+RET 1
+.CODE
+esPrimo_A: LOADFP
+LOADSP
+STOREFP
+LOAD 4
+PUSH 2
+LT
+BF label_0
+PUSH 0
+STORE 5
+JUMP esPrimo_A_end
+JUMP label_1
+label_0: 
+NOP
+label_1: NOP
+LOAD 4
+PUSH 2
+EQ
+BF label_2
+PUSH 1
+STORE 5
+JUMP esPrimo_A_end
+JUMP label_3
+label_2: 
+NOP
+label_3: NOP
+LOAD 4
+PUSH 2
+MOD
+PUSH 0
+EQ
+BF label_4
+PUSH 0
+STORE 5
+JUMP esPrimo_A_end
+JUMP label_5
+label_4: 
+NOP
+label_5: NOP
+PUSH 3
+label_7: 
+LOAD 0
+LOAD 3
+RMEM 1
+SWAP
+LOAD 4
+SWAP
+DUP
+LOADREF 0
+LOADREF 1
+CALL
+LE
+BF label_6
+LOAD 4
+LOAD 0
+MOD
+PUSH 0
+EQ
+BF label_8
+PUSH 0
+STORE 5
+FMEM 1
+JUMP esPrimo_A_end
+JUMP label_9
+label_8: 
+NOP
+label_9: NOP
+LOAD 0
+PUSH 2
+ADD
+STORE 0
+JUMP label_7
+label_6: 
+FMEM 1
+PUSH 1
+STORE 5
+JUMP esPrimo_A_end
+esPrimo_A_end: STOREFP
+RET 2
+debugPrint_Object: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+IPRINT
+PRNLN
+debugPrint_Object_end: STOREFP
+RET 1
+getMaxiumFactorOfTheMiniumPossibleFactors_A: LOADFP
+LOADSP
+STOREFP
+LOAD 4
+PUSH 1
+SUB
+STORE 5
+JUMP getMaxiumFactorOfTheMiniumPossibleFactors_A_end
+getMaxiumFactorOfTheMiniumPossibleFactors_A_end: STOREFP
+RET 2
+constructor_A: LOADFP
+LOADSP
+STOREFP
+constructor_A_end: STOREFP
+RET 1
+.CODE
+getMaxiumFactorOfTheMiniumPossibleFactors_B: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+LOADREF 1
+POP
+RMEM 1
+LOAD 4
+PUSH ceilOfSqrt_Math
+CALL
+STORE 5
+JUMP getMaxiumFactorOfTheMiniumPossibleFactors_B_end
+getMaxiumFactorOfTheMiniumPossibleFactors_B_end: STOREFP
+RET 2
+constructor_B: LOADFP
+LOADSP
+STOREFP
+RMEM 1
+PUSH 1
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_Math
+STOREREF 0
+DUP
+PUSH constructor_Math
+CALL
+LOAD 3
+SWAP
+STOREREF 1
+constructor_B_end: STOREFP
+RET 1
+.CODE
+main_Test: LOADFP
+LOADSP
+STOREFP
+RMEM 1
+PUSH 1
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_System
+STOREREF 0
+DUP
+PUSH constructor_System
+CALL
+RMEM 1
+PUSH 2
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_B
+STOREREF 0
+DUP
+PUSH constructor_B
+CALL
+PUSH 0
+label_11: 
+LOAD -2
+PUSH 100
+LT
+BF label_10
+LOAD -1
+RMEM 1
+SWAP
+LOAD -2
+SWAP
+DUP
+LOADREF 0
+LOADREF 0
+CALL
+BF label_12
+LOAD 0
+POP
+LOAD -2
+PUSH printI_System
+CALL
+LOAD 0
+POP
+.DATA
+label_14: DW " es primo!", 0
+.CODE
+PUSH label_14
+PUSH printSln_System
+CALL
+JUMP label_13
+label_12: 
+LOAD 0
+POP
+LOAD -2
+PUSH printI_System
+CALL
+LOAD 0
+POP
+.DATA
+label_15: DW " NO es primo!", 0
+.CODE
+PUSH label_15
+PUSH printSln_System
+CALL
+label_13: NOP
+LOAD -2
+PUSH 1
+ADD
+STORE -2
+JUMP label_11
+label_10: 
+FMEM 1
+FMEM 2
+main_Test_end: STOREFP
+RET 0
+constructor_Test: LOADFP
+LOADSP
+STOREFP
+constructor_Test_end: STOREFP
+RET 1
+.CODE
+constructor_Object: LOADFP
+LOADSP
+STOREFP
+constructor_Object_end: STOREFP
+RET 1
+.CODE
+ceilOfSqrt_Math: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+PUSH 0
+EQ
+LOAD 3
+PUSH 1
+EQ
+OR
+BF label_16
+LOAD 3
+STORE 4
+JUMP ceilOfSqrt_Math_end
+JUMP label_17
+label_16: 
+NOP
+label_17: NOP
+PUSH 1
+PUSH 1
+label_19: 
+LOAD -1
+LOAD 3
+LT
+BF label_18
+LOAD 0
+PUSH 1
+ADD
+STORE 0
+LOAD 0
+LOAD 0
+MUL
+STORE -1
+JUMP label_19
+label_18: 
+FMEM 1
+LOAD 0
+STORE 4
+FMEM 1
+JUMP ceilOfSqrt_Math_end
+FMEM 1
+ceilOfSqrt_Math_end: STOREFP
+RET 1
+constructor_Math: LOADFP
+LOADSP
+STOREFP
+constructor_Math_end: STOREFP
+RET 1
+.CODE
+printC_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+CPRINT
+printC_System_end: STOREFP
+RET 1
+printS_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+SPRINT
+printS_System_end: STOREFP
+RET 1
+println_System: LOADFP
+LOADSP
+STOREFP
+PRNLN
+println_System_end: STOREFP
+RET 0
+printCln_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+CPRINT
+PRNLN
+printCln_System_end: STOREFP
+RET 1
+printSln_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+SPRINT
+PRNLN
+printSln_System_end: STOREFP
+RET 1
+read_System: LOADFP
+LOADSP
+STOREFP
+READ
+STORE 3
+read_System_end: STOREFP
+RET 0
+printB_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+BPRINT
+printB_System_end: STOREFP
+RET 1
+printIln_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+IPRINT
+PRNLN
+printIln_System_end: STOREFP
+RET 1
+printI_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+IPRINT
+printI_System_end: STOREFP
+RET 1
+printBln_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+BPRINT
+PRNLN
+printBln_System_end: STOREFP
+RET 1
+constructor_System: LOADFP
+LOADSP
+STOREFP
+constructor_System_end: STOREFP
+RET 1

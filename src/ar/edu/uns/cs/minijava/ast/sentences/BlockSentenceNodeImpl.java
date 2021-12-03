@@ -77,9 +77,13 @@ public class BlockSentenceNodeImpl extends BlockSentenceNode {
     public void generate() throws CodeGeneratorException {
         for (SentenceNode sentence : sentences) {
             sentence.generate();
+            modifyMemoryReservedWith(sentence.getAmountOfMemoryReserved());
         }
 
-        SymbolTable.getInstance().appendInstruction(
-                new Instruction(OneArgumentInstruction.FMEM, localVariables.size()));
+        if(localVariables.size() > 0){
+            SymbolTable.getInstance().appendInstruction(
+                    new Instruction(OneArgumentInstruction.FMEM, localVariables.size()));
+            modifyMemoryReservedWith(-localVariables.size());
+        }
     }
 }

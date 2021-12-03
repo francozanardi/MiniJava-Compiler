@@ -35,6 +35,14 @@ public abstract class ChainedNode extends Node {
         }
     }
 
+    public void disableWriteMode() {
+        if(nextChained != null){
+            nextChained.disableWriteMode();
+        } else if(isAssignable()) {
+            isWriteMode = false;
+        }
+    }
+
     protected Class getClassAssociatedToType(Type type) throws SemanticException {
         Class classAssociated = SymbolTable.getInstance().getClassById(type.getType());
 

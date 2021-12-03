@@ -21,14 +21,18 @@ public class Method extends EntityWithType {
     protected final List<Parameter> parametersInOrder;
     protected BlockSentenceNodeImpl bodyBlock;
     protected Class classContainer;
-    protected Label label;
+    protected Label beginMethodLabel;
+    protected Label endMethodLabel;
+    protected boolean codeWasGenerated;
 
     public Method(Token identifierToken, Type returnType, MethodForm methodForm) {
         super(identifierToken, returnType);
         this.methodForm = methodForm;
         this.parameters = new EntityTable<>();
         this.parametersInOrder = new ArrayList<>();
-        this.label = null;
+        this.beginMethodLabel = null;
+        this.endMethodLabel = null;
+        this.codeWasGenerated = false;
     }
 
     public Parameter getParameterById(String parameterId) {
@@ -100,17 +104,19 @@ public class Method extends EntityWithType {
     }
 
     public void generate() throws CodeGeneratorException {
-        createLabelIfDoesNotExist();
+        if(!codeWasGenerated){
+            createLabelIfDoesNotExist();
 
-        SymbolTable.getInstance().appendInstruction(new Instruction(CodeSection.CODE));
-        initMethodRA();
-        bodyBlock.generate();
-        finishMethodRA();
+            initMethodRA();
+            bodyBlock.generate();
+            finishMethodRA();
+            codeWasGenerated = true;
+        }
     }
 
     private void initMethodRA() throws CodeGeneratorException {
         Instruction firstInstruction = new Instruction(ZeroArgumentInstruction.LOADFP);
-        firstInstruction.setLabel(label);
+        firstInstruction.setLabel(beginMethodLabel);
         SymbolTable.getInstance().appendInstruction(firstInstruction);
 
         SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.LOADSP));
@@ -118,26 +124,36 @@ public class Method extends EntityWithType {
     }
 
     private void finishMethodRA() throws CodeGeneratorException {
-        if(SymbolTable.getInstance().getMainMethod() != this){
-            int spacesToFree = parameters.size();
+        int spacesToFree = parameters.size();
 
-            if(!methodForm.equals(MethodForm.STATIC)){
-                spacesToFree++;
-            }
-
-            SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.STOREFP));
-            SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.RET, spacesToFree));
+        if(!methodForm.equals(MethodForm.STATIC)){
+            spacesToFree++;
         }
+
+        Instruction beginToEndMethodInstruction = new Instruction(ZeroArgumentInstruction.STOREFP);
+        beginToEndMethodInstruction.setLabel(endMethodLabel);
+        SymbolTable.getInstance().appendInstruction(beginToEndMethodInstruction);
+        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.RET, spacesToFree));
     }
 
     public void createLabelIfDoesNotExist() {
-        if(label != null){
-            label = new Label(identifierToken.getLexema() +
+        if(beginMethodLabel == null){
+            beginMethodLabel = new Label(identifierToken.getLexema() +
                     "_" + classContainer.getIdentifierToken().getLexema());
+        }
+
+        if(endMethodLabel == null){
+            endMethodLabel = new Label(beginMethodLabel.getName() + "_end");
         }
     }
 
-    public Label getLabel() {
-        return label;
+    public Label getBeginMethodLabel() {
+        createLabelIfDoesNotExist();
+        return beginMethodLabel;
+    }
+
+    public Label getEndMethodLabel() {
+        createLabelIfDoesNotExist();
+        return endMethodLabel;
     }
 }

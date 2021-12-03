@@ -3,16 +3,17 @@ package ar.edu.uns.cs.minijava.semanticanalyzer;
 import ar.edu.uns.cs.minijava.codegenerator.CodeGenerator;
 import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
 import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
-import ar.edu.uns.cs.minijava.codegenerator.predefinedrutines.PredefinedRoutine;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.Label;
+import ar.edu.uns.cs.minijava.codegenerator.predefinedcode.routines.PredefinedRoutine;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Method;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.EntityAlreadyExistsException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
-import ar.edu.uns.cs.minijava.semanticanalyzer.predefinedclasses.Object;
-import ar.edu.uns.cs.minijava.semanticanalyzer.predefinedclasses.PredefinedClass;
-import ar.edu.uns.cs.minijava.semanticanalyzer.predefinedclasses.System;
+import ar.edu.uns.cs.minijava.codegenerator.predefinedcode.classes.object.Object;
+import ar.edu.uns.cs.minijava.codegenerator.predefinedcode.classes.PredefinedClass;
+import ar.edu.uns.cs.minijava.codegenerator.predefinedcode.classes.system.System;
 import ar.edu.uns.cs.minijava.semanticanalyzer.utils.EntityTable;
 
 import java.io.IOException;
@@ -27,25 +28,21 @@ public class SymbolTable {
     private EntityTable<String, Class> classes;
     private Map.Entry<Class, Method> mainMethod;
     private CodeGenerator codeGenerator;
-    private final List<PredefinedClass> predefinedClasses;
 
     private SymbolTable() {
         context = new Context();
         classes = new EntityTable<>();
         mainMethod = null;
-        predefinedClasses = new ArrayList<>();
     }
 
     public void initialize(String outputPath) throws IOException {
+        codeGenerator = new CodeGenerator(outputPath);
+
         PredefinedClass object = new Object();
         object.addClassToSymbolTable();
-        predefinedClasses.add(object);
 
         PredefinedClass system = new System();
         system.addClassToSymbolTable();
-        predefinedClasses.add(system);
-
-        codeGenerator = new CodeGenerator(outputPath);
     }
 
     public static SymbolTable getInstance(){
@@ -64,7 +61,7 @@ public class SymbolTable {
         classes.putAndCheck(identifier, clazz);
     }
 
-    public void checkDeclarations() throws SemanticException {
+    public void checkDeclarations() throws SemanticException, CodeGeneratorException {
         if(mainMethod == null){
             throw new SemanticException(new Token(TokenName.IDENTIFICADOR_DE_METODO_O_VARIABLE, "main", 0),
                     "No se encontró el método main definido en ninguna clase.");
@@ -110,15 +107,17 @@ public class SymbolTable {
         return codeGenerator.getMalloc();
     }
 
-    public void generate() throws CodeGeneratorException {
+    public void generate() throws CodeGeneratorException, IOException {
         codeGenerator.init();
-
-        for (PredefinedClass predefinedClass : predefinedClasses) {
-            predefinedClass.getClassCreated().generate();
-        }
 
         for (Class clazz : classes.values()) {
             clazz.generate();
         }
+
+        codeGenerator.close();
+    }
+
+    public Label getUniqueLabel() {
+        return codeGenerator.getUniqueLabel();
     }
 }

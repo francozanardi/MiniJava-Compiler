@@ -20,6 +20,6 @@ public class PlusUnaryExpressionNode extends UnaryExpressionNode {
 
     @Override
     public void generate() throws CodeGeneratorException {
-
+        operand.generate();
     }
 }

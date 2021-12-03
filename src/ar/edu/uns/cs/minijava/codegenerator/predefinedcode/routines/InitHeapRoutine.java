@@ -1,4 +1,4 @@
-package ar.edu.uns.cs.minijava.codegenerator.predefinedrutines;
+package ar.edu.uns.cs.minijava.codegenerator.predefinedcode.routines;
 
 import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
 import ar.edu.uns.cs.minijava.codegenerator.instructions.Label;

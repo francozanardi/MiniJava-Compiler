@@ -62,4 +62,12 @@ public abstract class BlockSentenceNode extends SentenceNode {
     }
 
     public abstract int getLocalVariablesNumberInMethod();
+
+    public int getCurrentMemoryReservedInMethod() {
+        if(containerBlock != null){
+            return containerBlock.getCurrentMemoryReservedInMethod() + getAmountOfMemoryReserved();
+        }
+
+        return getAmountOfMemoryReserved();
+    }
 }

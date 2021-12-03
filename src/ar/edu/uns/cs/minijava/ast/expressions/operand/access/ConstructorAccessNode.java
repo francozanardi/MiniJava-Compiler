@@ -35,7 +35,7 @@ public class ConstructorAccessNode extends MethodAccessNode {
 
     @Override
     public void generate() throws CodeGeneratorException {
-        saveReturnSpaceIfExists();
+        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.RMEM, 1));
         loadCIRSpace();
         loadMallocCall();
         associateVirtualTableToCIR();
@@ -73,7 +73,7 @@ public class ConstructorAccessNode extends MethodAccessNode {
 
     private void callConstructor() throws CodeGeneratorException {
         SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.PUSH,
-                searchMethodCalled().getLabel()));
+                searchMethodCalled().getBeginMethodLabel()));
         SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.CALL));
     }
 }

@@ -36,8 +36,19 @@ public abstract class TableWithOffsets<E extends EntityWithType> {
         table.add(e);
     }
 
-    public void setEntityInPosition(E e, int position){
-        table.set(position, e);
+    public void setEntityInPosition(E entity, int position){
+        if(position < table.size()){
+            table.set(position, entity);
+        }
+
+        addNullValuesUntilPositionNeeded(position);
+        table.add(entity);
+    }
+
+    private void addNullValuesUntilPositionNeeded(int position){
+        for(int i = 0; i < (position - table.size()); i++){
+            table.add(null);
+        }
     }
 
     public int getEntityPosition(E e){
@@ -52,5 +63,13 @@ public abstract class TableWithOffsets<E extends EntityWithType> {
 
     public Iterable<E> getIterable(){
         return table;
+    }
+
+    public boolean isEmpty(){
+        return table.isEmpty();
+    }
+
+    public void removeEntity(E entity){
+        table.remove(entity);
     }
 }

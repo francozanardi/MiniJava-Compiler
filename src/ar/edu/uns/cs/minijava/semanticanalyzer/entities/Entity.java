@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer.entities;
 
+import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 
@@ -14,5 +15,5 @@ public abstract class Entity {
         return this.identifierToken;
     }
 
-    public abstract void checkDeclarations() throws SemanticException;
+    public abstract void checkDeclarations() throws SemanticException, CodeGeneratorException;
 }

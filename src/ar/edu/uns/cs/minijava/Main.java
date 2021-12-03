@@ -50,23 +50,20 @@ public class Main {
 
     private static void startSyntaxAndSemanticAnalyzer(SyntaxAnalyzer syntaxAnalyzer){
         try {
-            try {
-                SymbolTable.getInstance().initialize(outputPath);
-
-                syntaxAnalyzer.initGrammar();
-
-                SymbolTable.getInstance().checkDeclarations();
-                SymbolTable.getInstance().checkSentences();
-                infoDisplay.showSuccess();
-            } catch (CompilerException compilerException) {
-                infoDisplay.showCompilerException(compilerException);
-            }
-
             SymbolTable.getInstance().reloadSymbolTable(outputPath);
+
+            syntaxAnalyzer.initGrammar();
+
+            SymbolTable.getInstance().checkDeclarations();
+            SymbolTable.getInstance().checkSentences();
+
+            SymbolTable.getInstance().generate();
+            infoDisplay.showSuccess();
+        } catch (CompilerException compilerException) {
+            infoDisplay.showCompilerException(compilerException);
         } catch (IOException ioException) {
             infoDisplay.showErrorWritingFile(ioException);
         }
-
     }
 
     @Deprecated

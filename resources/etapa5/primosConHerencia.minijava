@@ -1,0 +1,68 @@
+class Test {
+	static void main() {
+		System s = new System();
+		A primeCalculator = new B();
+
+		for(int i = 0; i < 100; i++){
+			if(primeCalculator.esPrimo(i)){
+				s.printI(i);
+				s.printSln(" es primo!");
+			} else {
+				s.printI(i);
+				s.printSln(" NO es primo!");
+			}
+		}
+	}
+}
+
+class A {
+	dynamic boolean esPrimo(int n){
+		if(n < 2)
+			return false;
+		
+		if(n == 2)
+			return true;
+		
+		if((n%2) == 0)
+			return false;
+		
+		for(int d = 3; d <= getMaxiumFactorOfTheMiniumPossibleFactors(n); d = d+2){
+			if((n%d) == 0){
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	dynamic int getMaxiumFactorOfTheMiniumPossibleFactors(int n){
+		return n-1;
+	}
+}
+
+class B extends A {
+	private Math math;
+	
+	B(){
+		math = new Math();
+	}
+	
+	dynamic int getMaxiumFactorOfTheMiniumPossibleFactors(int n){
+		return math.ceilOfSqrt(n);
+	}
+}
+
+
+class Math {
+	static int ceilOfSqrt(int x){
+		if ((x == 0) || (x == 1))
+			return x;
+ 
+		int i = 1;
+		for(int result = 1; result < x; result = i*i) {
+			i++;
+		}
+		
+		return i;
+	}
+}

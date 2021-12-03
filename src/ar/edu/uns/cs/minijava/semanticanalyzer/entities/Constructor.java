@@ -30,6 +30,6 @@ public class Constructor extends Method {
     public void setClassContainer(Class classContainer) {
         super.setClassContainer(classContainer);
 
-        label = new Label("constructor_" + classContainer.getIdentifierToken().getLexema());
+        beginMethodLabel = new Label("constructor_" + classContainer.getIdentifierToken().getLexema());
     }
 }

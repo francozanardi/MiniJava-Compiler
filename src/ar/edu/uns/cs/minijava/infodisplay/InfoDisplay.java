@@ -25,7 +25,7 @@ public class InfoDisplay {
     }
 
     public void showFileNotSpecified(){
-        System.out.println("Debe especificar un archivo fuente");
+        System.out.println("Debe especificar un archivo fuente y el nombre del archivo a crear.");
     }
 
     public void showToken(Token token){
