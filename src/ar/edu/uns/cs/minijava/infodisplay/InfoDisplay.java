@@ -10,12 +10,25 @@ import java.io.IOException;
 
 public class InfoDisplay {
 
-    public void mostrarErrorAlLeerArchivo(IOException error) {
-        System.out.println("Se ha producido un error al intentar leer el archivo");
+    public void showErrorReadingFile(IOException error) {
+        System.out.println("Se ha producido un error al intentar leer el archivo.");
         System.out.println(error.getMessage());
     }
 
-    public void mostrarToken(Token token){
+    public void showErrorWritingFile(IOException error) {
+        System.out.println("Se ha producido un error al intentar escribir en el archivo de salida.");
+        System.out.println(error.getMessage());
+    }
+
+    public void showFileNotFoundError(){
+        System.out.println("No se ha encontrado el archivo fuente especificado");
+    }
+
+    public void showFileNotSpecified(){
+        System.out.println("Debe especificar un archivo fuente y el nombre del archivo a crear.");
+    }
+
+    public void showToken(Token token){
         String tokenInfo = "(" +
                 token.getTokenName() +
                 "," +
@@ -32,7 +45,7 @@ public class InfoDisplay {
         System.out.println("[SinErrores]");
     }
 
-    public void mostrarCantidadErrores(int cantidadErrores) {
+    public void showNumberOfErrors(int cantidadErrores) {
         System.out.println();
         System.out.println("Se ha" +
                 (cantidadErrores != 1 ? "n" : "") +

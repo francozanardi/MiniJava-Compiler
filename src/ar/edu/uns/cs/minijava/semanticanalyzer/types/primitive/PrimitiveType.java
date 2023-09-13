@@ -11,4 +11,9 @@ public abstract class PrimitiveType extends Type {
     public boolean requireCheckExistence() {
         return false;
     }
+
+    @Override
+    public boolean isSubtypeOf(Type superType) {
+        return this.equals(superType);
+    }
 }

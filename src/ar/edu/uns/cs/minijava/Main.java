@@ -15,25 +15,22 @@ import java.util.Optional;
 
 public class Main {
     private static InfoDisplay infoDisplay;
-    private static final Boolean SYNTAX_ANALYZER_ENABLED = true;
+    private static String outputPath;
 
     public static void main(String[] args){
         infoDisplay = new InfoDisplay();
 
-        if(args.length == 1){
-            if(SYNTAX_ANALYZER_ENABLED){
-                createLexicalAnalyzer(args[0])
-                        .map(SyntaxAnalyzer::new)
-                        .ifPresent(Main::startSyntaxAndSemanticAnalyzer);
-            } else {
-                createLexicalAnalyzer(args[0]).ifPresent(Main::searchTokens);
-            }
+        if(args.length == 2){
+            outputPath = args[1];
+
+            createLexicalAnalyzer(args[0])
+                    .map(SyntaxAnalyzer::new)
+                    .ifPresent(Main::startSyntaxAndSemanticAnalyzer);
 
         } else {
-            System.out.println("Debe especificar un archivo fuente");
+            infoDisplay.showFileNotSpecified();
         }
     }
-
 
     private static Optional<LexicalAnalyzer> createLexicalAnalyzer(String pathname){
         GestorDeSource gestorDeSource;
@@ -43,35 +40,40 @@ public class Main {
             gestorDeSource = new GestorDeSource(pathname);
             lexicalAnalyzer = new LexicalAnalyzer(gestorDeSource);
         } catch (FileNotFoundException e) {
-            System.out.println("No se ha encontrado el archivo fuente especificado");
+            infoDisplay.showFileNotFoundError();
         } catch (IOException e) {
-            infoDisplay.mostrarErrorAlLeerArchivo(e);
+            infoDisplay.showErrorReadingFile(e);
         }
 
         return Optional.ofNullable(lexicalAnalyzer);
     }
 
-
     private static void startSyntaxAndSemanticAnalyzer(SyntaxAnalyzer syntaxAnalyzer){
         try {
+            SymbolTable.getInstance().reloadSymbolTable(outputPath);
+
             syntaxAnalyzer.initGrammar();
+
             SymbolTable.getInstance().checkDeclarations();
+            SymbolTable.getInstance().checkSentences();
+
+            SymbolTable.getInstance().generate();
             infoDisplay.showSuccess();
         } catch (CompilerException compilerException) {
             infoDisplay.showCompilerException(compilerException);
+        } catch (IOException ioException) {
+            infoDisplay.showErrorWritingFile(ioException);
         }
-
-        SymbolTable.getInstance().emptySymbolTable();
     }
 
-
+    @Deprecated
     private static void searchTokens(LexicalAnalyzer lexicalAnalyzer){
         int cantidadErrores = 0;
         Token token = new Token(null, "", 0);
         do {
             try {
                 token = lexicalAnalyzer.nextToken();
-                infoDisplay.mostrarToken(token);
+                infoDisplay.showToken(token);
             } catch (LexicalException lexicalException) {
                 infoDisplay.showCompilerException(lexicalException);
                 cantidadErrores++;
@@ -80,7 +82,7 @@ public class Main {
         } while (!token.getTokenName().equals(TokenName.EOF));
 
         if(cantidadErrores > 0)
-            infoDisplay.mostrarCantidadErrores(cantidadErrores);
+            infoDisplay.showNumberOfErrors(cantidadErrores);
         else
             infoDisplay.showSuccess();
     }

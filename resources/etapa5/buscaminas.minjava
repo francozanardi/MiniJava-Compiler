@@ -1,0 +1,516 @@
+class Main {
+	static void main() {		
+		Game game = new Game();
+	}
+}
+
+class Game {
+	private Random random;
+	private System system;
+	private Board board;
+	private MineGenerator mineGenerator;
+	
+	Game() {
+		system = new System();
+		greet();
+		initRandom();
+		
+		mineGenerator = new MineGenerator(random, this);
+		board = new Board(mineGenerator);
+		startGame();
+	}
+	
+	dynamic void greet(){
+		system.printSln("Welcome to Minesweeper in MiniJava");
+	}
+	
+	dynamic void initRandom() {
+		system.printS("Input a random number: "); //really can be any character
+		
+		int seedModifier = 0;
+		for(int c = system.read(); c != 10; c = system.read()) { // 10 is the \n character
+			seedModifier = seedModifier + c;
+		}
+		system.println();
+		
+		random = new Random(seedModifier);
+	}
+	
+	dynamic void startGame() {
+		boolean winning = true;
+		for(int i = 0; winning && board.thereIsOpenableCells(); i++) {
+			board.updateAndShowBoard();
+			if(board.thereIsOpenableCells()){
+				CellPosition position = readMovement();
+				winning = board.openCellInPosition(position);
+			}
+		}
+		
+		showFinishGameMessage(winning);
+	}
+	
+	dynamic CellPosition readMovement() {
+		system.printS("Input your movement [row-col, i.e: 5-3]: ");
+		
+		int row = system.read()-48;
+		int trash = system.read(); //limpiamos -
+		int col = system.read()-48;
+		trash = system.read(); //limpiamos \r (asumimos windows)
+		trash = system.read(); //limpiamos \n 
+		
+		system.println();
+		
+		return new CellPosition(row, col);
+	}
+	
+	dynamic void showFinishGameMessage(boolean won) {
+		if(won) {
+			system.printSln("You won! Congratulations :)");
+		} else {
+			board.updateAndShowBoard();
+			system.printSln("Ohhhh, try again :(");
+		}
+	}
+	
+	dynamic Board getBoard() {
+		return board;
+	}
+}
+
+class Cell {
+	private boolean isMine;
+	private boolean isOpen;
+	private CellPosition position;
+	private Board board;
+	
+	Cell(boolean isMine, CellPosition position, Board board) {
+		this.isMine = isMine;
+		this.position = position;
+		this.isOpen = false;
+		this.board = board;
+	}
+	
+	dynamic boolean isMine() {
+		return isMine;
+	}
+	
+	dynamic boolean isOpen() {
+		return isOpen;
+	}
+	
+	dynamic CellPosition getPosition() {
+		return position;
+	}
+	
+	dynamic void open() {
+		isOpen = true;
+	}
+}
+
+class CellPosition {
+	private int row;
+	private int column;
+	
+	CellPosition(int row, int column) {
+		this.row = row;
+		this.column = column;
+	}
+	
+	dynamic int getRow() {
+		return row;
+	}
+	
+	dynamic int getColumn() {
+		return column;
+	}
+}
+
+class Board {
+	private LinkedList board;
+	private MineGenerator mineGenerator;
+	private System system;
+	private int rowsNumber;
+	private boolean thereIsOpenableCells;
+	
+	Board(MineGenerator mineGenerator) {
+		this.rowsNumber = 8;
+		
+		this.mineGenerator = mineGenerator;
+		this.board = new LinkedList();
+		this.system = new System();
+		
+		this.thereIsOpenableCells = true;
+		
+		fillBoard();
+	}
+	
+	dynamic void fillBoard() {
+		for(int i = 0; i < rowsNumber; i++) {
+			LinkedList row = new LinkedList();
+			
+			for(int j = 0; j < rowsNumber; j++) {
+				row.appendElement(mineGenerator.getNextCell(new CellPosition(i, j)));
+			}
+			
+			board.appendElement(row);
+			Object rowadded = board.getLast();
+		}
+	}
+	
+	dynamic Cell getCellInPosition(int row, int col) {
+		if(isIndexOutsideOfBoard(row) || isIndexOutsideOfBoard(col))
+			return null;
+		
+		LinkedList rowList = (LinkedList)board.getElementInPosition(row);
+		return (Cell)rowList.getElementInPosition(col);
+	}
+	
+	dynamic boolean isIndexOutsideOfBoard(int index) {
+		if((index < 0) || (index >= rowsNumber))
+			return true;
+		
+		return false;
+	}
+	
+	dynamic int getMinesNumberAroundOf(CellPosition position) {
+		return
+			countMineInPosition(position.getRow()-1, position.getColumn()-1) +
+			countMineInPosition(position.getRow()-1, position.getColumn()) +
+			countMineInPosition(position.getRow()-1, position.getColumn()+1) +
+			countMineInPosition(position.getRow(), position.getColumn()-1) +
+			countMineInPosition(position.getRow(), position.getColumn()+1) +
+			countMineInPosition(position.getRow()+1, position.getColumn()-1) +
+			countMineInPosition(position.getRow()+1, position.getColumn()) +
+			countMineInPosition(position.getRow()+1, position.getColumn()+1);
+	}
+
+	//return 1 if there is a mine, 0 otherwise
+	dynamic int countMineInPosition(int row, int column) {
+		Cell cell = getCellInPosition(row, column);
+		
+		if(cell != null) {
+			if(cell.isMine()){
+				return 1;
+			}
+		}
+		
+		return 0;
+	}
+	
+	dynamic void updateAndShowBoard() {
+		thereIsOpenableCells = false;
+		
+		showColumnsNumber();
+		for(int i = 0; i < rowsNumber; i++) {
+			LinkedList row = (LinkedList)board.getElementInPosition(i);
+			showRowNumber(i);
+			for(int j = 0; j < rowsNumber; j++) {
+				Cell cell = (Cell)row.getElementInPosition(j);
+				showCell(cell);
+				checkIfCellIsOpenable(cell);
+			}
+			
+			system.println();
+		}
+		system.println();
+	}
+	
+	dynamic void showColumnsNumber() {
+		system.printS("    ");
+		
+		for(int col = 0; col < rowsNumber; col++) {
+			system.printS("|");
+			system.printI(col);
+			system.printS("|");
+		}
+		
+		system.println();
+		system.printS("    ");
+		
+		for(int col = 0; col < rowsNumber; col++) {				
+			system.printS("---");
+		}
+		
+		system.println();
+	}
+	
+	dynamic void showRowNumber(int row) {
+		system.printS("|");
+		system.printI(row);
+		system.printS("| ");
+	}
+	
+	dynamic void showCell(Cell cell) {
+		if(!cell.isOpen()) {
+			system.printS("[x]");
+		} else {
+			if(cell.isMine()) {
+				system.printS("[*]");
+			} else {
+				system.printS("[");
+				system.printI(getMinesNumberAroundOf(cell.getPosition()));
+				system.printS("]");
+			}
+		}
+	}
+	
+	dynamic void checkIfCellIsOpenable(Cell cell) {
+		if(!cell.isOpen() && !cell.isMine()) {
+			thereIsOpenableCells = true;
+		}
+	}
+	
+	dynamic boolean openCellInPosition(CellPosition position) {
+		Cell cell = getCellInPosition(position.getRow(), position.getColumn());
+		
+		if(cell == null) { //wrong position
+			return true;
+		}
+		
+		if(cell.isMine()) {
+			cell.open();
+			return false;
+		}
+		
+		if(cell.isOpen()) { //position already open
+			return true;
+		}
+		
+		openAdjacentsWithZeroMinesIfHasZeroMines(position.getRow(), position.getColumn());
+		cell.open();
+		return true;
+	}
+	
+	dynamic void openAdjacentsWithZeroMines(int row, int col) {
+		openAdjacentsWithZeroMinesIfHasZeroMines(row-1, col-1);
+		openAdjacentsWithZeroMinesIfHasZeroMines(row-1, col);
+		openAdjacentsWithZeroMinesIfHasZeroMines(row-1, col+1);
+		openAdjacentsWithZeroMinesIfHasZeroMines(row, col-1);
+		openAdjacentsWithZeroMinesIfHasZeroMines(row, col+1);
+		openAdjacentsWithZeroMinesIfHasZeroMines(row+1, col-1);
+		openAdjacentsWithZeroMinesIfHasZeroMines(row+1, col);
+		openAdjacentsWithZeroMinesIfHasZeroMines(row+1, col+1);
+	}
+	
+	dynamic void openAdjacentsWithZeroMinesIfHasZeroMines(int row, int col) {
+		CellPosition position = new CellPosition(row, col);
+		
+		if(getMinesNumberAroundOf(position) == 0) {
+			Cell cell = getCellInPosition(row, col);
+			if(cell != null) {
+				if(cell.isMine() || cell.isOpen()){
+					return;
+				}
+		
+				cell.open();
+				openAdjacentsWithZeroMines(row, col);
+			}
+		}
+	}
+	
+	dynamic boolean thereIsOpenableCells() {
+		return thereIsOpenableCells;
+	}
+}
+
+class MineGenerator {
+	private int difficulty;
+	private Random random;
+	private Game game;
+	
+	MineGenerator(Random random, Game game) {
+		setDifficultyToEasy();
+		this.random = random;
+		this.game = game;
+	}
+	
+	dynamic void setDifficultyToEasy() {
+		this.difficulty = 0;
+	}
+	
+	dynamic void setDifficultyToMedium() {
+		this.difficulty = 10;
+	}
+	
+	dynamic void setDifficultyToHard() {
+		this.difficulty = 30;
+	}
+	
+	dynamic void setDifficultyToImpossible() {
+		this.difficulty = 50;
+	}
+	
+	dynamic Cell getNextCell(CellPosition position) {
+		return new Cell(decideIfIsMine(position), position, game.getBoard());
+	}
+	
+	//true if is mine, false otherwise
+	dynamic boolean decideIfIsMine(CellPosition position) {
+		int modifier = random.getAGoodModifierWithTwoArguments(position.getRow(), position.getColumn());
+		int randomNumber = random.generateRandomNumberBetween(0, 127, modifier);
+		//if we choose a "big" coprime number is easier to avoid sequences
+		
+		return randomNumber < (25 + difficulty);
+	}
+}
+
+class Math {
+	static int abs(int x) {
+		if(x < 0)
+			return x*(-1);
+		
+		return x;
+	}
+	
+	static int max(int a, int b) {	
+		if(b > a){
+			return b;
+		}
+		
+		return a;
+	}
+	
+	static int min(int a, int b) {	
+		if(b < a){
+			return b;
+		}
+		
+		return a;
+	}
+}
+
+// No tiene nada de random, pero es para simplificar las cosas
+class Random {
+	private int initSeed;
+	private int factorRandomizador;
+	
+	private int currentSeed;
+	private Math math;
+	
+	Random(int initialSeedModifier) {
+		this.initSeed = 131071; // a "big" number to have a big initial range
+		this.factorRandomizador = 8191; // a factor to modify the current seed
+		
+		this.currentSeed = initSeed + initialSeedModifier;	
+		this.math = new Math();
+	}
+	
+	// include 'a', but exclude 'b'.
+	dynamic int generateRandomNumberBetween(int a, int b, int modifier) {	
+		int max = math.max(a, b);
+		int min = math.min(a, b);
+		int difference = max - min;
+		
+		int randomNumber = (currentSeed % difference);
+		
+		randomizarSeed(modifier);
+		return randomNumber + min;
+	}
+	
+	dynamic void randomizarSeed(int randomizador) {
+		this.currentSeed = this.currentSeed + randomizador;
+	}
+	
+	dynamic int getAGoodModifierWithTwoArguments(int a, int b) {
+		return a + b + factorRandomizador + 1;
+	}
+}
+
+class LinkedList {
+	private int size;
+	private ListItem head;
+	private ListItem tail;
+	
+	LinkedList() {
+		this.size = 0;
+		this.head = null;
+		this.tail = null;
+	}
+	
+	dynamic void appendElement(Object element) {
+		if(head == null) {
+			head = new ListItem(element, null, null);
+			tail = head;
+		} else {
+			ListItem newTail = new ListItem(element, tail, null);
+			tail.setNext(newTail);
+			tail = newTail;
+		}
+		
+		size++;
+	}
+	
+	dynamic void setElementInPosition(int pos, Object newElement) {
+		ListItem pointer = head;
+		for(int i = 0; i < pos; i++) {
+			if(pointer == null) {
+				return;
+			}
+			
+			pointer = pointer.getNext();
+		}
+		
+		pointer.setElement(newElement);
+	}
+	
+	dynamic Object getElementInPosition(int pos) {
+		ListItem pointer = head;
+		for(int i = 0; i < pos; i++) {
+			if(pointer == null) {
+				return null;
+			}
+			
+			pointer = pointer.getNext();
+		}
+		
+		return pointer.getElement();
+	}
+	
+	dynamic Object getFirst() {
+		return head.getElement();
+	}
+	
+	dynamic Object getLast() {
+		return tail.getElement();
+	}
+	
+	dynamic int getSize() {
+		return size;
+	}
+}
+
+class ListItem {
+	private Object element;
+	private ListItem nextItem;
+	private ListItem prevItem;
+	
+	ListItem(Object element, ListItem prev, ListItem next) {
+		this.element = element;
+		nextItem = next;
+		prevItem = prev;
+	}
+	
+	dynamic Object getElement() {
+		return this.element;
+	}
+	
+	dynamic ListItem getNext() {
+		return this.nextItem;
+	}
+	
+	dynamic ListItem getPrev() {
+		return this.prevItem;
+	}
+	
+	dynamic void setNext(ListItem next) {
+		nextItem = next;
+	}
+	
+	dynamic void setPrev(ListItem prev) {
+		prevItem = prev;
+	}
+	
+	dynamic void setElement(Object element) {
+		this.element = element;
+	}
+}

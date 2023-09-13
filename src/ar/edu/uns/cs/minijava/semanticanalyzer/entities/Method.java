@@ -1,6 +1,10 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer.entities;
 
+import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
+import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.*;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
+import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.EntityAlreadyExistsException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
@@ -15,13 +19,20 @@ public class Method extends EntityWithType {
     protected final EntityTable<String, Parameter> parameters;
     protected final MethodForm methodForm;
     protected final List<Parameter> parametersInOrder;
+    protected BlockSentenceNodeImpl bodyBlock;
     protected Class classContainer;
+    protected Label beginMethodLabel;
+    protected Label endMethodLabel;
+    protected boolean codeWasGenerated;
 
     public Method(Token identifierToken, Type returnType, MethodForm methodForm) {
         super(identifierToken, returnType);
         this.methodForm = methodForm;
         this.parameters = new EntityTable<>();
         this.parametersInOrder = new ArrayList<>();
+        this.beginMethodLabel = null;
+        this.endMethodLabel = null;
+        this.codeWasGenerated = false;
     }
 
     public Parameter getParameterById(String parameterId) {
@@ -35,6 +46,13 @@ public class Method extends EntityWithType {
     public void appendParameter(String identifier, Parameter parameter) throws EntityAlreadyExistsException {
         this.parameters.putAndCheck(identifier, parameter);
         parameter.setPosition(parametersInOrder.size());
+
+        if(methodForm.equals(MethodForm.STATIC)){
+            parameter.setOffset(parametersInOrder.size() + 3);
+        } else {
+            parameter.setOffset(parametersInOrder.size() + 4);
+        }
+
         parametersInOrder.add(parameter);
     }
 
@@ -57,8 +75,20 @@ public class Method extends EntityWithType {
         }
     }
 
+    public void checkSentences() throws SemanticException {
+        bodyBlock.check();
+    }
+
     public int getParameterNumber(){
         return parametersInOrder.size();
+    }
+
+    public BlockSentenceNodeImpl getBodyBlock() {
+        return bodyBlock;
+    }
+
+    public void setBodyBlock(BlockSentenceNodeImpl bodyBlock) {
+        this.bodyBlock = bodyBlock;
     }
 
     public Class getClassContainer() {
@@ -71,5 +101,59 @@ public class Method extends EntityWithType {
 
     public boolean canHasReturn(){
         return true;
+    }
+
+    public void generate() throws CodeGeneratorException {
+        if(!codeWasGenerated){
+            createLabelIfDoesNotExist();
+
+            initMethodRA();
+            bodyBlock.generate();
+            finishMethodRA();
+            codeWasGenerated = true;
+        }
+    }
+
+    private void initMethodRA() throws CodeGeneratorException {
+        Instruction firstInstruction = new Instruction(ZeroArgumentInstruction.LOADFP);
+        firstInstruction.setLabel(beginMethodLabel);
+        SymbolTable.getInstance().appendInstruction(firstInstruction);
+
+        SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.LOADSP));
+        SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.STOREFP));
+    }
+
+    private void finishMethodRA() throws CodeGeneratorException {
+        int spacesToFree = parameters.size();
+
+        if(!methodForm.equals(MethodForm.STATIC)){
+            spacesToFree++;
+        }
+
+        Instruction beginToEndMethodInstruction = new Instruction(ZeroArgumentInstruction.STOREFP);
+        beginToEndMethodInstruction.setLabel(endMethodLabel);
+        SymbolTable.getInstance().appendInstruction(beginToEndMethodInstruction);
+        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.RET, spacesToFree));
+    }
+
+    public void createLabelIfDoesNotExist() {
+        if(beginMethodLabel == null){
+            beginMethodLabel = new Label(identifierToken.getLexema() +
+                    "_" + classContainer.getIdentifierToken().getLexema());
+        }
+
+        if(endMethodLabel == null){
+            endMethodLabel = new Label(beginMethodLabel.getName() + "_end");
+        }
+    }
+
+    public Label getBeginMethodLabel() {
+        createLabelIfDoesNotExist();
+        return beginMethodLabel;
+    }
+
+    public Label getEndMethodLabel() {
+        createLabelIfDoesNotExist();
+        return endMethodLabel;
     }
 }

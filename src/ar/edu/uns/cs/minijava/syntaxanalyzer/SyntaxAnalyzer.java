@@ -1,5 +1,22 @@
 package ar.edu.uns.cs.minijava.syntaxanalyzer;
 
+import ar.edu.uns.cs.minijava.ast.expressions.ExpressionNode;
+import ar.edu.uns.cs.minijava.ast.expressions.binaryexpressions.*;
+import ar.edu.uns.cs.minijava.ast.expressions.binaryexpressions.classtype.ComparatorBinaryExpressionNode;
+import ar.edu.uns.cs.minijava.ast.expressions.binaryexpressions.classtype.DistinctBinaryExpressionNode;
+import ar.edu.uns.cs.minijava.ast.expressions.binaryexpressions.primitivetype.*;
+import ar.edu.uns.cs.minijava.ast.expressions.operand.OperandNode;
+import ar.edu.uns.cs.minijava.ast.expressions.operand.access.*;
+import ar.edu.uns.cs.minijava.ast.expressions.operand.access.chained.ChainedNode;
+import ar.edu.uns.cs.minijava.ast.expressions.operand.access.chained.MethodChainedNode;
+import ar.edu.uns.cs.minijava.ast.expressions.operand.access.chained.VariableChainedNode;
+import ar.edu.uns.cs.minijava.ast.expressions.operand.literals.*;
+import ar.edu.uns.cs.minijava.ast.expressions.unaryexpressions.*;
+import ar.edu.uns.cs.minijava.ast.sentences.*;
+import ar.edu.uns.cs.minijava.ast.sentences.assignments.AssignmentNode;
+import ar.edu.uns.cs.minijava.ast.sentences.assignments.DecrementAssignmentNode;
+import ar.edu.uns.cs.minijava.ast.sentences.assignments.EqualAssignmentNode;
+import ar.edu.uns.cs.minijava.ast.sentences.assignments.IncrementAssignmentNode;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalAnalyzer;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
@@ -191,6 +208,7 @@ public class SyntaxAnalyzer {
 
             for(Token token : identifiers){
                 attribute = new Attribute(token, type, visibility);
+                attribute.setClassContainer(currentClass);
                 currentClass.addAttribute(token.getLexema(), attribute);
             }
         } else {
@@ -220,7 +238,9 @@ public class SyntaxAnalyzer {
                 constructor.appendParameter(parameter.getIdentifierToken().getLexema(), parameter);
             }
 
-            bloque();
+            BlockSentenceNodeImpl block = bloque();
+            constructor.setBodyBlock(block);
+            constructor.setClassContainer(currentClass);
 
             currentClass.setConstructor(constructor);
         } else {
@@ -241,7 +261,10 @@ public class SyntaxAnalyzer {
             match(IDENTIFICADOR_DE_METODO_O_VARIABLE);
 
             Class currentClass = SymbolTable.getInstance().getContext().getCurrentClass();
+
             Method method = new Method(methodIdentifier, type, methodForm);
+            method.setClassContainer(currentClass);
+
             SymbolTable.getInstance().getContext().setCurrentMethod(method);
 
             List<Parameter> parameters = argsFormales();
@@ -249,7 +272,8 @@ public class SyntaxAnalyzer {
                 method.appendParameter(parameter.getIdentifierToken().getLexema(), parameter);
             }
 
-            bloque();
+            BlockSentenceNodeImpl block = bloque();
+            method.setBodyBlock(block);
 
             currentClass.addMethod(methodIdentifier.getLexema(), method);
         } else {
@@ -493,22 +517,39 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void bloque() throws LexicalException, SyntaxException {
+    private BlockSentenceNodeImpl bloque() throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(LLAVE_ABRE);
 
         List<TokenName> tokensExpected = new ArrayList<>();
         tokensExpected.addAll(primerosDerivacion1);
 
-        if(primerosDerivacion1.contains(currentToken.getTokenName())){
+        if(primerosDerivacion1.contains(currentToken.getTokenName())) {
+            BlockSentenceNode currentBlock = SymbolTable.getInstance().getContext().getCurrentBlock();
+            Method currentMethod = SymbolTable.getInstance().getContext().getCurrentMethod();
+
+            Token blockBegin = currentToken;
             match(LLAVE_ABRE);
-            listaSentencias();
+
+            BlockSentenceNodeImpl block = new BlockSentenceNodeImpl(blockBegin, currentMethod, currentBlock);
+            SymbolTable.getInstance().getContext().setCurrentBlock(block);
+
+            List<SentenceNode> sentences = new ArrayList<>();
+            listaSentencias(sentences);
+
             match(LLAVE_CIERRA);
+
+            block.setSentences(sentences);
+
+            //volvemos a poner el bloque que estaba (bloque padre) como actual en el contexto
+            SymbolTable.getInstance().getContext().setCurrentBlock(currentBlock);
+
+            return block;
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void listaSentencias() throws LexicalException, SyntaxException {
+    private void listaSentencias(List<SentenceNode> sentences) throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(PUNTO_Y_COMA, BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE, RETURN_PR, IF_PR, FOR_PR, LLAVE_ABRE, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE);
         List<TokenName> siguientes = List.of(LLAVE_CIERRA);
 
@@ -517,8 +558,8 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(siguientes);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            sentencia();
-            listaSentencias();
+            sentences.add(sentencia());
+            listaSentencias(sentences);
         } else if(siguientes.contains(currentToken.getTokenName())){
 
         } else if(!currentToken.getTokenName().equals(EOF)){
@@ -526,7 +567,7 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void sentencia() throws LexicalException, SyntaxException {
+    private SentenceNode sentencia() throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(PUNTO_Y_COMA);
         List<TokenName> primerosDerivacion2 = List.of(BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE);
         List<TokenName> primerosDerivacion3 = List.of(RETURN_PR);
@@ -545,42 +586,50 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion7);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
+            Token emptySentence = currentToken;
             match(PUNTO_Y_COMA);
+            return new EmptySentenceNode(emptySentence);
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
-            varLocal();
+            LocalVariable localVariable = varLocal();
+
             match(PUNTO_Y_COMA);
+
+            return localVariable.getSentence();
         } else if(primerosDerivacion3.contains(currentToken.getTokenName())){
-            return_();
+            ReturnSentenceNode returnNode = return_();
             match(PUNTO_Y_COMA);
+
+            return returnNode;
         } else if(primerosDerivacion4.contains(currentToken.getTokenName())){
-            if_();
+            return if_();
         } else if(primerosDerivacion5.contains(currentToken.getTokenName())){
-            for_();
+            return for_();
         } else if(primerosDerivacion6.contains(currentToken.getTokenName())){
-            bloque();
+            return bloque();
         } else if(primerosDerivacion7.contains(currentToken.getTokenName())){
-            asignacionOLlamada();
+            SentenceNode sentence = asignacionOLlamada();
             match(PUNTO_Y_COMA);
+            return sentence;
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void asignacionOLlamada() throws LexicalException, SyntaxException {
+    private SentenceNode asignacionOLlamada() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE);
 
         List<TokenName> tokensExpected = new ArrayList<>();
         tokensExpected.addAll(primerosDerivacion1);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            acceso();
-            asignacionOLlamadaAux();
+            AccessNode access = acceso();
+            return asignacionOLlamadaAux(access);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void asignacionOLlamadaAux() throws LexicalException, SyntaxException {
+    private SentenceNode asignacionOLlamadaAux(AccessNode access) throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(ASIGNACION, INCREMENTOR, DECREMENTOR);
         List<TokenName> siguientes = List.of(PUNTO_Y_COMA);
 
@@ -589,29 +638,31 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(siguientes);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            tipoDeAsignacion();
+            return tipoDeAsignacion(access);
         } else if(siguientes.contains(currentToken.getTokenName())){
-
+            return new CallSentenceNode(access.getSentenceToken(), access);
         } else if(!currentToken.getTokenName().equals(EOF)){
             throw new SyntaxException(currentToken, tokensExpected);
         }
+
+        return null;
     }
 
-    private void asignacion() throws LexicalException, SyntaxException {
+    private AssignmentNode asignacion() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE);
 
         List<TokenName> tokensExpected = new ArrayList<>();
         tokensExpected.addAll(primerosDerivacion1);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            acceso();
-            tipoDeAsignacion();
+            AccessNode access = acceso();
+            return tipoDeAsignacion(access);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void tipoDeAsignacion() throws LexicalException, SyntaxException {
+    private AssignmentNode tipoDeAsignacion(AccessNode access) throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(ASIGNACION);
         List<TokenName> primerosDerivacion2 = List.of(INCREMENTOR);
         List<TokenName> primerosDerivacion3 = List.of(DECREMENTOR);
@@ -621,34 +672,53 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion2);
         tokensExpected.addAll(primerosDerivacion3);
 
+        Token assignationToken;
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
+            assignationToken = currentToken;
             match(ASIGNACION);
-            expresion();
+            ExpressionNode expression = expresion();
+            return new EqualAssignmentNode(assignationToken, access, expression);
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
+            assignationToken = currentToken;
             match(INCREMENTOR);
+            return new IncrementAssignmentNode(assignationToken, access);
         } else if(primerosDerivacion3.contains(currentToken.getTokenName())){
+            assignationToken = currentToken;
             match(DECREMENTOR);
+            return new DecrementAssignmentNode(assignationToken, access);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void varLocal() throws LexicalException, SyntaxException {
+    private LocalVariable varLocal() throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE);
 
         List<TokenName> tokensExpected = new ArrayList<>();
         tokensExpected.addAll(primerosDerivacion1);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            tipo();
+            Type type = tipo();
+            Token identifier = currentToken;
+
             match(IDENTIFICADOR_DE_METODO_O_VARIABLE);
-            varLocalAux();
+
+            LocalVariable localVariable = new LocalVariable(identifier, type);
+            varLocalAux(localVariable);
+
+            SymbolTable
+                    .getInstance()
+                    .getContext()
+                    .getCurrentBlock()
+                    .addLocalVariable(localVariable);
+
+            return localVariable;
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void varLocalAux() throws LexicalException, SyntaxException {
+    private void varLocalAux(LocalVariable localVariable) throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(ASIGNACION);
         List<TokenName> siguientes = List.of(PUNTO_Y_COMA);
 
@@ -658,7 +728,8 @@ public class SyntaxAnalyzer {
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             match(ASIGNACION);
-            expresion();
+            ExpressionNode expression = expresion();
+            localVariable.setExpressionAssigned(expression);
         } else if(siguientes.contains(currentToken.getTokenName())){
 
         } else if(!currentToken.getTokenName().equals(EOF)){
@@ -666,21 +737,27 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void return_() throws LexicalException, SyntaxException {
+    private ReturnSentenceNode return_() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(RETURN_PR);
 
         List<TokenName> tokensExpected = new ArrayList<>();
         tokensExpected.addAll(primerosDerivacion1);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
+            Token sentenceToken = currentToken;
             match(RETURN_PR);
-            expresionOVacio();
+            ExpressionNode expression = expresionOVacio();
+
+            return new ReturnSentenceNode(sentenceToken, expression,
+                    SymbolTable.getInstance().getContext().getCurrentMethod(),
+                    SymbolTable.getInstance().getContext().getCurrentBlock()
+            );
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void expresionOVacio() throws LexicalException, SyntaxException {
+    private ExpressionNode expresionOVacio() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(SUMA, RESTA, NEGACION, NULL_PR, TRUE_PR, FALSE_PR, ENTERO, CARACTER, STRING, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE);
         List<TokenName> siguientes = List.of(PUNTO_Y_COMA);
 
@@ -689,33 +766,49 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(siguientes);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            expresion();
+            return expresion();
         } else if(siguientes.contains(currentToken.getTokenName())){
-
+            return null;
         } else if(!currentToken.getTokenName().equals(EOF)){
             throw new SyntaxException(currentToken, tokensExpected);
         }
+
+        return null;
     }
 
-    private void if_() throws LexicalException, SyntaxException {
+    private IfSentenceNode if_() throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(IF_PR);
 
         List<TokenName> tokensExpected = new ArrayList<>();
         tokensExpected.addAll(primerosDerivacion1);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
+            Token sentenceToken = currentToken;
+            Method currentMethod = SymbolTable.getInstance().getContext().getCurrentMethod();
+            BlockSentenceNode currentBlock = SymbolTable.getInstance().getContext().getCurrentBlock();
             match(IF_PR);
             match(PARENTESIS_ABRE);
-            expresion();
+            ExpressionNode condition = expresion();
             match(PARENTESIS_CIERRA);
-            sentencia();
-            else_();
+
+            //estos bloques son wrappers para sentencias como declaraciones de variables globales.
+            //dado que si se declara una variable global como body de un if, no debería ser accesible fuera del scope de ese body.
+            BlockSentenceNodeImpl ifBlock = new BlockSentenceNodeImpl(sentenceToken, currentMethod, currentBlock);
+            SymbolTable.getInstance().getContext().setCurrentBlock(ifBlock);
+            SentenceNode ifBody = sentencia();
+
+            BlockSentenceNodeImpl elseBlock = new BlockSentenceNodeImpl(sentenceToken, currentMethod, currentBlock);
+            SymbolTable.getInstance().getContext().setCurrentBlock(elseBlock);
+            SentenceNode elseBody = else_();
+
+            SymbolTable.getInstance().getContext().setCurrentBlock(currentBlock); //volvemos al bloque original
+            return new IfSentenceNode(sentenceToken, condition, ifBody, elseBody);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void else_() throws LexicalException, SyntaxException {
+    private SentenceNode else_() throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(ELSE_PR);
         List<TokenName> siguientes = List.of(PUNTO_Y_COMA, BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, IDENTIFICADOR_DE_CLASE, RETURN_PR, IF_PR, FOR_PR, LLAVE_ABRE, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE, LLAVE_CIERRA, ELSE_PR);
 
@@ -725,50 +818,66 @@ public class SyntaxAnalyzer {
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             match(ELSE_PR);
-            sentencia();
+            return sentencia();
         } else if(siguientes.contains(currentToken.getTokenName())){
-
+            return null; //TODO: pensar si conviene reemplazarlo por EmptySentenceNode
         } else if(!currentToken.getTokenName().equals(EOF)){
             throw new SyntaxException(currentToken, tokensExpected);
         }
+
+        return null;
     }
 
-    private void for_() throws LexicalException, SyntaxException {
+    private ForSentenceNode for_() throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(FOR_PR);
 
         List<TokenName> tokensExpected = new ArrayList<>();
         tokensExpected.addAll(primerosDerivacion1);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
+            BlockSentenceNode currentBlock = SymbolTable.getInstance().getContext().getCurrentBlock();
+            Method currentMethod = SymbolTable.getInstance().getContext().getCurrentMethod();
+
+
+            Token forToken = currentToken;
             match(FOR_PR);
+
+            ForSentenceNode forNode = new ForSentenceNode(forToken, currentMethod, currentBlock);
+            SymbolTable.getInstance().getContext().setCurrentBlock(forNode);
+
             match(PARENTESIS_ABRE);
             varLocal();
             match(PUNTO_Y_COMA);
-            expresion();
+            forNode.setCondition(expresion());
             match(PUNTO_Y_COMA);
-            asignacion();
+            forNode.setAssignment(asignacion());
             match(PARENTESIS_CIERRA);
-            sentencia();
+            forNode.setBody(sentencia());
+
+            SymbolTable.getInstance().getContext().setCurrentBlock(currentBlock);
+            //volvemos a poner el bloque padre como bloque actual
+
+            return forNode;
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void expresion() throws LexicalException, SyntaxException {
+    private ExpressionNode expresion() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(SUMA, RESTA, NEGACION, NULL_PR, TRUE_PR, FALSE_PR, ENTERO, CARACTER, STRING, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE);
 
         List<TokenName> tokensExpected = new ArrayList<>();
         tokensExpected.addAll(primerosDerivacion1);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            expresionUnaria();
-            expresionBinaria();
+            UnaryExpressionNode leftExpression = expresionUnaria();
+            return expresionBinaria(leftExpression);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void expresionBinaria() throws LexicalException, SyntaxException {
+    private ExpressionNode expresionBinaria(UnaryExpressionNode leftExpression) throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(OR, AND, COMPARACION, DISTINTO, MENOR, MAYOR, MENOR_IGUAL, MAYOR_IGUAL, SUMA, RESTA, PRODUCTO, DIVISION, MODULO);
         List<TokenName> siguientes = List.of(PUNTO_Y_COMA, PARENTESIS_CIERRA, COMA);
 
@@ -777,17 +886,24 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(siguientes);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            operadorBinario();
-            expresionUnaria();
-            expresionBinaria();
-        } else if(siguientes.contains(currentToken.getTokenName())){
+            BinaryExpressionNode operator = operadorBinario();
+            operator.setLeftExpression(leftExpression);
 
+            UnaryExpressionNode rightExpression = expresionUnaria();
+            ExpressionNode extraExpression = expresionBinaria(rightExpression);
+            operator.setRightExpression(extraExpression);
+
+            return operator;
+        } else if(siguientes.contains(currentToken.getTokenName())){
+            return leftExpression;
         } else if(!currentToken.getTokenName().equals(EOF)){
             throw new SyntaxException(currentToken, tokensExpected);
         }
+
+        return null;
     }
 
-    private void operadorBinario() throws LexicalException, SyntaxException {
+    private BinaryExpressionNode operadorBinario() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(OR);
         List<TokenName> primerosDerivacion2 = List.of(AND);
         List<TokenName> primerosDerivacion3 = List.of(COMPARACION);
@@ -817,38 +933,65 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion12);
         tokensExpected.addAll(primerosDerivacion13);
 
+        Token operatorToken;
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(OR);
+            return new OrBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(AND);
+            return new AndBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion3.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(COMPARACION);
+            return new ComparatorBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion4.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(DISTINTO);
+            return new DistinctBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion5.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(MENOR);
+            return new LessBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion6.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(MAYOR);
+            return new GreaterBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion7.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(MENOR_IGUAL);
+            return new LessOrEqualBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion8.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(MAYOR_IGUAL);
+            return new GreaterOrEqualBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion9.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(SUMA);
+            return new PlusBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion10.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(RESTA);
+            return new MinusBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion11.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(PRODUCTO);
+            return new MultiplicationBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion12.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(DIVISION);
+            return new DivisionBinaryExpressionNode(operatorToken);
         } else if(primerosDerivacion13.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(MODULO);
+            return new ModuleBinaryExpressionNode(operatorToken);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void expresionUnaria() throws LexicalException, SyntaxException {
+    private UnaryExpressionNode expresionUnaria() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(SUMA, RESTA, NEGACION);
         List<TokenName> primerosDerivacion2 = List.of(NULL_PR, TRUE_PR, FALSE_PR, ENTERO, CARACTER, STRING, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE);
 
@@ -857,16 +1000,23 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion2);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            operadorUnario();
-            operando();
+            UnaryExpressionNode operator = operadorUnario();
+            OperandNode operand = operando();
+            operator.setOperand(operand);
+
+            return operator;
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
-            operando();
+            OperandNode operand = operando();
+            UnaryExpressionNode unaryExpression = new WithoutOperatorUnaryExpressionNode(operand.getSentenceToken());
+            unaryExpression.setOperand(operand);
+
+            return unaryExpression;
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void operadorUnario() throws LexicalException, SyntaxException {
+    private UnaryExpressionNode operadorUnario() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(SUMA);
         List<TokenName> primerosDerivacion2 = List.of(RESTA);
         List<TokenName> primerosDerivacion3 = List.of(NEGACION);
@@ -876,18 +1026,25 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion2);
         tokensExpected.addAll(primerosDerivacion3);
 
+        Token operatorToken;
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(SUMA);
+            return new PlusUnaryExpressionNode(operatorToken);
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(RESTA);
+            return new MinusUnaryExpressionNode(operatorToken);
         } else if(primerosDerivacion3.contains(currentToken.getTokenName())){
+            operatorToken = currentToken;
             match(NEGACION);
+            return new NegationUnaryExpressionNode(operatorToken);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void operando() throws LexicalException, SyntaxException {
+    private OperandNode operando() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(NULL_PR, TRUE_PR, FALSE_PR, ENTERO, CARACTER, STRING);
         List<TokenName> primerosDerivacion2 = List.of(THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE);
 
@@ -896,15 +1053,15 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion2);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            literal();
+            return literal();
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
-            acceso();
+            return acceso();
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void literal() throws LexicalException, SyntaxException {
+    private LiteralNode literal() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(NULL_PR);
         List<TokenName> primerosDerivacion2 = List.of(TRUE_PR);
         List<TokenName> primerosDerivacion3 = List.of(FALSE_PR);
@@ -920,24 +1077,37 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion5);
         tokensExpected.addAll(primerosDerivacion6);
 
+        Token literalToken;
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
+            literalToken = currentToken;
             match(NULL_PR);
+            return new NullLiteralNode(literalToken);
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
+            literalToken = currentToken;
             match(TRUE_PR);
+            return new TrueLiteralNode(literalToken);
         } else if(primerosDerivacion3.contains(currentToken.getTokenName())){
+            literalToken = currentToken;
             match(FALSE_PR);
+            return new FalseLiteralNode(literalToken);
         } else if(primerosDerivacion4.contains(currentToken.getTokenName())){
+            literalToken = currentToken;
             match(ENTERO);
+            return new IntLiteralNode(literalToken);
         } else if(primerosDerivacion5.contains(currentToken.getTokenName())){
+            literalToken = currentToken;
             match(CARACTER);
+            return new CharLiteralNode(literalToken);
         } else if(primerosDerivacion6.contains(currentToken.getTokenName())){
+            literalToken = currentToken;
             match(STRING);
+            return new StringLiteralNode(literalToken);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void acceso() throws LexicalException, SyntaxException {
+    private AccessNode acceso() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE);
         List<TokenName> primerosDerivacion2 = List.of(PARENTESIS_ABRE);
 
@@ -946,17 +1116,23 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion2);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            primarioSinExpresionParentizada();
-            encadenado();
+            AccessNode access = primarioSinExpresionParentizada();
+            ChainedNode chained = encadenado();
+            access.setChained(chained);
+
+            return access;
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
-            castingOExpresionParentizada();
-            encadenado();
+            AccessNode access = castingOExpresionParentizada();
+            ChainedNode chained = encadenado();
+            access.setChained(chained);
+
+            return access;
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void castingOExpresionParentizada() throws LexicalException, SyntaxException {
+    private AccessNode castingOExpresionParentizada() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(PARENTESIS_ABRE);
 
         List<TokenName> tokensExpected = new ArrayList<>();
@@ -964,13 +1140,13 @@ public class SyntaxAnalyzer {
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             match(PARENTESIS_ABRE);
-            castingOExpresionParentizadaAux();
+            return castingOExpresionParentizadaAux();
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void castingOExpresionParentizadaAux() throws LexicalException, SyntaxException {
+    private AccessNode castingOExpresionParentizadaAux() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(IDENTIFICADOR_DE_CLASE);
         List<TokenName> primerosDerivacion2 = List.of(SUMA, RESTA, NEGACION, NULL_PR, TRUE_PR, FALSE_PR, ENTERO, CARACTER, STRING, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE);
 
@@ -979,18 +1155,22 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion2);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
+            Token castingClass = currentToken;
             match(IDENTIFICADOR_DE_CLASE);
             match(PARENTESIS_CIERRA);
-            primarioConExpresionParentizada();
+            AccessNode access = primarioConExpresionParentizada();
+            access.setCastingType(new ReferenceType(castingClass.getLexema()));
+            return access;
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
-            expresion();
+            ExpressionNode expression = expresion();
             match(PARENTESIS_CIERRA);
+            return new ExpressionAccessNode(expression.getSentenceToken(), expression);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void primarioConExpresionParentizada() throws LexicalException, SyntaxException {
+    private AccessNode primarioConExpresionParentizada() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(PARENTESIS_ABRE);
         List<TokenName> primerosDerivacion2 = List.of(THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE);
 
@@ -999,15 +1179,16 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion2);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            expresionParentizada();
+            ExpressionNode expression = expresionParentizada();
+            return new ExpressionAccessNode(expression.getSentenceToken(), expression);
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
-            primarioSinExpresionParentizada();
+            return primarioSinExpresionParentizada();
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void primarioSinExpresionParentizada() throws LexicalException, SyntaxException {
+    private AccessNode primarioSinExpresionParentizada() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(THIS_PR);
         List<TokenName> primerosDerivacion2 = List.of(NEW_PR);
         List<TokenName> primerosDerivacion3 = List.of(IDENTIFICADOR_DE_METODO_O_VARIABLE);
@@ -1018,17 +1199,17 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion3);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            accesoThis();
+            return accesoThis();
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
-            accesoConstructor();
+            return accesoConstructor();
         } else if(primerosDerivacion3.contains(currentToken.getTokenName())){
-            accesoVarOMetodo();
+            return accesoVarOMetodo();
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void expresionParentizada() throws LexicalException, SyntaxException {
+    private ExpressionNode expresionParentizada() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(PARENTESIS_ABRE);
 
         List<TokenName> tokensExpected = new ArrayList<>();
@@ -1036,28 +1217,30 @@ public class SyntaxAnalyzer {
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             match(PARENTESIS_ABRE);
-            expresion();
+            ExpressionNode expression = expresion();
             match(PARENTESIS_CIERRA);
+            return expression;
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void accesoVarOMetodo() throws LexicalException, SyntaxException {
+    private AccessNode accesoVarOMetodo() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(IDENTIFICADOR_DE_METODO_O_VARIABLE);
 
         List<TokenName> tokensExpected = new ArrayList<>();
         tokensExpected.addAll(primerosDerivacion1);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
+            Token identifier = currentToken;
             match(IDENTIFICADOR_DE_METODO_O_VARIABLE);
-            accesoVarOMetodoAux();
+            return accesoVarOMetodoAux(identifier);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void accesoVarOMetodoAux() throws LexicalException, SyntaxException {
+    private AccessNode accesoVarOMetodoAux(Token identifier) throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(PARENTESIS_ABRE);
         List<TokenName> siguientes = List.of(PUNTO, ASIGNACION, INCREMENTOR, DECREMENTOR, PUNTO_Y_COMA, OR, AND, COMPARACION, DISTINTO, MENOR, MAYOR, MENOR_IGUAL, MAYOR_IGUAL, SUMA, RESTA, PRODUCTO, DIVISION, MODULO, PARENTESIS_CIERRA, COMA);
 
@@ -1066,28 +1249,33 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(siguientes);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            argsActuales();
+            List<ExpressionNode> parameters = argsActuales();
+            return new MethodAccessNode(identifier, SymbolTable.getInstance().getContext().getCurrentMethod(), parameters);
         } else if(siguientes.contains(currentToken.getTokenName())){
-
+            return new VariableAccessNode(identifier, SymbolTable.getInstance().getContext().getCurrentBlock());
         } else if(!currentToken.getTokenName().equals(EOF)){
             throw new SyntaxException(currentToken, tokensExpected);
         }
+
+        return null;
     }
 
-    private void accesoThis() throws LexicalException, SyntaxException {
+    private ThisAccessNode accesoThis() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(THIS_PR);
 
         List<TokenName> tokensExpected = new ArrayList<>();
         tokensExpected.addAll(primerosDerivacion1);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
+            Token thisToken = currentToken;
             match(THIS_PR);
+            return new ThisAccessNode(thisToken, SymbolTable.getInstance().getContext().getCurrentMethod());
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void accesoConstructor() throws LexicalException, SyntaxException {
+    private ConstructorAccessNode accesoConstructor() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(NEW_PR);
 
         List<TokenName> tokensExpected = new ArrayList<>();
@@ -1095,29 +1283,37 @@ public class SyntaxAnalyzer {
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             match(NEW_PR);
+            Token identifier = currentToken;
             match(IDENTIFICADOR_DE_CLASE);
-            argsActuales();
+
+            List<ExpressionNode> arguments = argsActuales();
+
+            return new ConstructorAccessNode(identifier, SymbolTable.getInstance().getContext().getCurrentMethod(), arguments);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void argsActuales() throws LexicalException, SyntaxException {
+    private List<ExpressionNode> argsActuales() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(PARENTESIS_ABRE);
 
         List<TokenName> tokensExpected = new ArrayList<>();
         tokensExpected.addAll(primerosDerivacion1);
 
+        List<ExpressionNode> arguments = new ArrayList<>();
+
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             match(PARENTESIS_ABRE);
-            listaExpsOVacio();
+            listaExpsOVacio(arguments);
             match(PARENTESIS_CIERRA);
+
+            return arguments;
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void listaExpsOVacio() throws LexicalException, SyntaxException {
+    private void listaExpsOVacio(List<ExpressionNode> arguments) throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(SUMA, RESTA, NEGACION, NULL_PR, TRUE_PR, FALSE_PR, ENTERO, CARACTER, STRING, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE);
         List<TokenName> siguientes = List.of(PARENTESIS_CIERRA);
 
@@ -1126,7 +1322,7 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(siguientes);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            listaExps();
+            listaExps(arguments);
         } else if(siguientes.contains(currentToken.getTokenName())){
 
         } else if(!currentToken.getTokenName().equals(EOF)){
@@ -1134,21 +1330,22 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void listaExps() throws LexicalException, SyntaxException {
+    private void listaExps(List<ExpressionNode> arguments) throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(SUMA, RESTA, NEGACION, NULL_PR, TRUE_PR, FALSE_PR, ENTERO, CARACTER, STRING, THIS_PR, NEW_PR, IDENTIFICADOR_DE_METODO_O_VARIABLE, PARENTESIS_ABRE);
 
         List<TokenName> tokensExpected = new ArrayList<>();
         tokensExpected.addAll(primerosDerivacion1);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            expresion();
-            listaExpsAux();
+            ExpressionNode expression = expresion();
+            arguments.add(expression);
+            listaExpsAux(arguments);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void listaExpsAux() throws LexicalException, SyntaxException {
+    private void listaExpsAux(List<ExpressionNode> arguments) throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(COMA);
         List<TokenName> siguientes = List.of(PARENTESIS_CIERRA);
 
@@ -1158,8 +1355,9 @@ public class SyntaxAnalyzer {
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             match(COMA);
-            expresion();
-            listaExpsAux();
+            ExpressionNode expression = expresion();
+            arguments.add(expression);
+            listaExpsAux(arguments);
         } else if(siguientes.contains(currentToken.getTokenName())){
 
         } else if(!currentToken.getTokenName().equals(EOF)){
@@ -1167,7 +1365,7 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void encadenado() throws LexicalException, SyntaxException {
+    private ChainedNode encadenado() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(PUNTO);
         List<TokenName> siguientes = List.of(ASIGNACION, INCREMENTOR, DECREMENTOR, PUNTO_Y_COMA, OR, AND, COMPARACION, DISTINTO, MENOR, MAYOR, MENOR_IGUAL, MAYOR_IGUAL, SUMA, RESTA, PRODUCTO, DIVISION, MODULO, PARENTESIS_CIERRA, COMA);
 
@@ -1176,16 +1374,22 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(siguientes);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            varOMetodoEncadenado();
-            encadenado();
-        } else if(siguientes.contains(currentToken.getTokenName())){
+            ChainedNode firstChained = varOMetodoEncadenado();
+            ChainedNode nextChained = encadenado();
 
+            firstChained.setNextChained(nextChained);
+
+            return firstChained;
+        } else if(siguientes.contains(currentToken.getTokenName())){
+            return null;
         } else if(!currentToken.getTokenName().equals(EOF)){
             throw new SyntaxException(currentToken, tokensExpected);
         }
+
+        return null;
     }
 
-    private void varOMetodoEncadenado() throws LexicalException, SyntaxException {
+    private ChainedNode varOMetodoEncadenado() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(PUNTO);
 
         List<TokenName> tokensExpected = new ArrayList<>();
@@ -1193,14 +1397,15 @@ public class SyntaxAnalyzer {
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             match(PUNTO);
+            Token identifier = currentToken;
             match(IDENTIFICADOR_DE_METODO_O_VARIABLE);
-            varOMetodoEncadenadoAux();
+            return varOMetodoEncadenadoAux(identifier);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void varOMetodoEncadenadoAux() throws LexicalException, SyntaxException {
+    private ChainedNode varOMetodoEncadenadoAux(Token identifier) throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(PARENTESIS_ABRE);
         List<TokenName> siguientes = List.of(PUNTO, ASIGNACION, INCREMENTOR, DECREMENTOR, PUNTO_Y_COMA, OR, AND, COMPARACION, DISTINTO, MENOR, MAYOR, MENOR_IGUAL, MAYOR_IGUAL, SUMA, RESTA, PRODUCTO, DIVISION, MODULO, PARENTESIS_CIERRA, COMA);
 
@@ -1209,12 +1414,17 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(siguientes);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            argsActuales();
+            List<ExpressionNode> parameters = argsActuales();
+            return new MethodChainedNode(identifier, parameters);
+
         } else if(siguientes.contains(currentToken.getTokenName())){
+            return new VariableChainedNode(identifier, SymbolTable.getInstance().getContext().getCurrentBlock());
 
         } else if(!currentToken.getTokenName().equals(EOF)){
             throw new SyntaxException(currentToken, tokensExpected);
         }
+
+        return null;
     }
 
 }

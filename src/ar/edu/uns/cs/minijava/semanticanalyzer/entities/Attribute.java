@@ -7,6 +7,7 @@ import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 
 public class Attribute extends EntityWithType {
     private Visibility visibility;
+    private Class classContainer;
 
     public Attribute(Token identifierToken, Type type, Visibility visibility) {
         super(identifierToken, type);
@@ -21,4 +22,11 @@ public class Attribute extends EntityWithType {
         this.visibility = visibility;
     }
 
+    public Class getClassContainer() {
+        return classContainer;
+    }
+
+    public void setClassContainer(Class classContainer) {
+        this.classContainer = classContainer;
+    }
 }

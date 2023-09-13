@@ -1,0 +1,173 @@
+VT_Test: NOP
+VT_Object: NOP
+VT_System: NOP
+.CODE
+PUSH init_heap
+CALL
+PUSH main_Test
+CALL
+HALT
+init_heap: RET 0
+simple_malloc: LOADFP
+LOADSP
+STOREFP
+LOADHL
+DUP
+PUSH 1
+ADD
+STORE 4
+LOAD 3
+ADD
+STOREHL
+STOREFP
+RET 1
+.CODE
+debugPrint_Object: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+IPRINT
+PRNLN
+debugPrint_Object_end: STOREFP
+RET 1
+main_Test: LOADFP
+LOADSP
+STOREFP
+RMEM 1
+PUSH 1
+PUSH simple_malloc
+CALL
+DUP
+PUSH VT_System
+STOREREF 0
+DUP
+PUSH constructor_System
+CALL
+PUSH 0
+label_1: 
+LOAD -1
+PUSH 10
+LT
+BF label_0
+LOAD -1
+PUSH 2
+MOD
+PUSH 0
+EQ
+BF label_2
+LOAD 0
+POP
+LOAD -1
+PUSH printIln_System
+CALL
+JUMP label_3
+label_2: 
+LOAD 0
+POP
+.DATA
+label_4: DW "Es impar", 0
+.CODE
+PUSH label_4
+PUSH printSln_System
+CALL
+label_3: NOP
+LOAD -1
+PUSH 1
+ADD
+STORE -1
+JUMP label_1
+label_0: 
+FMEM 1
+FMEM 1
+main_Test_end: STOREFP
+RET 0
+constructor_Test: LOADFP
+LOADSP
+STOREFP
+constructor_Test_end: STOREFP
+RET 1
+.CODE
+constructor_Object: LOADFP
+LOADSP
+STOREFP
+constructor_Object_end: STOREFP
+RET 1
+.CODE
+printC_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+CPRINT
+printC_System_end: STOREFP
+RET 1
+printS_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+SPRINT
+printS_System_end: STOREFP
+RET 1
+println_System: LOADFP
+LOADSP
+STOREFP
+PRNLN
+println_System_end: STOREFP
+RET 0
+printCln_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+CPRINT
+PRNLN
+printCln_System_end: STOREFP
+RET 1
+printSln_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+SPRINT
+PRNLN
+printSln_System_end: STOREFP
+RET 1
+read_System: LOADFP
+LOADSP
+STOREFP
+READ
+STORE 3
+read_System_end: STOREFP
+RET 0
+printB_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+BPRINT
+printB_System_end: STOREFP
+RET 1
+printIln_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+IPRINT
+PRNLN
+printIln_System_end: STOREFP
+RET 1
+printI_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+IPRINT
+printI_System_end: STOREFP
+RET 1
+printBln_System: LOADFP
+LOADSP
+STOREFP
+LOAD 3
+BPRINT
+PRNLN
+printBln_System_end: STOREFP
+RET 1
+constructor_System: LOADFP
+LOADSP
+STOREFP
+constructor_System_end: STOREFP
+RET 1
