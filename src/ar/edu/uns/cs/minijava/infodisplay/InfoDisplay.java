@@ -1,10 +1,7 @@
 package ar.edu.uns.cs.minijava.infodisplay;
 
 import ar.edu.uns.cs.minijava.CompilerException;
-import ar.edu.uns.cs.minijava.lexicalanalyzer.LexicalException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
-import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
-import ar.edu.uns.cs.minijava.syntaxanalyzer.exception.SyntaxException;
 
 import java.io.IOException;
 

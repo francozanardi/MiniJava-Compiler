@@ -4,11 +4,7 @@ import ar.edu.uns.cs.minijava.CompilerException;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 
-import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 public class SyntaxException extends CompilerException {
     private final Token tokenFound;

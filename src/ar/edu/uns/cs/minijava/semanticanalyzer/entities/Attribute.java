@@ -1,7 +1,6 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer.entities;
 
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
-import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.access.Visibility;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 

@@ -1,22 +1,15 @@
 package ar.edu.uns.cs.minijava.codegenerator.predefinedcode.classes;
 
 import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
-import ar.edu.uns.cs.minijava.codegenerator.CodeGenerator;
 import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
-import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Method;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Parameter;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.EntityAlreadyExistsException;
-import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
-
-import java.util.List;
-
-import static ar.edu.uns.cs.minijava.codegenerator.instructions.ZeroArgumentInstruction.*;
 
 public abstract class PredefinedMethod {
     protected Method method;

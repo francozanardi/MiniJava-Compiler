@@ -1,7 +1,6 @@
 package ar.edu.uns.cs.minijava.codegenerator.predefinedcode.classes;
 
 import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
-import ar.edu.uns.cs.minijava.codegenerator.CodeGenerator;
 import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.*;

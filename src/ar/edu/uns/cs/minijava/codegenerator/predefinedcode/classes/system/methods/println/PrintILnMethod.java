@@ -8,7 +8,6 @@ import ar.edu.uns.cs.minijava.codegenerator.predefinedcode.classes.PredefinedMet
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
-import ar.edu.uns.cs.minijava.semanticanalyzer.types.primitive.CharType;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.primitive.IntType;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.reference.VoidType;
 

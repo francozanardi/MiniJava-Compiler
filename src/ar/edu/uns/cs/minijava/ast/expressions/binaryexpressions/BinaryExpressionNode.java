@@ -5,8 +5,6 @@ import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
 import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
-import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
-import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 
 public abstract class BinaryExpressionNode extends ExpressionNode {
     protected ExpressionNode leftExpression;

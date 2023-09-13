@@ -1,7 +1,5 @@
 package ar.edu.uns.cs.minijava.codegenerator.predefinedcode.classes.system.methods;
 
-import ar.edu.uns.cs.minijava.ast.expressions.operand.OperandNode;
-import ar.edu.uns.cs.minijava.codegenerator.CodeGenerator;
 import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
 import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
 import ar.edu.uns.cs.minijava.codegenerator.instructions.OneArgumentInstruction;
@@ -10,10 +8,7 @@ import ar.edu.uns.cs.minijava.codegenerator.predefinedcode.classes.PredefinedMet
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
-import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.primitive.IntType;
-
-import java.util.List;
 
 public class ReadMethod extends PredefinedMethod {
     public ReadMethod(Class classContainer) {

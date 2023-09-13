@@ -1,7 +1,6 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer;
 
 import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNode;
-import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Method;
 

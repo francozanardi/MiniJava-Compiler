@@ -1,6 +1,5 @@
 package ar.edu.uns.cs.minijava.ast.expressions.binaryexpressions.classtype;
 
-import ar.edu.uns.cs.minijava.ast.expressions.binaryexpressions.BinaryExpressionNode;
 import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
 import ar.edu.uns.cs.minijava.codegenerator.instructions.ZeroArgumentInstruction;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;

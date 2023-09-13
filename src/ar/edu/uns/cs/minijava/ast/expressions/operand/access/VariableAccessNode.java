@@ -10,15 +10,10 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Attribute;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.EntityWithType;
-import ar.edu.uns.cs.minijava.semanticanalyzer.entities.LocalVariable;
-import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Parameter;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.access.Visibility;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
-import org.w3c.dom.Attr;
-
-import java.util.Optional;
 
 public class VariableAccessNode extends AccessNode {
     private final BlockSentenceNode blockWhereIsUsed;

@@ -1,6 +1,5 @@
 package ar.edu.uns.cs.minijava.codegenerator.predefinedcode.classes.object;
 
-import ar.edu.uns.cs.minijava.codegenerator.CodeGenerator;
 import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
 import ar.edu.uns.cs.minijava.codegenerator.predefinedcode.classes.PredefinedClass;
 import ar.edu.uns.cs.minijava.codegenerator.predefinedcode.classes.PredefinedMethod;

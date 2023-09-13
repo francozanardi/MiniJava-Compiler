@@ -5,7 +5,6 @@ import ar.edu.uns.cs.minijava.ast.expressions.operand.OperandNode;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
-import ar.edu.uns.cs.minijava.semanticanalyzer.types.primitive.IntType;
 
 public abstract class UnaryExpressionNode extends ExpressionNode {
     protected OperandNode operand;

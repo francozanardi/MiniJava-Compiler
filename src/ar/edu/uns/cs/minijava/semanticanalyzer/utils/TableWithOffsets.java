@@ -1,7 +1,6 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer.utils;
 
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.EntityWithType;
-import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Method;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,9 +1,5 @@
 package ar.edu.uns.cs.minijava.util;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 public class CharacterUtils {
     public static boolean isDigit(char c){
         return c >= '0' && c <= '9';

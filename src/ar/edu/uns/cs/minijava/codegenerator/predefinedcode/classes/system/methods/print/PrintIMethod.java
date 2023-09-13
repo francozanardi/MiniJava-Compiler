@@ -9,7 +9,6 @@ import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.primitive.IntType;
-import ar.edu.uns.cs.minijava.semanticanalyzer.types.primitive.StringType;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.reference.VoidType;
 
 public class PrintIMethod extends PredefinedMethod {

@@ -1,6 +1,5 @@
 package ar.edu.uns.cs.minijava.codegenerator.predefinedcode.classes.system;
 
-import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
 import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
 import ar.edu.uns.cs.minijava.codegenerator.predefinedcode.classes.PredefinedClass;
 import ar.edu.uns.cs.minijava.codegenerator.predefinedcode.classes.PredefinedMethod;
@@ -14,14 +13,6 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.*;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
-import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.EntityAlreadyExistsException;
-import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
-import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
-import ar.edu.uns.cs.minijava.semanticanalyzer.types.primitive.BooleanType;
-import ar.edu.uns.cs.minijava.semanticanalyzer.types.primitive.CharType;
-import ar.edu.uns.cs.minijava.semanticanalyzer.types.primitive.IntType;
-import ar.edu.uns.cs.minijava.semanticanalyzer.types.primitive.StringType;
-import ar.edu.uns.cs.minijava.semanticanalyzer.types.reference.VoidType;
 
 import java.util.Collections;
 import java.util.List;
