@@ -98,6 +98,7 @@
 ./src/ar/edu/uns/cs/minijava/lexicalanalyzer/LexicalException.java
 ./src/ar/edu/uns/cs/minijava/lexicalanalyzer/Token.java
 ./src/ar/edu/uns/cs/minijava/lexicalanalyzer/TokenName.java
+./src/ar/edu/uns/cs/minijava/lexicalanalyzer/TokenName__.java
 ./src/ar/edu/uns/cs/minijava/Main.java
 ./src/ar/edu/uns/cs/minijava/semanticanalyzer/Context.java
 ./src/ar/edu/uns/cs/minijava/semanticanalyzer/entities/Attribute.java
