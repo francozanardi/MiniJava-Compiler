@@ -12,18 +12,19 @@
 <ListaMiembros> ::= <Miembro> <ListaMiembros>
 <ListaMiembros> ::= ε
 
-<Miembro> ::= <Atributo>
-<Miembro> ::= <Constructor>
+<Miembro> ::= <AtributoConVisibilidadExplicita>
+<Miembro> ::= <ConstructorOAtributoConVisibilidadImplicita>
 <Miembro> ::= <Metodo>
 
-<Atributo> ::= <Visibilidad> <Tipo> <ListaDecAtrs> ;
+<AtributoConVisibilidadExplicita> ::= <VisibilidadExplicita> <Tipo> <IdentificadoresDeAtributo>
 
-<Constructor> ::= idclase <ArgsFormales> <Bloque>
+<ConstructorOAtributoConVisibilidadImplicita> ::= idclase <ConstructorOAtributoAux>
+<ConstructorOAtributoConVisibilidadImplicita> ::= <TipoPrimitivo> <IdentificadoresDeAtributo>
 
 <Metodo> ::= <FormaMetodo> <TipoMetodo> idmetvar <ArgsFormales> <Bloque>
 
-<Visibilidad> ::= public
-<Visibilidad> ::= private
+<VisibilidadExplicita> ::= public
+<VisibilidadExplicita> ::= private
 
 <Tipo> ::= <TipoPrimitivo>
 <Tipo> ::= idclase
@@ -33,9 +34,14 @@
 <TipoPrimitivo> ::= int
 <TipoPrimitivo> ::= string
 
+<IdentificadoresDeAtributo> ::= <ListaDecAtrs> ;
+
 <ListaDecAtrs> ::= idmetvar <ListaDecAtrsAux>
 <ListaDecAtrsAux> ::= , idmetvar <ListaDecAtrsAux>
 <ListaDecAtrsAux> ::= ε
+
+<ConstructorOAtributoAux> ::= <ArgsFormales> <Bloque>
+<ConstructorOAtributoAux> ::= <IdentificadoresDeAtributo>
 
 <FormaMetodo> ::= static
 <FormaMetodo> ::= dynamic

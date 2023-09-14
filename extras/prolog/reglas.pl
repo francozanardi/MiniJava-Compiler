@@ -18,14 +18,19 @@ regla(herencia, [t('extends'), t('idclase')]).
 regla(herencia, [t('epsilon')]).
 regla(listaMiembros, [nt(miembro), nt(listaMiembros)]).
 regla(listaMiembros, [t('epsilon')]).
-regla(miembro, [nt(atributo)]).
-regla(miembro, [nt(constructor)]).
+regla(miembro, [nt(atributoConVisibilidadExplicita)]).
+regla(miembro, [nt(constructorOAtributoConVisibilidadImplicita)]).
 regla(miembro, [nt(metodo)]).
-regla(atributo, [nt(visibilidad), nt(tipo), nt(listaDecAtrs), t(';')]).
-regla(constructor, [t('idclase'), nt(argsFormales), nt(bloque)]).
-regla(metodo, [nt(formaMetodo), nt(tipoMetodo), t('idmetvar'), nt(argsFormales), nt(bloque)]).
-regla(visibilidad, [t('public')]).
-regla(visibilidad, [t('private')]).
+
+regla(atributoConVisibilidadExplicita, [nt(visibilidadExplicita), nt(tipo), nt(identificadoresDeAtributo)]).
+regla(constructorOAtributoConVisibilidadImplicita, [t('idclase'), nt(constructorOAtributoAux)]).
+regla(constructorOAtributoConVisibilidadImplicita, [nt(tipoPrimitivo), nt(identificadoresDeAtributo)]).
+regla(constructorOAtributoAux, [nt(argsFormales), nt(bloque)]). % constructor
+regla(constructorOAtributoAux, [nt(identificadoresDeAtributo)]). % atributo
+
+regla(identificadoresDeAtributo, [nt(listaDecAtrs), t(';')]).
+regla(visibilidadExplicita, [t('public')]).
+regla(visibilidadExplicita, [t('private')]).
 regla(tipo, [nt(tipoPrimitivo)]).
 regla(tipo, [t('idclase')]).
 regla(tipoPrimitivo, [t('boolean')]).
@@ -40,6 +45,7 @@ regla(listaDecAtrs, [t('idmetvar'), nt(listaDecAtrsAux)]).
 regla(listaDecAtrsAux, [t(','), t('idmetvar'), nt(listaDecAtrsAux)]).
 regla(listaDecAtrsAux, [t('epsilon')]).
 
+regla(metodo, [nt(formaMetodo), nt(tipoMetodo), t('idmetvar'), nt(argsFormales), nt(bloque)]).
 regla(formaMetodo, [t('static')]).
 regla(formaMetodo, [t('dynamic')]).
 regla(tipoMetodo, [nt(tipo)]).

@@ -24,6 +24,7 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.TokenName;
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.*;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
+import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.EntityAlreadyExistsException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.access.Visibility;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
@@ -153,7 +154,7 @@ public class SyntaxAnalyzer {
     }
 
     private void listaMiembros() throws LexicalException, SyntaxException, SemanticException {
-        List<TokenName> primerosDerivacion1 = List.of(PUBLIC_PR, PRIVATE_PR, IDENTIFICADOR_DE_CLASE, STATIC_PR, DYNAMIC_PR);
+        List<TokenName> primerosDerivacion1 = List.of(PUBLIC_PR, PRIVATE_PR, IDENTIFICADOR_DE_CLASE, BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR, STATIC_PR, DYNAMIC_PR);
         List<TokenName> siguientes = List.of(LLAVE_CIERRA);
 
         List<TokenName> tokensExpected = new ArrayList<>();
@@ -172,7 +173,7 @@ public class SyntaxAnalyzer {
 
     private void miembro() throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(PUBLIC_PR, PRIVATE_PR);
-        List<TokenName> primerosDerivacion2 = List.of(IDENTIFICADOR_DE_CLASE);
+        List<TokenName> primerosDerivacion2 = List.of(IDENTIFICADOR_DE_CLASE, BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR);
         List<TokenName> primerosDerivacion3 = List.of(STATIC_PR, DYNAMIC_PR);
 
         List<TokenName> tokensExpected = new ArrayList<>();
@@ -181,9 +182,9 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion3);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            atributo();
+            atributoConVisibilidadExplicita();
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
-            constructor();
+            constructorOAtributoConVisibilidadImplicita();
         } else if(primerosDerivacion3.contains(currentToken.getTokenName())){
             metodo();
         } else {
@@ -191,49 +192,71 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void atributo() throws LexicalException, SyntaxException, SemanticException {
+    private void atributoConVisibilidadExplicita() throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(PUBLIC_PR, PRIVATE_PR);
 
         List<TokenName> tokensExpected = new ArrayList<>();
         tokensExpected.addAll(primerosDerivacion1);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            Visibility visibility = visibilidad();
+            Visibility visibility = visibilidadExplicita();
             Type type = tipo();
-            List<Token> identifiers = listaDecAtrs();
-            match(PUNTO_Y_COMA);
-
-            Class currentClass = SymbolTable.getInstance().getContext().getCurrentClass();
-            Attribute attribute;
-
-            for(Token token : identifiers){
-                attribute = new Attribute(token, type, visibility);
-                attribute.setClassContainer(currentClass);
-                currentClass.addAttribute(token.getLexema(), attribute);
-            }
+            List<Token> identifiers = identificadoresDeAtributo();
+            this.addAttributesToCurrentClass(visibility, type, identifiers);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
     }
 
-    private void constructor() throws LexicalException, SyntaxException, SemanticException {
+    private void addAttributesToCurrentClass(Type type, List<Token> identifiers) throws EntityAlreadyExistsException {
+        this.addAttributesToCurrentClass(Visibility.PUBLIC, type, identifiers);
+    }
+
+    private void addAttributesToCurrentClass(Visibility visibility, Type type, List<Token> identifiers) throws EntityAlreadyExistsException {
+        Class currentClass = SymbolTable.getInstance().getContext().getCurrentClass();
+        Attribute attribute;
+        for(Token token : identifiers) {
+            attribute = new Attribute(token, type, visibility);
+            attribute.setClassContainer(currentClass);
+            currentClass.addAttribute(token.getLexema(), attribute);
+        }
+    }
+
+    private void constructorOAtributoConVisibilidadImplicita() throws LexicalException, SyntaxException, SemanticException {
         List<TokenName> primerosDerivacion1 = List.of(IDENTIFICADOR_DE_CLASE);
+        List<TokenName> primerosDerivacion2 = List.of(BOOLEAN_PR, CHAR_PR, INT_PR, STRING_PR);
 
         List<TokenName> tokensExpected = new ArrayList<>();
         tokensExpected.addAll(primerosDerivacion1);
+        tokensExpected.addAll(primerosDerivacion2);
 
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
-            Token constructorIdentifier = currentToken;
+            Token classIdentifier = currentToken;
             match(IDENTIFICADOR_DE_CLASE);
+            constructorOAtributoAux(classIdentifier);
+        } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
+            Type type = tipoPrimitivo();
+            List<Token> identifiers = identificadoresDeAtributo();
+            this.addAttributesToCurrentClass(type, identifiers);
+        } else {
+            throw new SyntaxException(currentToken, tokensExpected);
+        }
+    }
 
+    private void constructorOAtributoAux(Token classIdentifier) throws LexicalException, SyntaxException, SemanticException {
+        List<TokenName> primerosDerivacion1 = List.of(PARENTESIS_ABRE);
+        List<TokenName> primerosDerivacion2 = List.of(IDENTIFICADOR_DE_METODO_O_VARIABLE);
+
+        List<TokenName> tokensExpected = new ArrayList<>();
+        tokensExpected.addAll(primerosDerivacion1);
+        tokensExpected.addAll(primerosDerivacion2);
+
+        if(primerosDerivacion1.contains(currentToken.getTokenName())){
             Class currentClass = SymbolTable.getInstance().getContext().getCurrentClass();
             Type constructorType = new ReferenceType(currentClass.getIdentifierToken().getLexema());
-            Constructor constructor = new Constructor(constructorIdentifier, constructorType);
-
+            Constructor constructor = new Constructor(classIdentifier, constructorType);
             SymbolTable.getInstance().getContext().setCurrentMethod(constructor);
-
             List<Parameter> parameters = argsFormales();
-
             for(Parameter parameter : parameters){
                 constructor.appendParameter(parameter.getIdentifierToken().getLexema(), parameter);
             }
@@ -241,8 +264,11 @@ public class SyntaxAnalyzer {
             BlockSentenceNodeImpl block = bloque();
             constructor.setBodyBlock(block);
             constructor.setClassContainer(currentClass);
-
             currentClass.setConstructor(constructor);
+        } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
+            Type type = new ReferenceType(classIdentifier.getLexema());
+            List<Token> identifiers = identificadoresDeAtributo();
+            this.addAttributesToCurrentClass(type, identifiers);
         } else {
             throw new SyntaxException(currentToken, tokensExpected);
         }
@@ -281,7 +307,22 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private Visibility visibilidad() throws LexicalException, SyntaxException {
+    private List<Token> identificadoresDeAtributo() throws LexicalException, SyntaxException {
+        List<TokenName> primerosDerivacion1 = List.of(IDENTIFICADOR_DE_METODO_O_VARIABLE);
+
+        List<TokenName> tokensExpected = new ArrayList<>();
+        tokensExpected.addAll(primerosDerivacion1);
+
+        if(primerosDerivacion1.contains(currentToken.getTokenName())){
+            List<Token> identifiers = listaDecAtrs();
+            match(PUNTO_Y_COMA);
+            return identifiers;
+        } else {
+            throw new SyntaxException(currentToken, tokensExpected);
+        }
+    }
+
+    private Visibility visibilidadExplicita() throws LexicalException, SyntaxException {
         List<TokenName> primerosDerivacion1 = List.of(PUBLIC_PR);
         List<TokenName> primerosDerivacion2 = List.of(PRIVATE_PR);
 
