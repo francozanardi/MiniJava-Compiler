@@ -25,6 +25,11 @@ public class ReturnSentenceNode extends SentenceNode {
     }
 
     @Override
+    public boolean containsReturnSentence() {
+        return true;
+    }
+
+    @Override
     public void check() throws SemanticException {
         if(!methodContainer.canHasReturn()){
             throw new SemanticException(sentenceToken, "El método " +

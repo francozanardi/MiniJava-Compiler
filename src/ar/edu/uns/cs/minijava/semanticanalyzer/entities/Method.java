@@ -9,6 +9,7 @@ import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.EntityAlreadyExistsExc
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
+import ar.edu.uns.cs.minijava.semanticanalyzer.types.reference.VoidType;
 import ar.edu.uns.cs.minijava.semanticanalyzer.utils.EntityTable;
 
 import java.util.ArrayList;
@@ -77,6 +78,13 @@ public class Method extends EntityWithType {
 
     public void checkSentences() throws SemanticException {
         bodyBlock.check();
+        boolean shouldCheckIfMethodContainsReturnSentence = !this.methodForm.equals(MethodForm.CONSTRUCTOR) && !this.type.equals(new VoidType());
+        if (shouldCheckIfMethodContainsReturnSentence && !bodyBlock.containsReturnSentence()) {
+            throw new SemanticException(
+                    this.getIdentifierToken(),
+                    "El método " + this.getIdentifierToken().getLexema() + " tiene al menos un posible camino de ejecución donde no tiene una sentencia de retorno."
+            );
+        }
     }
 
     public int getParameterNumber(){

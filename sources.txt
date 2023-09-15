@@ -129,6 +129,5 @@
 ./src/ar/edu/uns/cs/minijava/syntaxanalyzer/exception/SyntaxException.java
 ./src/ar/edu/uns/cs/minijava/syntaxanalyzer/exception/TokenNameDisplayable.java
 ./src/ar/edu/uns/cs/minijava/syntaxanalyzer/SyntaxAnalyzer.java
-./src/ar/edu/uns/cs/minijava/syntaxanalyzer/SyntaxAnalyzerNew.java
 ./src/ar/edu/uns/cs/minijava/util/CharacterUtils.java
 ./src/ar/edu/uns/cs/minijava/util/GestorDeSource.java

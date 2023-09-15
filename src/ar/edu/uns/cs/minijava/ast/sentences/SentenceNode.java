@@ -13,6 +13,10 @@ public abstract class SentenceNode extends Node {
 
     public abstract void check() throws SemanticException;
 
+    public boolean containsReturnSentence() {
+        return false;
+    }
+
     public int getAmountOfMemoryReserved() {
         return memoryReserved;
     }

@@ -25,6 +25,14 @@ public class IfSentenceNode extends SentenceNode {
     }
 
     @Override
+    public boolean containsReturnSentence() {
+        if (this.elseBody == null) {
+            return false;
+        }
+        return this.ifBody.containsReturnSentence() && this.elseBody.containsReturnSentence();
+    }
+
+    @Override
     public void check() throws SemanticException {
         Type expressionType = condition.check();
         if(!expressionType.equals(new BooleanType())){

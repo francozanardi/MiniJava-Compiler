@@ -25,6 +25,11 @@ public class BlockSentenceNodeImpl extends BlockSentenceNode {
         this.localVariables = new EntityTable<>();
     }
 
+    @Override
+    public boolean containsReturnSentence() {
+        return this.sentences.stream().anyMatch(SentenceNode::containsReturnSentence);
+    }
+
     public void appendSentence(SentenceNode sentence){
         sentences.add(sentence);
     }
