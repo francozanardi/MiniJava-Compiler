@@ -5,7 +5,6 @@
 <ListaClasesAux> ::= ε
 
 <Clase> ::= class idclase <Herencia> { <ListaMiembros> }
-
 <Herencia> ::= extends idclase
 <Herencia> ::= ε
 
@@ -13,15 +12,31 @@
 <ListaMiembros> ::= ε
 
 <Miembro> ::= <AtributoConVisibilidadExplicita>
-<Miembro> ::= <ConstructorOAtributoConVisibilidadImplicita>
-<Miembro> ::= <Metodo>
+<Miembro> ::= <ConstructorOAtributoNoEstaticoConVisibilidadImplicita>
+<Miembro> ::= <MetodoEstaticoOAtributoEstaticoConVisibilidadImplicita>
+<Miembro> ::= <MetodoDinamico>
 
-<AtributoConVisibilidadExplicita> ::= <VisibilidadExplicita> <Tipo> <IdentificadoresDeAtributo>
+<AtributoConVisibilidadExplicita> ::= <VisibilidadExplicita> <FormaAtributo> <Tipo> <IdentificadoresDeAtributo>
 
-<ConstructorOAtributoConVisibilidadImplicita> ::= idclase <ConstructorOAtributoAux>
-<ConstructorOAtributoConVisibilidadImplicita> ::= <TipoPrimitivo> <IdentificadoresDeAtributo>
+<ConstructorOAtributoNoEstaticoConVisibilidadImplicita> ::= idclase <ConstructorOAtributoAux>
+<ConstructorOAtributoNoEstaticoConVisibilidadImplicita> ::= <TipoPrimitivo> <IdentificadoresDeAtributo>
+<ConstructorOAtributoAux> ::= <ArgsFormales> <Bloque>
+<ConstructorOAtributoAux> ::= <IdentificadoresDeAtributo>
 
-<Metodo> ::= <FormaMetodo> <TipoMetodo> idmetvar <ArgsFormales> <Bloque>
+<MetodoEstaticoOAtributoEstaticoConVisibilidadImplicita> ::= static <MetodoOAtributoAux>
+<MetodoOAtributoAux> ::= void <IdentificadorParametrosYDefinicionDeMetodo>
+<MetodoOAtributoAux> ::= <Tipo> idmetvar <MetodoOAtributoAuxAux>
+<MetodoOAtributoAuxAux> ::= <ArgsFormales> <Bloque>
+<MetodoOAtributoAuxAux> ::= <ListaDecAtrsAux> ;
+
+<MetodoDinamico> ::= dynamic <TipoMetodo> <IdentificadorParametrosYDefinicionDeMetodo>
+
+<IdentificadorParametrosYDefinicionDeMetodo> ::= idmetvar <ArgsFormales> <Bloque>
+
+<FormaAtributo> ::= static
+<FormaAtributo> ::= ε
+
+<IdentificadoresDeAtributo> ::= <ListaDecAtrs> ;
 
 <VisibilidadExplicita> ::= public
 <VisibilidadExplicita> ::= private
@@ -34,30 +49,19 @@
 <TipoPrimitivo> ::= int
 <TipoPrimitivo> ::= string
 
-<IdentificadoresDeAtributo> ::= <ListaDecAtrs> ;
-
 <ListaDecAtrs> ::= idmetvar <ListaDecAtrsAux>
 <ListaDecAtrsAux> ::= , idmetvar <ListaDecAtrsAux>
 <ListaDecAtrsAux> ::= ε
-
-<ConstructorOAtributoAux> ::= <ArgsFormales> <Bloque>
-<ConstructorOAtributoAux> ::= <IdentificadoresDeAtributo>
-
-<FormaMetodo> ::= static
-<FormaMetodo> ::= dynamic
 
 <TipoMetodo> ::= <Tipo>
 <TipoMetodo> ::= void
 
 <ArgsFormales> ::= ( <ListaArgsFormalesOVacio> )
-
 <ListaArgsFormalesOVacio> ::= <ListaArgsFormales>
 <ListaArgsFormalesOVacio> ::= ε
-
 <ListaArgsFormales> ::= <ArgFormal> <ListaArgsFormalesAux>
 <ListaArgsFormalesAux> ::= , <ArgFormal> <ListaArgsFormalesAux>
 <ListaArgsFormalesAux> ::= ε
-
 <ArgFormal> ::= <Tipo> idmetvar
 
 <Bloque> ::= { <ListaSentencias> }
@@ -66,41 +70,49 @@
 <ListaSentencias> ::= ε
 
 <Sentencia> ::= ;
-<Sentencia> ::= <VarLocal> ;
-<Sentencia> ::= <Return> ;
-<Sentencia> ::= <If>
-<Sentencia> ::= <For>
+<Sentencia> ::= <VarLocalConTipoPrimitivo> ;
+<Sentencia> ::= <VarLocalConTipoDeClaseOAccesoVarMetEstatico> ;
+<Sentencia> ::= <Return_> ;
+<Sentencia> ::= <If_>
+<Sentencia> ::= <For_>
 <Sentencia> ::= <Bloque>
-<Sentencia> ::= <AsignacionOLlamada> ;
+<Sentencia> ::= <AsignacionOLlamadaNoEstaticos> ;
 
-<AsignacionOLlamada> ::= <Acceso> <AsignacionOLlamadaAux>
+<AsignacionOLlamadaNoEstaticos> ::= <AccesoExcluyendoEstaticos> <AsignacionOLlamadaAux>
 <AsignacionOLlamadaAux> ::= <TipoDeAsignacion>
 <AsignacionOLlamadaAux> ::= ε
-
-<Asignacion> ::= <Acceso> <TipoDeAsignacion>
+<Asignacion> ::= <AccesoIncluyendoEstaticos> <TipoDeAsignacion>
 
 <TipoDeAsignacion> ::= = <Expresion>
 <TipoDeAsignacion> ::= ++
 <TipoDeAsignacion> ::= --
 
-<VarLocal> ::= <Tipo> idmetvar <VarLocalAux>
+<VarLocal> ::= <Tipo> <VarLocalIdentificadorYDefinicion>
+<VarLocalIdentificadorYDefinicion> ::= idmetvar <VarLocalAux>
+<VarLocalConTipoPrimitivo> ::= <TipoPrimitivo> <VarLocalIdentificadorYDefinicion>
+
 <VarLocalAux> ::= = <Expresion>
 <VarLocalAux> ::= ε
 
-<Return> ::= return <ExpresionOVacio>
+<VarLocalConTipoDeClaseOAccesoVarMetEstatico> ::= idclase <VarLocalConTipoDeClaseOAccesoVarMetEstaticoAux>
+<VarLocalConTipoDeClaseOAccesoVarMetEstaticoAux> ::= <VarLocalIdentificadorYDefinicion>
+<VarLocalConTipoDeClaseOAccesoVarMetEstaticoAux> ::= <VarOMetodoEncadenado> <Encadenado> <AsignacionOLlamadaAux>
+
+<Return_> ::= return <ExpresionOVacio>
+
 <ExpresionOVacio> ::= <Expresion>
 <ExpresionOVacio> ::= ε
 
-<If> ::= if ( <Expresion> ) <Sentencia> <Else>
+<If_> ::= if ( <Expresion> ) <Sentencia> <Else_>
+<Else_> ::= else <Sentencia>
+<Else_> ::= ε
 
-<Else> ::= else <Sentencia>
-<Else> ::= ε
+<For_> ::= for ( <VarLocal> ; <Expresion> ; <Asignacion> ) <Sentencia>
 
-<For> ::= for ( <VarLocal> ; <Expresion> ; <Asignacion> ) <Sentencia>
+<ExpresionSinAccesoEstatico> ::= <ExpresionUnariaSinAccesoEstatico> <ExpresionBinaria>
+<Expresion> ::= <ExpresionUnariaConAccesoEstatico> <ExpresionBinaria>
 
-<Expresion> ::= <ExpresionUnaria> <ExpresionBinaria>
-
-<ExpresionBinaria> ::= <OperadorBinario> <ExpresionUnaria> <ExpresionBinaria>
+<ExpresionBinaria> ::= <OperadorBinario> <ExpresionUnariaConAccesoEstatico> <ExpresionBinaria>
 <ExpresionBinaria> ::= ε
 
 <OperadorBinario> ::= ||
@@ -117,15 +129,19 @@
 <OperadorBinario> ::= /
 <OperadorBinario> ::= %
 
-<ExpresionUnaria> ::= <OperadorUnario> <Operando>
-<ExpresionUnaria> ::= <Operando>
+<ExpresionUnariaConAccesoEstatico> ::= <OperadorUnario> <OperandoConAccesoEstatico>
+<ExpresionUnariaConAccesoEstatico> ::= <OperandoConAccesoEstatico>
+<ExpresionUnariaSinAccesoEstatico> ::= <OperadorUnario> <OperandoConAccesoEstatico>
+<ExpresionUnariaSinAccesoEstatico> ::= <OperandoSinAccesoEstatico>
 
 <OperadorUnario> ::= +
 <OperadorUnario> ::= -
 <OperadorUnario> ::= !
 
-<Operando> ::= <Literal>
-<Operando> ::= <Acceso>
+<OperandoSinAccesoEstatico> ::= <Literal>
+<OperandoSinAccesoEstatico> ::= <AccesoExcluyendoEstaticos>
+<OperandoConAccesoEstatico> ::= <Literal>
+<OperandoConAccesoEstatico> ::= <AccesoIncluyendoEstaticos>
 
 <Literal> ::= null
 <Literal> ::= true
@@ -134,21 +150,28 @@
 <Literal> ::= charliteral
 <Literal> ::= stringliteral
 
-<Acceso> ::= <PrimarioSinExpresionParentizada> <Encadenado>
-<Acceso> ::= <CastingOExpresionParentizada> <Encadenado>
+<AccesoIncluyendoEstaticos> ::= <AccesoExcluyendoEstaticos>
+<AccesoIncluyendoEstaticos> ::= <AccesoVarOMetodoEstatico>
+<AccesoExcluyendoEstaticos> ::= <PrimarioSinExpresionParentizadaYSinAccesoEstatico> <Encadenado>
+<AccesoExcluyendoEstaticos> ::= <CastingOExpresionParentizada> <Encadenado>
 
 <CastingOExpresionParentizada> ::= ( <CastingOExpresionParentizadaAux>
-<CastingOExpresionParentizadaAux> ::= idclase ) <PrimarioConExpresionParentizada>
-<CastingOExpresionParentizadaAux> ::= <Expresion> )
+<CastingOExpresionParentizadaAux> ::= idclase <CastingOExpresionParentizadaAuxAux>
+<CastingOExpresionParentizadaAux> ::= <ExpresionSinAccesoEstatico> )
+<CastingOExpresionParentizadaAuxAux> ::= ) <PrimarioConExpresionParentizada>
+<CastingOExpresionParentizadaAuxAux> ::= <VarOMetodoEncadenado> <Encadenado> )
 
 <PrimarioConExpresionParentizada> ::= <ExpresionParentizada>
 <PrimarioConExpresionParentizada> ::= <PrimarioSinExpresionParentizada>
+<PrimarioSinExpresionParentizada> ::= <PrimarioSinExpresionParentizadaYSinAccesoEstatico>
+<PrimarioSinExpresionParentizada> ::= <AccesoVarOMetodoEstatico>
 
-<PrimarioSinExpresionParentizada> ::= <AccesoThis>
-<PrimarioSinExpresionParentizada> ::= <AccesoConstructor>
-<PrimarioSinExpresionParentizada> ::= <AccesoVarOMetodo>
+<AccesoVarOMetodoEstatico> ::= idclase <VarOMetodoEncadenado> <Encadenado>
 
+<PrimarioSinExpresionParentizadaYSinAccesoEstatico> ::= <AccesoThis>
+<PrimarioSinExpresionParentizadaYSinAccesoEstatico> ::= <AccesoConstructor>
 <ExpresionParentizada> ::= ( <Expresion> )
+<PrimarioSinExpresionParentizadaYSinAccesoEstatico> ::= <AccesoVarOMetodo>
 
 <AccesoVarOMetodo> ::= idmetvar <AccesoVarOMetodoAux>
 <AccesoVarOMetodoAux> ::= <ArgsActuales>
@@ -159,10 +182,8 @@
 <AccesoConstructor> ::= new idclase <ArgsActuales>
 
 <ArgsActuales> ::= ( <ListaExpsOVacio> )
-
 <ListaExpsOVacio> ::= <ListaExps>
 <ListaExpsOVacio> ::= ε
-
 <ListaExps> ::= <Expresion> <ListaExpsAux>
 <ListaExpsAux> ::= , <Expresion> <ListaExpsAux>
 <ListaExpsAux> ::= ε

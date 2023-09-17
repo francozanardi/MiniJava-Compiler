@@ -19,14 +19,28 @@ regla(herencia, [t('epsilon')]).
 regla(listaMiembros, [nt(miembro), nt(listaMiembros)]).
 regla(listaMiembros, [t('epsilon')]).
 regla(miembro, [nt(atributoConVisibilidadExplicita)]).
-regla(miembro, [nt(constructorOAtributoConVisibilidadImplicita)]).
-regla(miembro, [nt(metodo)]).
+regla(miembro, [nt(constructorOAtributoNoEstaticoConVisibilidadImplicita)]).
+regla(miembro, [nt(metodoEstaticoOAtributoEstaticoConVisibilidadImplicita)]).
+regla(miembro, [nt(metodoDinamico)]).
 
-regla(atributoConVisibilidadExplicita, [nt(visibilidadExplicita), nt(tipo), nt(identificadoresDeAtributo)]).
-regla(constructorOAtributoConVisibilidadImplicita, [t('idclase'), nt(constructorOAtributoAux)]).
-regla(constructorOAtributoConVisibilidadImplicita, [nt(tipoPrimitivo), nt(identificadoresDeAtributo)]).
+regla(atributoConVisibilidadExplicita, [nt(visibilidadExplicita), nt(formaAtributo), nt(tipo), nt(identificadoresDeAtributo)]).
+
+regla(constructorOAtributoNoEstaticoConVisibilidadImplicita, [t('idclase'), nt(constructorOAtributoAux)]).
+regla(constructorOAtributoNoEstaticoConVisibilidadImplicita, [nt(tipoPrimitivo), nt(identificadoresDeAtributo)]).
 regla(constructorOAtributoAux, [nt(argsFormales), nt(bloque)]). % constructor
 regla(constructorOAtributoAux, [nt(identificadoresDeAtributo)]). % atributo
+
+regla(metodoEstaticoOAtributoEstaticoConVisibilidadImplicita, [t('static'), nt(metodoOAtributoAux)]).
+regla(metodoOAtributoAux, [t('void'), nt(identificadorParametrosYDefinicionDeMetodo)]). % es un método
+regla(metodoOAtributoAux, [nt(tipo), t('idmetvar'), nt(metodoOAtributoAuxAux)]). % aún puede ser un método no void y estático o atributo estático con visibilidad implícita
+regla(metodoOAtributoAuxAux, [nt(argsFormales), nt(bloque)]). % es un método estático no void
+regla(metodoOAtributoAuxAux, [nt(listaDecAtrsAux), t(';')]). % es un atributo estático con visibilidad implícita
+
+regla(metodoDinamico, [t('dynamic'), nt(tipoMetodo), nt(identificadorParametrosYDefinicionDeMetodo)]).
+regla(identificadorParametrosYDefinicionDeMetodo, [t('idmetvar'), nt(argsFormales), nt(bloque)]).
+
+regla(formaAtributo, [t('static')]).
+regla(formaAtributo, [t('epsilon')]).
 
 regla(identificadoresDeAtributo, [nt(listaDecAtrs), t(';')]).
 regla(visibilidadExplicita, [t('public')]).
@@ -45,9 +59,6 @@ regla(listaDecAtrs, [t('idmetvar'), nt(listaDecAtrsAux)]).
 regla(listaDecAtrsAux, [t(','), t('idmetvar'), nt(listaDecAtrsAux)]).
 regla(listaDecAtrsAux, [t('epsilon')]).
 
-regla(metodo, [nt(formaMetodo), nt(tipoMetodo), t('idmetvar'), nt(argsFormales), nt(bloque)]).
-regla(formaMetodo, [t('static')]).
-regla(formaMetodo, [t('dynamic')]).
 regla(tipoMetodo, [nt(tipo)]).
 regla(tipoMetodo, [t('void')]).
 regla(argsFormales, [t('('), nt(listaArgsFormalesOVacio), t(')')]).
@@ -66,7 +77,8 @@ regla(bloque, [t('{'), nt(listaSentencias), t('}')]).
 regla(listaSentencias, [nt(sentencia), nt(listaSentencias)]).
 regla(listaSentencias, [t('epsilon')]).
 regla(sentencia, [t(';')]).
-regla(sentencia, [nt(varLocal), t(';')]).
+regla(sentencia, [nt(varLocalConTipoPrimitivo), t(';')]).
+regla(sentencia, [nt(varLocalConTipoDeClaseOAccesoVarMetEstatico), t(';')]).
 regla(sentencia, [nt(return_), t(';')]).
 regla(sentencia, [nt(if_)]).
 regla(sentencia, [nt(for_)]).
@@ -77,11 +89,11 @@ regla(sentencia, [nt(bloque)]).
 % regla(asignacion, [nt(acceso), nt(tipoDeAsignacion)]).
 % regla(llamada, [nt(acceso)]).
 
-regla(sentencia, [nt(asignacionOLlamada), t(';')]).
-regla(asignacionOLlamada, [nt(acceso), nt(asignacionOLlamadaAux)]).
+regla(sentencia, [nt(asignacionOLlamadaNoEstaticos), t(';')]).
+regla(asignacionOLlamadaNoEstaticos, [nt(accesoExcluyendoEstaticos), nt(asignacionOLlamadaAux)]).
 regla(asignacionOLlamadaAux, [nt(tipoDeAsignacion)]).
 regla(asignacionOLlamadaAux, [t('epsilon')]).
-regla(asignacion, [nt(acceso), nt(tipoDeAsignacion)]). %necesario porque es llamado en el for
+regla(asignacion, [nt(accesoIncluyendoEstaticos), nt(tipoDeAsignacion)]). %necesario porque es llamado en el for
 
 regla(tipoDeAsignacion, [t('='), nt(expresion)]).
 regla(tipoDeAsignacion, [t('++')]).
@@ -90,9 +102,17 @@ regla(tipoDeAsignacion, [t('--')]).
 % regla(varLocal, [nt(tipo), t('idmetvar')]).
 % regla(varLocal, [nt(tipo), t('idmetvar'), t('='), nt(expresion)]).
 
-regla(varLocal, [nt(tipo), t('idmetvar'), nt(varLocalAux)]).
+regla(varLocal, [nt(tipo), nt(varLocalIdentificadorYDefinicion)]).
+regla(varLocalIdentificadorYDefinicion, [t('idmetvar'), nt(varLocalAux)]).
+
+regla(varLocalConTipoPrimitivo, [nt(tipoPrimitivo), nt(varLocalIdentificadorYDefinicion)]).
 regla(varLocalAux, [t('='), nt(expresion)]).
 regla(varLocalAux, [t('epsilon')]).
+
+regla(varLocalConTipoDeClaseOAccesoVarMetEstatico, [t('idclase'), nt(varLocalConTipoDeClaseOAccesoVarMetEstaticoAux)]).
+regla(varLocalConTipoDeClaseOAccesoVarMetEstaticoAux, [nt(varLocalIdentificadorYDefinicion)]). % es variable local
+regla(varLocalConTipoDeClaseOAccesoVarMetEstaticoAux, [nt(varOMetodoEncadenado), nt(encadenado), nt(asignacionOLlamadaAux)]). % es acceso a variable o método estático
+
 
 regla(return_, [t('return'), nt(expresionOVacio)]).
 regla(expresionOVacio, [nt(expresion)]).
@@ -110,8 +130,9 @@ regla(for_, [t('for'), t('('), nt(varLocal), t(';'), nt(expresion), t(';'), nt(a
 % regla(expresion, [nt(expresion), nt(operadorBinario), nt(expresionUnaria)]).
 % regla(expresion, [nt(expresionUnaria)]).
 
-regla(expresion, [nt(expresionUnaria), nt(expresionBinaria)]).
-regla(expresionBinaria, [nt(operadorBinario), nt(expresionUnaria), nt(expresionBinaria)]).
+regla(expresionSinAccesoEstatico, [nt(expresionUnariaSinAccesoEstatico), nt(expresionBinaria)]).
+regla(expresion, [nt(expresionUnariaConAccesoEstatico), nt(expresionBinaria)]).
+regla(expresionBinaria, [nt(operadorBinario), nt(expresionUnariaConAccesoEstatico), nt(expresionBinaria)]).
 regla(expresionBinaria, [t('epsilon')]).
 
 regla(operadorBinario, [t('||')]).
@@ -127,13 +148,17 @@ regla(operadorBinario, [t('-')]).
 regla(operadorBinario, [t('*')]).
 regla(operadorBinario, [t('/')]).
 regla(operadorBinario, [t('%')]).
-regla(expresionUnaria, [nt(operadorUnario), nt(operando)]).
-regla(expresionUnaria, [nt(operando)]).
+regla(expresionUnariaConAccesoEstatico, [nt(operadorUnario), nt(operandoConAccesoEstatico)]).
+regla(expresionUnariaConAccesoEstatico, [nt(operandoConAccesoEstatico)]).
+regla(expresionUnariaSinAccesoEstatico, [nt(operadorUnario), nt(operandoConAccesoEstatico)]).
+regla(expresionUnariaSinAccesoEstatico, [nt(operandoSinAccesoEstatico)]).
 regla(operadorUnario, [t('+')]).
 regla(operadorUnario, [t('-')]).
 regla(operadorUnario, [t('!')]).
-regla(operando, [nt(literal)]).
-regla(operando, [nt(acceso)]).
+regla(operandoSinAccesoEstatico, [nt(literal)]).
+regla(operandoSinAccesoEstatico, [nt(accesoExcluyendoEstaticos)]).
+regla(operandoConAccesoEstatico, [nt(literal)]).
+regla(operandoConAccesoEstatico, [nt(accesoIncluyendoEstaticos)]).
 regla(literal, [t('null')]).
 regla(literal, [t('true')]).
 regla(literal, [t('false')]).
@@ -149,15 +174,28 @@ regla(literal, [t('stringliteral')]).
 % regla(primario, [nt(accesoConstructor)]).
 % regla(expresionParentizada, [t('('), nt(expresion), t(')')]).
 
-regla(acceso, [nt(primarioSinExpresionParentizada), nt(encadenado)]).
-regla(acceso, [nt(castingOExpresionParentizada), nt(encadenado)]).
+regla(accesoIncluyendoEstaticos, [nt(accesoExcluyendoEstaticos)]).
+regla(accesoIncluyendoEstaticos, [nt(accesoVarOMetodoEstatico)]).
+
+regla(accesoExcluyendoEstaticos, [nt(primarioSinExpresionParentizadaYSinAccesoEstatico), nt(encadenado)]).
+regla(accesoExcluyendoEstaticos, [nt(castingOExpresionParentizada), nt(encadenado)]).
+
 regla(castingOExpresionParentizada, [t('('), nt(castingOExpresionParentizadaAux)]).
-regla(castingOExpresionParentizadaAux, [t('idclase'), t(')'), nt(primarioConExpresionParentizada)]). % es casting
-regla(castingOExpresionParentizadaAux, [nt(expresion), t(')')]). % es expresion parentizada
+regla(castingOExpresionParentizadaAux, [t('idclase'), nt(castingOExpresionParentizadaAuxAux)]). % aún no se sabe si es expresión parentizada o casting
+regla(castingOExpresionParentizadaAux, [nt(expresionSinAccesoEstatico), t(')')]). % es expresión parentizada
+regla(castingOExpresionParentizadaAuxAux, [t(')'), nt(primarioConExpresionParentizada)]). % es casting
+regla(castingOExpresionParentizadaAuxAux, [nt(varOMetodoEncadenado), nt(encadenado), t(')')]). % es expresión parentizada de acceso estático
+
 regla(primarioConExpresionParentizada, [nt(expresionParentizada)]).
 regla(primarioConExpresionParentizada, [nt(primarioSinExpresionParentizada)]).
-regla(primarioSinExpresionParentizada, [nt(accesoThis)]).
-regla(primarioSinExpresionParentizada, [nt(accesoConstructor)]).
+
+regla(primarioSinExpresionParentizada, [nt(primarioSinExpresionParentizadaYSinAccesoEstatico)]).
+regla(primarioSinExpresionParentizada, [nt(accesoVarOMetodoEstatico)]).
+regla(accesoVarOMetodoEstatico, [t('idclase'), nt(varOMetodoEncadenado), nt(encadenado)]).
+
+regla(primarioSinExpresionParentizadaYSinAccesoEstatico, [nt(accesoThis)]).
+regla(primarioSinExpresionParentizadaYSinAccesoEstatico, [nt(accesoConstructor)]).
+
 regla(expresionParentizada, [t('('), nt(expresion), t(')')]).
 
 % regla(primario, [nt(accesovar)]).
@@ -165,7 +203,7 @@ regla(expresionParentizada, [t('('), nt(expresion), t(')')]).
 % regla(accesovar, [t('idmetvar')]).
 % regla(accesometodo, [t('idmetvar'), nt(argsActuales)]).
 
-regla(primarioSinExpresionParentizada, [nt(accesoVarOMetodo)]).
+regla(primarioSinExpresionParentizadaYSinAccesoEstatico, [nt(accesoVarOMetodo)]).
 regla(accesoVarOMetodo, [t('idmetvar'), nt(accesoVarOMetodoAux)]).
 regla(accesoVarOMetodoAux, [nt(argsActuales)]).
 regla(accesoVarOMetodoAux, [t('epsilon')]).
