@@ -85,6 +85,11 @@ public class MethodChainedNode extends ChainedNode {
     }
 
     @Override
+    public boolean isStatic(Class classContainer) throws SemanticException {
+        return this.searchMethodCalled(classContainer).getMethodForm().equals(MethodForm.STATIC);
+    }
+
+    @Override
     public void generate() throws CodeGeneratorException {
         removeThisIfIsStatic();
         saveReturnSpaceIfExists();

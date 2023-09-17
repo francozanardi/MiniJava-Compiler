@@ -11,6 +11,7 @@ import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Attribute;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.access.Visibility;
+import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.AttributeForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 
 public class VariableChainedNode extends ChainedNode {
@@ -64,6 +65,11 @@ public class VariableChainedNode extends ChainedNode {
     @Override
     public boolean isAssignable() {
         return true;
+    }
+
+    @Override
+    public boolean isStatic(Class classContainer) throws SemanticException {
+        return this.searchAttribute(classContainer).getAttributeForm().equals(AttributeForm.STATIC);
     }
 
     @Override

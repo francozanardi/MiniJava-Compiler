@@ -26,6 +26,7 @@ public abstract class ChainedNode extends Node {
     public abstract Type check(Type previousType) throws SemanticException;
     public abstract boolean isCallable();
     public abstract boolean isAssignable();
+    public abstract boolean isStatic(Class classContainer) throws SemanticException;
 
     public void enableWriteMode(){
         if(nextChained != null){

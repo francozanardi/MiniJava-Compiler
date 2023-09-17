@@ -218,7 +218,7 @@ public class SyntaxAnalyzer {
         Class currentClass = SymbolTable.getInstance().getContext().getCurrentClass();
         Attribute attribute;
         for(Token token : identifiers) {
-            attribute = new Attribute(token, type, visibility);
+            attribute = new Attribute(token, type, visibility, form);
             attribute.setClassContainer(currentClass);
             currentClass.addAttribute(token.getLexema(), attribute);
         }
