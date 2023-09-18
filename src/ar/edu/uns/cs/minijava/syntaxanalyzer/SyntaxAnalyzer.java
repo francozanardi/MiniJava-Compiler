@@ -1364,12 +1364,16 @@ public class SyntaxAnalyzer {
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             AccessNode access = primarioSinExpresionParentizadaYSinAccesoEstatico();
             ChainedNode chained = encadenado();
-            access.setChained(chained);
+            if (chained != null) {
+                access.setChained(chained);
+            }
             return access;
         } else if(primerosDerivacion2.contains(currentToken.getTokenName())){
             AccessNode access = castingOExpresionParentizada();
             ChainedNode chained = encadenado();
-            access.setChained(chained);
+            if (chained != null) {
+                access.setChained(chained);
+            }
             return access;
         } else {
             throw new SyntaxException(currentToken, tokensExpected);

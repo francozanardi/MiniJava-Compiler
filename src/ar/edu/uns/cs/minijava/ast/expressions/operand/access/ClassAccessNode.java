@@ -1,6 +1,8 @@
 package ar.edu.uns.cs.minijava.ast.expressions.operand.access;
 
 import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
+import ar.edu.uns.cs.minijava.codegenerator.instructions.OneArgumentInstruction;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
@@ -46,6 +48,9 @@ public class ClassAccessNode extends AccessNode {
 
     @Override
     public void generate() throws CodeGeneratorException {
-
+        // Esto es raro y seguramente mejorable, pero es la única rápida solución que se me ocurrió.
+        // Representa un dummy value que luego va a ser eliminado con un "pop" en el método estático encadenado o la variable estática encadenada.
+        SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.PUSH, 0));
+        this.getChained().generate();
     }
 }

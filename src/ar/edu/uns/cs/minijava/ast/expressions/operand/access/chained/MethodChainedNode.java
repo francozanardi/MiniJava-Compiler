@@ -1,6 +1,7 @@
 package ar.edu.uns.cs.minijava.ast.expressions.operand.access.chained;
 
 import ar.edu.uns.cs.minijava.ast.expressions.ExpressionNode;
+import ar.edu.uns.cs.minijava.ast.expressions.operand.access.ClassAccessNode;
 import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
 import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
 import ar.edu.uns.cs.minijava.codegenerator.instructions.OneArgumentInstruction;
@@ -105,51 +106,51 @@ public class MethodChainedNode extends ChainedNode {
     }
 
     private void removeThisIfIsStatic() throws CodeGeneratorException {
-        if(!methodCalledIsNotStatic()){
+        if (methodCalledIsStatic()) {
             SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.POP));
         }
     }
 
-    private boolean methodCalledIsNotStatic(){
-        return !methodCalled.getMethodForm().equals(MethodForm.STATIC);
+    private boolean methodCalledIsStatic(){
+        return methodCalled.getMethodForm().equals(MethodForm.STATIC);
     }
 
     protected void saveReturnSpaceIfExists() throws CodeGeneratorException {
         Type returnType = methodCalled.getType();
 
-        if(!returnType.equals(new VoidType())){
+        if (!returnType.equals(new VoidType())) {
             SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.RMEM, 1));
             addSwapIfIsNotStatic();
         }
     }
 
     protected void addSwapIfIsNotStatic() throws CodeGeneratorException {
-        if(methodCalledIsNotStatic()){
+        if (!methodCalledIsStatic()) {
             SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.SWAP));
         }
     }
 
     protected void loadArguments() throws CodeGeneratorException {
-        for(int i = arguments.size()-1; i >= 0; i--) {
+        for (int i = arguments.size()-1; i >= 0; i--) {
             arguments.get(i).generate();
             addSwapIfIsNotStatic(); //bajamos el this
         }
     }
 
     protected void loadVirtualTableIfIsNotStatic() throws CodeGeneratorException {
-        if(methodCalledIsNotStatic()){
+        if (!methodCalledIsStatic()) {
             SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.DUP));
             SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.LOADREF, 0));
         }
     }
 
     protected void loadMethodCalled() throws CodeGeneratorException {
-        if(methodCalledIsNotStatic()){
-            SymbolTable.getInstance().appendInstruction(
-                    new Instruction(OneArgumentInstruction.LOADREF, methodCalled.getOffset()));
-        } else {
+        if (methodCalledIsStatic()) {
             SymbolTable.getInstance().appendInstruction(
                     new Instruction(OneArgumentInstruction.PUSH, methodCalled.getBeginMethodLabel()));
+        } else {
+            SymbolTable.getInstance().appendInstruction(
+                    new Instruction(OneArgumentInstruction.LOADREF, methodCalled.getOffset()));
         }
     }
 }

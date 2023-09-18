@@ -31,6 +31,9 @@ public abstract class AccessNode extends OperandNode {
 
     public void setChained(ChainedNode chained) {
         this.chained = chained;
+        if (this.chained != null) {
+            this.chained.setPrevChained(this);
+        }
     }
 
     public boolean isLastElementChainedCallable() {

@@ -25,6 +25,7 @@ public class Method extends EntityWithType {
     protected Label beginMethodLabel;
     protected Label endMethodLabel;
     protected boolean codeWasGenerated;
+    private boolean isPredefined;
 
     public Method(Token identifierToken, Type returnType, MethodForm methodForm) {
         super(identifierToken, returnType);
@@ -34,6 +35,7 @@ public class Method extends EntityWithType {
         this.beginMethodLabel = null;
         this.endMethodLabel = null;
         this.codeWasGenerated = false;
+        this.isPredefined = false;
     }
 
     public Parameter getParameterById(String parameterId) {
@@ -70,7 +72,6 @@ public class Method extends EntityWithType {
     @Override
     public void checkDeclarations() throws SemanticException {
         super.checkDeclarations();
-
         for(Parameter parameter : parameters.values()){
             parameter.checkDeclarations();
         }
@@ -78,7 +79,7 @@ public class Method extends EntityWithType {
 
     public void checkSentences() throws SemanticException {
         bodyBlock.check();
-        boolean shouldCheckIfMethodContainsReturnSentence = !this.methodForm.equals(MethodForm.CONSTRUCTOR) && !this.type.equals(new VoidType());
+        boolean shouldCheckIfMethodContainsReturnSentence = !this.methodForm.equals(MethodForm.CONSTRUCTOR) && !this.type.equals(new VoidType()) && !this.isPredefined;
         if (shouldCheckIfMethodContainsReturnSentence && !bodyBlock.containsReturnSentence()) {
             throw new SemanticException(
                     this.getIdentifierToken(),
@@ -163,5 +164,13 @@ public class Method extends EntityWithType {
     public Label getEndMethodLabel() {
         createLabelIfDoesNotExist();
         return endMethodLabel;
+    }
+
+    public void markAsPredefined() {
+        this.isPredefined = true;
+    }
+
+    public boolean isPredefined() {
+        return this.isPredefined;
     }
 }

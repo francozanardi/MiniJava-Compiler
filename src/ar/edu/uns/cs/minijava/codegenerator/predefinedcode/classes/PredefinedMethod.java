@@ -20,6 +20,7 @@ public abstract class PredefinedMethod {
                     methodType,
                     methodForm);
 
+        method.markAsPredefined();
         method.setClassContainer(classContainer);
         method.setBodyBlock(getBlockWithInstructions());
     }

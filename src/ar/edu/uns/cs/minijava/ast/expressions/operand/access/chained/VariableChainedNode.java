@@ -15,8 +15,10 @@ import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.AttributeForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 
 public class VariableChainedNode extends ChainedNode {
+
     private final BlockSentenceNode blockWhereIsUsed;
     private Attribute attributeUsed;
+    private Class classTypeOfCurrentAttribute;
 
     public VariableChainedNode(Token variableToken, BlockSentenceNode blockWhereIsUsed) {
         super(variableToken);
@@ -25,8 +27,8 @@ public class VariableChainedNode extends ChainedNode {
 
     @Override
     public Type check(Type previousType) throws SemanticException {
-        Class classAssociatedToType = getClassAssociatedToType(previousType);
-        attributeUsed = searchAttribute(classAssociatedToType);
+        classTypeOfCurrentAttribute = getClassAssociatedToType(previousType);
+        attributeUsed = searchAttribute(classTypeOfCurrentAttribute);
 
         if(nextChained != null){
             return nextChained.check(attributeUsed.getType());
@@ -74,12 +76,18 @@ public class VariableChainedNode extends ChainedNode {
 
     @Override
     public void generate() throws CodeGeneratorException {
-        if(isWriteMode){
-            SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.SWAP));
-            SymbolTable.getInstance().appendInstruction(
+        SymbolTable symbolTable = SymbolTable.getInstance();
+        if (attributeUsed.getAttributeForm().equals(AttributeForm.STATIC)) {
+            symbolTable.appendInstruction(new Instruction(ZeroArgumentInstruction.POP)); // removemos referencia al this
+            symbolTable.appendInstruction(
+                    new Instruction(OneArgumentInstruction.PUSH, classTypeOfCurrentAttribute.getStaticAttributesTableLabel()));
+        }
+        if (isWriteMode) {
+            symbolTable.appendInstruction(new Instruction(ZeroArgumentInstruction.SWAP));
+            symbolTable.appendInstruction(
                     new Instruction(OneArgumentInstruction.STOREREF, attributeUsed.getOffset()));
         } else {
-            SymbolTable.getInstance().appendInstruction(
+            symbolTable.appendInstruction(
                     new Instruction(OneArgumentInstruction.LOADREF, attributeUsed.getOffset()));
         }
 

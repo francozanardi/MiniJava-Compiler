@@ -26,6 +26,10 @@ public class DWDirective {
         this.argument = "\"" + str + "\", 0";
     }
 
+    public DWDirective() {
+        this.argument = "0";
+    }
+
     private <E> String getArgumentsFromList(E[] list, UnaryOperator<String> listElementToArg){
         if(list.length == 0){
             return "";

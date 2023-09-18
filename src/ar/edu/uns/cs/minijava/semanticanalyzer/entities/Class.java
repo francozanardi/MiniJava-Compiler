@@ -7,16 +7,20 @@ import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.EntityAlreadyExistsException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
+import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.AttributeForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.reference.ReferenceType;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.reference.VoidType;
 import ar.edu.uns.cs.minijava.semanticanalyzer.utils.ClassInstanceRecord;
 import ar.edu.uns.cs.minijava.semanticanalyzer.utils.EntityTable;
+import ar.edu.uns.cs.minijava.semanticanalyzer.utils.StaticAttributesTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.utils.VirtualTable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Class extends Entity {
+
     private final EntityTable<String, Method> methods;
     private final EntityTable<String, Attribute> attributes;
     private Token tokenOfParentClass;
@@ -24,6 +28,7 @@ public class Class extends Entity {
     private boolean classConsolidated;
     private final VirtualTable virtualTable;
     private final ClassInstanceRecord classInstanceRecord;
+    private final StaticAttributesTable staticAttributesTable;
 
     public Class(Token identifierToken) {
         super(identifierToken);
@@ -34,6 +39,7 @@ public class Class extends Entity {
         classConsolidated = false;
         virtualTable = new VirtualTable(identifierToken.getLexema());
         classInstanceRecord = new ClassInstanceRecord();
+        staticAttributesTable = new StaticAttributesTable(this);
     }
 
     @Override
@@ -43,6 +49,7 @@ public class Class extends Entity {
         consolidate();
         virtualTable.assignOffsetToEntities();
         classInstanceRecord.assignOffsetToEntities();
+        staticAttributesTable.assignOffsetToEntities();
         addVirtualTableLabels();
 
         for(Entity method : methods.values()){
@@ -123,7 +130,6 @@ public class Class extends Entity {
 
             consolidateMethods(parent);
             consolidateAttributes(parent);
-
         }
 
         classConsolidated = true;
@@ -184,7 +190,10 @@ public class Class extends Entity {
     }
 
     private void consolidateAttributes(Class parent) throws EntityAlreadyExistsException {
-        for(Map.Entry<String, Attribute> entry : parent.attributes.entrySet()){
+        for (Map.Entry<String, Attribute> entry : parent.attributes.entrySet()) {
+            if (entry.getValue().getAttributeForm().equals(AttributeForm.STATIC)) {
+                continue;
+            }
             try {
                 this.attributes.putAndCheck(entry.getKey(), entry.getValue());
             } catch (EntityAlreadyExistsException unused) {
@@ -223,7 +232,11 @@ public class Class extends Entity {
 
     public void addAttribute(String identifier, Attribute attribute) throws EntityAlreadyExistsException {
         attributes.putAndCheck(identifier, attribute);
-        classInstanceRecord.appendEntity(attribute);
+        if (attribute.getAttributeForm().equals(AttributeForm.DEFAULT)) {
+            classInstanceRecord.appendEntity(attribute);
+        } else {
+            staticAttributesTable.appendEntity(attribute);
+        }
     }
 
     public Constructor getConstructor() {
@@ -262,16 +275,39 @@ public class Class extends Entity {
     }
 
     public void generate() throws CodeGeneratorException {
+        this.generateStaticAttributesCode();
         SymbolTable.getInstance().appendInstruction(new Instruction(CodeSection.CODE));
-
         for(Method method : methods.values()){
             method.generate();
         }
-
         constructor.generate();
+    }
+
+    private void generateStaticAttributesCode() throws CodeGeneratorException {
+        List<Attribute> staticAttributes = this.attributes
+                .values()
+                .stream()
+                .filter(attribute -> attribute.getAttributeForm().equals(AttributeForm.STATIC))
+                .collect(Collectors.toList());
+        if (staticAttributes.isEmpty()) {
+            return;
+        }
+        SymbolTable symbolTable = SymbolTable.getInstance();
+        symbolTable.appendInstruction(new Instruction(CodeSection.DATA));
+        DWDirective dwDirective = new DWDirective();
+        Instruction instruction = new Instruction(dwDirective);
+        instruction.setLabel(this.staticAttributesTable.getLabel());
+        for (Attribute ignored : staticAttributes) {
+            symbolTable.appendInstruction(instruction);
+            instruction.setLabel(null);
+        }
     }
 
     public Label getVirtualTableLabel(){
         return virtualTable.getLabel();
+    }
+
+    public Label getStaticAttributesTableLabel(){
+        return this.staticAttributesTable.getLabel();
     }
 }

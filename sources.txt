@@ -19,6 +19,7 @@
 ./src/ar/edu/uns/cs/minijava/ast/expressions/operand/access/chained/ChainedNode.java
 ./src/ar/edu/uns/cs/minijava/ast/expressions/operand/access/chained/MethodChainedNode.java
 ./src/ar/edu/uns/cs/minijava/ast/expressions/operand/access/chained/VariableChainedNode.java
+./src/ar/edu/uns/cs/minijava/ast/expressions/operand/access/ClassAccessNode.java
 ./src/ar/edu/uns/cs/minijava/ast/expressions/operand/access/ConstructorAccessNode.java
 ./src/ar/edu/uns/cs/minijava/ast/expressions/operand/access/ExpressionAccessNode.java
 ./src/ar/edu/uns/cs/minijava/ast/expressions/operand/access/MethodAccessNode.java
@@ -111,6 +112,7 @@
 ./src/ar/edu/uns/cs/minijava/semanticanalyzer/exceptions/EntityAlreadyExistsException.java
 ./src/ar/edu/uns/cs/minijava/semanticanalyzer/exceptions/SemanticException.java
 ./src/ar/edu/uns/cs/minijava/semanticanalyzer/modifiers/access/Visibility.java
+./src/ar/edu/uns/cs/minijava/semanticanalyzer/modifiers/form/AttributeForm.java
 ./src/ar/edu/uns/cs/minijava/semanticanalyzer/modifiers/form/MethodForm.java
 ./src/ar/edu/uns/cs/minijava/semanticanalyzer/SymbolTable.java
 ./src/ar/edu/uns/cs/minijava/semanticanalyzer/types/primitive/BooleanType.java
@@ -124,6 +126,7 @@
 ./src/ar/edu/uns/cs/minijava/semanticanalyzer/types/Type.java
 ./src/ar/edu/uns/cs/minijava/semanticanalyzer/utils/ClassInstanceRecord.java
 ./src/ar/edu/uns/cs/minijava/semanticanalyzer/utils/EntityTable.java
+./src/ar/edu/uns/cs/minijava/semanticanalyzer/utils/StaticAttributesTable.java
 ./src/ar/edu/uns/cs/minijava/semanticanalyzer/utils/TableWithOffsets.java
 ./src/ar/edu/uns/cs/minijava/semanticanalyzer/utils/VirtualTable.java
 ./src/ar/edu/uns/cs/minijava/syntaxanalyzer/exception/SyntaxException.java

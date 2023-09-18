@@ -1,6 +1,6 @@
 package ar.edu.uns.cs.minijava.ast.expressions.operand.access;
 
-
+import ar.edu.uns.cs.minijava.ast.expressions.operand.access.chained.VariableChainedNode;
 import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNode;
 import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
 import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
@@ -9,9 +9,12 @@ import ar.edu.uns.cs.minijava.codegenerator.instructions.ZeroArgumentInstruction
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.semanticanalyzer.SymbolTable;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Attribute;
+import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Class;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.EntityWithType;
+import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Method;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.access.Visibility;
+import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.AttributeForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.modifiers.form.MethodForm;
 import ar.edu.uns.cs.minijava.semanticanalyzer.types.Type;
 
@@ -56,27 +59,27 @@ public class VariableAccessNode extends AccessNode {
     }
 
     private EntityWithType searchAttribute() throws SemanticException {
-        Attribute attributeFound = blockWhereIsUsed.getContainerMethod()
-                .getClassContainer().getAttributeById(sentenceToken.getLexema());
-
-        if(attributeFound != null){
-            if(blockWhereIsUsed.getContainerMethod().getMethodForm().equals(MethodForm.STATIC)){
-                throw new SemanticException(sentenceToken, "No se puede acceder al atributo de instancia " +
-                        sentenceToken.getLexema() + " desde un método estático");
-            }
-
-            if( attributeFound.getVisibility().equals(Visibility.PRIVATE) &&
-                !blockWhereIsUsed.getContainerMethod().getClassContainer().equals(attributeFound.getClassContainer())){
-                throw new SemanticException(sentenceToken, "El atributo de instancia " +
-                        sentenceToken.getLexema() +
-                        " es inaccesible desde la clase " +
-                        blockWhereIsUsed.getContainerMethod().getClassContainer().getIdentifierToken().getLexema());
-            }
-
-            return attributeFound;
+        Method currentMethod = blockWhereIsUsed.getContainerMethod();
+        Class classContainer = currentMethod.getClassContainer();
+        Attribute attributeFound = classContainer.getAttributeById(sentenceToken.getLexema());
+        if (attributeFound == null) {
+            return null;
         }
-
-        return null;
+        boolean currentMethodIsStatic = currentMethod.getMethodForm().equals(MethodForm.STATIC);
+        boolean isInstanceAttribute = attributeFound.getAttributeForm().equals(AttributeForm.DEFAULT);
+        if (currentMethodIsStatic && isInstanceAttribute) {
+            throw new SemanticException(sentenceToken, "No se puede acceder al atributo de instancia " +
+                    sentenceToken.getLexema() + " desde un método estático");
+        }
+        boolean attributeIsPrivate = attributeFound.getVisibility().equals(Visibility.PRIVATE);
+        boolean attributeAndCurrentMethodAreInTheSameClass = classContainer.equals(attributeFound.getClassContainer());
+        if (attributeIsPrivate && !attributeAndCurrentMethodAreInTheSameClass) {
+            throw new SemanticException(sentenceToken, "El atributo de instancia " +
+                    sentenceToken.getLexema() +
+                    " es inaccesible desde la clase " +
+                    classContainer.getIdentifierToken().getLexema());
+        }
+        return attributeFound;
     }
 
     @Override
@@ -102,38 +105,35 @@ public class VariableAccessNode extends AccessNode {
 
     private boolean generateIfIAmLocalVariableOrParameter() throws CodeGeneratorException {
         EntityWithType variableOrParameter = searchLocalVariableOrParameter();
-        Instruction instruction;
-
-        if(variableOrParameter != null){
-            if(isWriteMode){
-                instruction = new Instruction(OneArgumentInstruction.STORE, variableOrParameter.getOffset());
-            } else {
-                instruction = new Instruction(OneArgumentInstruction.LOAD, variableOrParameter.getOffset());
-            }
-
-            SymbolTable.getInstance().appendInstruction(instruction);
-
-            return true;
+        if (variableOrParameter == null) {
+            return false;
         }
-
-        return false;
+        OneArgumentInstruction instructionType = isWriteMode ? OneArgumentInstruction.STORE : OneArgumentInstruction.LOAD;
+        Instruction instruction = new Instruction(instructionType, variableOrParameter.getOffset());
+        SymbolTable.getInstance().appendInstruction(instruction);
+        return true;
     }
 
     private void generateIfIAmAttribute() throws CodeGeneratorException {
-        Attribute attributeFound = blockWhereIsUsed.getContainerMethod()
-                .getClassContainer().getAttributeById(sentenceToken.getLexema());
-
-        if(attributeFound != null){
-            SymbolTable.getInstance().appendInstruction(new Instruction(OneArgumentInstruction.LOAD, 3));
-
-            if(isWriteMode){
-                SymbolTable.getInstance().appendInstruction(new Instruction(ZeroArgumentInstruction.SWAP));
-                SymbolTable.getInstance().appendInstruction(
-                        new Instruction(OneArgumentInstruction.STOREREF, attributeFound.getOffset()));
-            } else {
-                SymbolTable.getInstance().appendInstruction(
-                        new Instruction(OneArgumentInstruction.LOADREF, attributeFound.getOffset()));
-            }
+        SymbolTable symbolTable = SymbolTable.getInstance();
+        Class classContainer = blockWhereIsUsed.getContainerMethod().getClassContainer();
+        Attribute attributeFound = classContainer.getAttributeById(sentenceToken.getLexema());
+        if (attributeFound == null) {
+            return;
+        }
+        if (attributeFound.getAttributeForm().equals(AttributeForm.STATIC)) {
+            Instruction instruction = new Instruction(OneArgumentInstruction.PUSH, classContainer.getStaticAttributesTableLabel());
+            symbolTable.appendInstruction(instruction);
+        } else {
+            symbolTable.appendInstruction(new Instruction(OneArgumentInstruction.LOAD, 3));
+        }
+        if (isWriteMode) {
+            symbolTable.appendInstruction(new Instruction(ZeroArgumentInstruction.SWAP));
+            symbolTable.appendInstruction(
+                    new Instruction(OneArgumentInstruction.STOREREF, attributeFound.getOffset()));
+        } else {
+            symbolTable.appendInstruction(
+                    new Instruction(OneArgumentInstruction.LOADREF, attributeFound.getOffset()));
         }
     }
 
