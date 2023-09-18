@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer.entities;
 
+import ar.edu.uns.cs.minijava.Main;
 import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
 import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
 import ar.edu.uns.cs.minijava.codegenerator.instructions.*;
@@ -80,7 +81,7 @@ public class Method extends EntityWithType {
     public void checkSentences() throws SemanticException {
         bodyBlock.check();
         boolean shouldCheckIfMethodContainsReturnSentence = !this.methodForm.equals(MethodForm.CONSTRUCTOR) && !this.type.equals(new VoidType()) && !this.isPredefined;
-        if (shouldCheckIfMethodContainsReturnSentence && !bodyBlock.containsReturnSentence()) {
+        if (shouldCheckIfMethodContainsReturnSentence && !bodyBlock.containsReturnSentence() && !Main.UNTIL_STAGE_4) {
             throw new SemanticException(
                     this.getIdentifierToken(),
                     "El método " + this.getIdentifierToken().getLexema() + " tiene al menos un posible camino de ejecución donde no tiene una sentencia de retorno."

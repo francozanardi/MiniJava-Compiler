@@ -139,19 +139,20 @@ public class SyntaxAnalyzer {
         tokensExpected.addAll(primerosDerivacion1);
         tokensExpected.addAll(siguientes);
 
+        Class objectClass = SymbolTable.getInstance().getClassById("Object");
         if(primerosDerivacion1.contains(currentToken.getTokenName())){
             match(EXTENDS_PR);
             Token parentClassToken = currentToken;
             match(IDENTIFICADOR_DE_CLASE);
 
             return parentClassToken;
-        } else if(siguientes.contains(currentToken.getTokenName())){
-            return SymbolTable.getInstance().getClassById("Object").getIdentifierToken();
+        } else if(siguientes.contains(currentToken.getTokenName())) {
+            return objectClass != null ? objectClass.getIdentifierToken() : null;
         } else if(!currentToken.getTokenName().equals(EOF)){
             throw new SyntaxException(currentToken, tokensExpected);
         }
 
-        return SymbolTable.getInstance().getClassById("Object").getIdentifierToken();
+        return objectClass != null ? objectClass.getIdentifierToken() : null;
     }
 
     private void listaMiembros() throws LexicalException, SyntaxException, SemanticException {

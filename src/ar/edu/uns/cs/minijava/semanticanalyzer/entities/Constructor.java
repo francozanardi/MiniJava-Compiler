@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer.entities;
 
+import ar.edu.uns.cs.minijava.Main;
 import ar.edu.uns.cs.minijava.codegenerator.instructions.Label;
 import ar.edu.uns.cs.minijava.lexicalanalyzer.Token;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.SemanticException;
@@ -13,6 +14,9 @@ public class Constructor extends Method {
     }
 
     private void checkConstructorName() throws SemanticException {
+        if (Main.UNTIL_STAGE_2) {
+            return;
+        }
         if(!identifierToken.getLexema().equals(type.getType())){
             throw new SemanticException(identifierToken, "El nombre del contructor " +
                     identifierToken.getLexema() +

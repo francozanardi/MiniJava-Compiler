@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer;
 
+import ar.edu.uns.cs.minijava.Main;
 import ar.edu.uns.cs.minijava.codegenerator.CodeGenerator;
 import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
 import ar.edu.uns.cs.minijava.codegenerator.instructions.Instruction;
@@ -34,7 +35,9 @@ public class SymbolTable {
     }
 
     public void initialize(String outputPath) throws IOException {
-        codeGenerator = new CodeGenerator(outputPath);
+        if (!Main.UNTIL_STAGE_2 && !Main.UNTIL_STAGE_3 && !Main.UNTIL_STAGE_4) {
+            codeGenerator = new CodeGenerator(outputPath);
+        }
 
         PredefinedClass object = new Object();
         object.addClassToSymbolTable();
@@ -84,10 +87,10 @@ public class SymbolTable {
     }
 
     public void setMainMethod(Class classContainer, Method method) throws SemanticException {
-        if(mainMethod != null){
+        if (mainMethod != null) {
             throw new SemanticException(method.getIdentifierToken(),
                     "El método main ya se encontraba previamente definido en la clase "
-                            + mainMethod.getKey().getIdentifierToken());
+                            + mainMethod.getKey().getIdentifierToken().getLexema());
         }
 
         mainMethod = new AbstractMap.SimpleEntry<>(classContainer, method);

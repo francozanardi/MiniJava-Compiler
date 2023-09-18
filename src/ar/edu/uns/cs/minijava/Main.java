@@ -14,21 +14,43 @@ import java.io.IOException;
 import java.util.Optional;
 
 public class Main {
+
     private static InfoDisplay infoDisplay;
     private static String outputPath;
+    public final static boolean UNTIL_STAGE_2 = false;
+    public final static boolean UNTIL_STAGE_3 = false;
+    public final static boolean UNTIL_STAGE_4 = false;
 
     public static void main(String[] args){
         infoDisplay = new InfoDisplay();
 
-        if(args.length == 2){
-            outputPath = args[1];
+        if (Main.UNTIL_STAGE_2 || Main.UNTIL_STAGE_3 || Main.UNTIL_STAGE_4) {
+            Main.startOldCompiler(args);
+            return;
+        }
 
+        if (args.length == 2) {
+            outputPath = args[1];
             createLexicalAnalyzer(args[0])
                     .map(SyntaxAnalyzer::new)
                     .ifPresent(Main::startSyntaxAndSemanticAnalyzer);
-
         } else {
             infoDisplay.showFileNotSpecified();
+        }
+    }
+
+    private static void startOldCompiler(String[] args) {
+        if (args.length != 1) {
+            System.out.println("Debe especificar un archivo fuente");
+            return;
+        }
+        Optional<SyntaxAnalyzer> syntaxAnalyzer = createLexicalAnalyzer(args[0]).map(SyntaxAnalyzer::new);
+        if (Main.UNTIL_STAGE_2) {
+            syntaxAnalyzer.ifPresent(Main::startUntilStage2);
+        } else if (Main.UNTIL_STAGE_3) {
+            syntaxAnalyzer.ifPresent(Main::startUntilStage3);
+        } else if (Main.UNTIL_STAGE_4) {
+            syntaxAnalyzer.ifPresent(Main::startUntilStage4);
         }
     }
 
@@ -48,16 +70,52 @@ public class Main {
         return Optional.ofNullable(lexicalAnalyzer);
     }
 
-    private static void startSyntaxAndSemanticAnalyzer(SyntaxAnalyzer syntaxAnalyzer){
+    private static void startSyntaxAndSemanticAnalyzer(SyntaxAnalyzer syntaxAnalyzer) {
         try {
-            SymbolTable.getInstance().reloadSymbolTable(outputPath);
-
+            SymbolTable symbolTable = SymbolTable.getInstance();
+            symbolTable.reloadSymbolTable(outputPath);
             syntaxAnalyzer.initGrammar();
+            symbolTable.checkDeclarations();
+            symbolTable.checkSentences();
+            symbolTable.generate();
+            infoDisplay.showSuccess();
+        } catch (CompilerException compilerException) {
+            infoDisplay.showCompilerException(compilerException);
+        } catch (IOException ioException) {
+            infoDisplay.showErrorWritingFile(ioException);
+        }
+    }
 
-            SymbolTable.getInstance().checkDeclarations();
-            SymbolTable.getInstance().checkSentences();
+    private static void startUntilStage2(SyntaxAnalyzer syntaxAnalyzer) {
+        try {
+            syntaxAnalyzer.initGrammar();
+            infoDisplay.showSuccess();
+        } catch (CompilerException compilerException) {
+            infoDisplay.showCompilerException(compilerException);
+        }
+    }
 
-            SymbolTable.getInstance().generate();
+    private static void startUntilStage3(SyntaxAnalyzer syntaxAnalyzer) {
+        try {
+            SymbolTable symbolTable = SymbolTable.getInstance();
+            symbolTable.reloadSymbolTable(null);
+            syntaxAnalyzer.initGrammar();
+            symbolTable.checkDeclarations();
+            infoDisplay.showSuccess();
+        } catch (CompilerException compilerException) {
+            infoDisplay.showCompilerException(compilerException);
+        } catch (IOException ioException) {
+            infoDisplay.showErrorWritingFile(ioException);
+        }
+    }
+
+    private static void startUntilStage4(SyntaxAnalyzer syntaxAnalyzer) {
+        try {
+            SymbolTable symbolTable = SymbolTable.getInstance();
+            symbolTable.reloadSymbolTable(null);
+            syntaxAnalyzer.initGrammar();
+            symbolTable.checkDeclarations();
+            symbolTable.checkSentences();
             infoDisplay.showSuccess();
         } catch (CompilerException compilerException) {
             infoDisplay.showCompilerException(compilerException);
@@ -86,5 +144,4 @@ public class Main {
         else
             infoDisplay.showSuccess();
     }
-
 }

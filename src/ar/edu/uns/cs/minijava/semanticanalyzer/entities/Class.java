@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer.entities;
 
+import ar.edu.uns.cs.minijava.Main;
 import ar.edu.uns.cs.minijava.ast.sentences.BlockSentenceNodeImpl;
 import ar.edu.uns.cs.minijava.codegenerator.CodeGeneratorException;
 import ar.edu.uns.cs.minijava.codegenerator.instructions.*;
@@ -136,11 +137,14 @@ public class Class extends Entity {
     }
 
     private void addVirtualTableLabels() throws CodeGeneratorException {
+        if (Main.UNTIL_STAGE_2 || Main.UNTIL_STAGE_3 || Main.UNTIL_STAGE_4) {
+            return;
+        }
+
         Instruction addVtInstruction;
 
         if(!virtualTable.isEmpty()){
             SymbolTable.getInstance().appendInstruction(new Instruction(CodeSection.DATA));
-
             DWDirective dw = new DWDirective(virtualTable.assignAndGetLabels());
             addVtInstruction = new Instruction(dw);
         } else {
@@ -167,7 +171,7 @@ public class Class extends Entity {
             } catch (EntityAlreadyExistsException unused) {
                 Method methodRedefined = this.methods.get(entry.getKey());
 
-                if(isMainMethod(methodRedefined)){
+                if (isMainMethod(methodRedefined) && !Main.UNTIL_STAGE_3) {
                     SymbolTable.getInstance().setMainMethod(this, methodRedefined);
                 }
 
@@ -211,7 +215,7 @@ public class Class extends Entity {
     }
 
     public void addMethod(String identifier, Method method) throws SemanticException {
-        if(isMainMethod(method)){
+        if (isMainMethod(method)) {
             SymbolTable.getInstance().setMainMethod(this, method);
         }
 

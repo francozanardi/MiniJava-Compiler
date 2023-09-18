@@ -1,5 +1,6 @@
 package ar.edu.uns.cs.minijava.semanticanalyzer.utils;
 
+import ar.edu.uns.cs.minijava.Main;
 import ar.edu.uns.cs.minijava.semanticanalyzer.entities.Entity;
 import ar.edu.uns.cs.minijava.semanticanalyzer.exceptions.EntityAlreadyExistsException;
 
@@ -10,9 +11,9 @@ public class EntityTable<K extends String, V extends Entity> extends HashMap<K, 
     public void putAndCheck(K key, V newEntity) throws EntityAlreadyExistsException {
         V entityFound = get(key);
 
-        if(entityFound == null){
+        if (entityFound == null) {
             super.put(key, newEntity);
-        } else {
+        } else if (!Main.UNTIL_STAGE_2) {
             throw new EntityAlreadyExistsException(newEntity.getIdentifierToken(), "La entidad " +
                     newEntity.getIdentifierToken().getLexema() +
                     " ya ha sido previamente declarada en la línea " +
